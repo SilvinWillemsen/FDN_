@@ -23,6 +23,9 @@ namespace Global
     static const double RTmin = 0.2;
     static const double RTmax = 15.0;
     
+    static const double dryGainInit = 0.55;
+    static const double initInputGain = 0.5;
+    
     // Make this dynamic!! (using 125*2^(n-3))
     static const std::vector<double> fc1 = { 31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 };
     static const double sliderCoeff = 0.6;

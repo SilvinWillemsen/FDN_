@@ -71,6 +71,8 @@ public:
     std::shared_ptr<FDN> getFDN() { return fdn; };    
     void setRecalculateFlag() { recalculateCoeffsFlag = true; };
     
+    void setDryGain (double val) { dryGain = val; };
+    void setInputGain (double val) { inputGain = val; };
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
@@ -88,13 +90,16 @@ private:
 //    AudioParameterFloat* RT16000;
     
     double fs;
+    float totInput;
     float output;
+    double inputGain = Global::initInputGain;
 	
     bool init = false;
     unsigned long t = 0;
     Random rand;
     
     bool recalculateCoeffsFlag = false;
+    double dryGain = Global::dryGainInit;
 
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)

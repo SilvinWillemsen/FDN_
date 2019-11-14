@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-               BuildableName = "FDN_.app"
-               BlueprintName = "FDN_ - Standalone Plugin"
+               BlueprintIdentifier = "6F0394DE86E2821BC1376E22"
+               BuildableName = "FDN_.component"
+               BlueprintName = "FDN_ - AU"
                ReferencedContainer = "container:FDN_.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,7 +42,7 @@
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -70,16 +70,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-            BuildableName = "FDN_.app"
-            BlueprintName = "FDN_ - Standalone Plugin"
+            BlueprintIdentifier = "6F0394DE86E2821BC1376E22"
+            BuildableName = "FDN_.component"
+            BlueprintName = "FDN_ - AU"
             ReferencedContainer = "container:FDN_.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

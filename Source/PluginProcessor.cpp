@@ -150,7 +150,7 @@ bool Fdn_AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
     ScopedNoDenormals noDenormals;
-//    const float* input = buffer.getReadPointer (0);
+    const float* input = buffer.getReadPointer (0);
     
     float* channelData = buffer.getWritePointer (0);
 //    float input = t < fs ? (rand.nextFloat() * 2.0 - 1) : 0;
@@ -161,10 +161,12 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         {
             init = true;
         }
-        output = fdn->calculate (init ? 1.0f : 0.0f);
+        totInput = (input[i] + (init ? 1.0 : 0.0)) * inputGain;
+        
+        output = fdn->calculate (totInput);
         init = false;
 //        for (int j = 0; j < channelData.size(); ++i)
-        channelData[i] = Global::limit (output, -1, 1);
+        channelData[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
 //        std::cout << channelData[i] << std::endl;
         ++t;
 //        if (t % fdn->getEQComb(0)->getDelayLineLength() == 0)

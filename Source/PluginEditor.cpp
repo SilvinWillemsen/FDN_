@@ -35,11 +35,24 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         
     }
     sliders.add (new Slider ("dryGain"));
-    sliders[sliders.size() - 1]->setRange (0.0f, 1.0f, 0.001f);
-    sliders[sliders.size() - 1]->setValue (0.55f);
+    sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
+    sliders[sliders.size() - 1]->setValue (Global::dryGainInit);
+    
+    sliders[sliders.size() - 1]->addListener (this);
     addAndMakeVisible (sliders[sliders.size() - 1]);
     
-    labels.add (new Label ("dryGain", "dryGain"));
+    labels.add (new Label ("dryGain", "Dry Gain"));
+    addAndMakeVisible (labels[labels.size() - 1]);
+    labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], true);
+    
+    sliders.add (new Slider ("inputGain"));
+    sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
+    sliders[sliders.size() - 1]->setValue (Global::initInputGain);
+    
+    sliders[sliders.size() - 1]->addListener (this);
+    addAndMakeVisible (sliders[sliders.size() - 1]);
+    
+    labels.add (new Label ("inputGain", "Input Gain"));
     addAndMakeVisible (labels[labels.size() - 1]);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], true);
     
@@ -76,7 +89,9 @@ void Fdn_AudioProcessorEditor::resized()
     calculateBtn->setBounds(totArea.removeFromBottom (Global::sliderHeight));
     totArea.removeFromLeft (120);
     sliders[sliders.size() - 1]->setBounds (totArea.removeFromTop (Global::sliderHeight));
-    for (int i = 0; i < sliders.size() - 1; ++i)
+    sliders[sliders.size() - 2]->setBounds (totArea.removeFromTop (Global::sliderHeight));
+    
+    for (int i = 0; i < sliders.size() - 2; ++i)
     {
         sliders[i]->setBounds (totArea.removeFromTop (Global::sliderHeight));
     }
@@ -85,7 +100,7 @@ void Fdn_AudioProcessorEditor::resized()
 
 void Fdn_AudioProcessorEditor::sliderDragStarted (Slider* slider)
 {
-    for (int i = 0; i < sliders.size() - 1; ++i)
+    for (int i = 0; i < sliders.size() - 2; ++i)
     {
         sliderValuesAtStartDrag[i] = sliders[i]->getValue();
         if (slider == sliders[i])
@@ -98,15 +113,25 @@ void Fdn_AudioProcessorEditor::sliderDragStarted (Slider* slider)
 
 void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
+    if (slider == sliders[sliders.size() - 2])
+    {
+        processor.setDryGain (slider->getValue());
+        return;
+    }
+    
+    if (slider == sliders[sliders.size() - 1])
+    {
+        processor.setInputGain (slider->getValue());
+        return;
+    }
+    
     if (curSlider == nullptr)
         return;
     
     processor.getFDN()->setRT (curSliderIdx, curSlider->getValue());
     
-    for (int j = 0; j < sliders.size() - 1; ++j)
+    for (int j = 0; j < sliders.size() - 2; ++j)
     {
-//        auto test = sliderValuesAtStartDrag[j] - pow(sliderCoeff, abs(j-curSliderIdx));
-//        std::cout << j << ": " << test << std::endl;
         if (curSliderIdx != j)
         {
             sliders[j]->setValue (sliderValuesAtStartDrag[j] + (curSlider->getValue() - sliderValuesAtStartDrag[curSliderIdx]) * pow(sliderCoeff, abs(j-curSliderIdx)));
