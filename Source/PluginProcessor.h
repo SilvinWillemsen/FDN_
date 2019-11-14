@@ -46,7 +46,7 @@ public:
 
 
     //==============================================================================
-    AudioProcessorEditor* createEditor() override { return new GenericAudioProcessorEditor(*this); }
+    AudioProcessorEditor* createEditor() override;
 	bool hasEditor() const override; //{ return true; };
 
     //==============================================================================
@@ -68,21 +68,24 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    std::shared_ptr<FDN> getFDN() { return fdn; };    
+    void setRecalculateFlag() { recalculateCoeffsFlag = true; };
+    
 private:
     //==============================================================================
-    std::unique_ptr<FDN> fdn;
-    
-    AudioParameterFloat* dryGain;
-	AudioParameterFloat* RT31;
-	AudioParameterFloat* RT63;
-	AudioParameterFloat* RT125;
-	AudioParameterFloat* RT250;
-	AudioParameterFloat* RT500;
-	AudioParameterFloat* RT1000;
-	AudioParameterFloat* RT2000;
-	AudioParameterFloat* RT4000;
-	AudioParameterFloat* RT8000;
-	AudioParameterFloat* RT16000;
+    std::shared_ptr<FDN> fdn;
+//
+//    AudioParameterFloat* dryGain;
+//    AudioParameterFloat* RT31;
+//    AudioParameterFloat* RT63;
+//    AudioParameterFloat* RT125;
+//    AudioParameterFloat* RT250;
+//    AudioParameterFloat* RT500;
+//    AudioParameterFloat* RT1000;
+//    AudioParameterFloat* RT2000;
+//    AudioParameterFloat* RT4000;
+//    AudioParameterFloat* RT8000;
+//    AudioParameterFloat* RT16000;
     
     double fs;
     float output;
@@ -90,6 +93,8 @@ private:
     bool init = false;
     unsigned long t = 0;
     Random rand;
+    
+    bool recalculateCoeffsFlag = false;
 
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)

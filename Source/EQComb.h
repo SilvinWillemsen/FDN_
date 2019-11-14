@@ -26,29 +26,38 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
-    void setFilter (int i, std::vector<float> coeffs) { eqFilters[i]->setCoeffs (coeffs); };
+    void setFilter (int i, std::vector<double> coeffs) { eqFilters[i]->setCoeffs (coeffs); };
     
     float filter (float x);
     
     void increment() { readLoc = (readLoc + 1) % delayLine.size(); writeLoc = (writeLoc + 1) % delayLine.size(); };
     
     EQFilter* getFilter (int idx) { return eqFilters[idx]; };
-    int getDelayLineLength() { return delayLine.size(); };
+    int getDelayLineLength() { return static_cast<int> (delayLine.size()); };
     
     void debug() { debugFlag = true; };
     
     void addScatOutput (float val) { delayLine[writeLoc] += val; };
     void zeroWritePointer() { delayLine[writeLoc] = 0; };
+    
+    void zeroCoefficients() {
+        for (auto filter : eqFilters)
+            filter->zeroCoefficients();
+        
+        for (int i = 0; i < delayLine.size(); ++i)
+            delayLine[i] = 0;
+    };
 private:
     
     OwnedArray<EQFilter> eqFilters;
-    std::vector<float> delayLine;
+    std::vector<double> delayLine;
     
     int readLoc = 1;
     int writeLoc = 0;
-    float y;
     
     bool debugFlag = false;
+    
+    double y;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQComb)
 };

@@ -24,23 +24,25 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    void setCoeffs (std::vector<float> coeffs);
-    std::vector<float> getNums() { return nums; };
-    std::vector<float> getDens() { return dens; };
+    void setCoeffs (std::vector<double> coeffs);
+    std::vector<double> getNums() { return nums; };
+    std::vector<double> getDens() { return dens; };
     
-    float filter (float x);
+    double filter (double x);
+    
+    void zeroCoefficients() { yn = 0; ynMin1 = 0; ynMin2 = 0; xn = 0; xnMin1 = 0; xnMin2 = 0; };
     
 private:
-    std::vector<float> nums;
-    std::vector<float> dens;
+    std::vector<double> nums;
+    std::vector<double> dens;
     
-    float yn = 0;
-    float ynMin1 = 0;
-    float ynMin2 = 0;
+    double yn = 0;
+    double ynMin1 = 0;
+    double ynMin2 = 0;
     
-    float xn = 0;
-    float xnMin1 = 0;
-    float xnMin2 = 0;
+    double xn = 0;
+    double xnMin1 = 0;
+    double xnMin2 = 0;
     
     
 //    float* yn;
@@ -50,13 +52,13 @@ private:
 //    float* xn;
 //    float* xnMin1;
 //    float* xnMin2;
+//
+//    float* dummyPtrY;
+//    float* dummyPtrX;
     
-    float* dummyPtrY;
-    float* dummyPtrX;
+//    float output;
     
-    float output;
-    
-    std::vector<float> yVec;
-    std::vector<float> xVec;
+//    std::vector<float> yVec;
+//    std::vector<float> xVec;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQFilter)
 };

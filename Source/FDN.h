@@ -30,29 +30,58 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    float calculate (float input);
+    double calculate (double input);
     void initialise (double sampleRate);
+    void recalculateCoeffs (bool init = false);
     
-    std::vector<float> pareq (float G, float GB, float w0, float bw);//, float num[], float den[])
-    void interactionMatrix (float* G, float gw, float* wg, float* wc, float* bw, std::vector<std::vector<float>>& leak);
-    void aceq (std::vector<float> Gdb, std::vector<std::vector<float>>& numsopt, std::vector<std::vector<float>>& densopt);
-    void getAttenuation (std::vector<float> RT, std::vector<int>& dLen, std::vector<std::vector<float>>& gainDB);
+    std::vector<double> pareq (double G, double GB, double w0, double bw);//, double num[], double den[])
+    void interactionMatrix (double* G, double gw, double* wg, double* wc, double* bw, std::vector<std::vector<double>>& leak);
+    void aceq (int idx);
+    void getAttenuation();
     
     EQComb* getEQComb (int idx) { return eqCombs[idx]; };
     
     // Debug print
-    void debugPrint (std::vector<std::vector<float>>& vect);
+    void debugPrint (std::vector<std::vector<double>>& vect);
+    
+    // Set the reverb time
+    void setRT (int i, double val) { RT[i] = val; };
 
+    // makes sure that the states of the filters and the delay lines are reset
+    void zeroCoefficients() { for (auto eqComb : eqCombs) { eqComb->zeroCoefficients(); }};
+    
 private:
     OwnedArray<EQComb> eqCombs;
-    std::vector<float> b;
-    std::vector<float> c;
-    float d = 0.5;
+    std::vector<double> b;
+    std::vector<double> c;
+    double d = 0.5;
     
-    float output;
+    double output;
     
     double fs;
     
-    std::vector<std::vector<float>> A;
+    std::vector<std::vector<double>> A;
+    std::vector<double> RT; // reverbTime
+    
+    // variables pre-initialised
+    std::vector<std::vector<double>> gainDB;
+    std::vector<std::vector<double>> numsOpt;
+    std::vector<std::vector<double>> densOpt;
+    
+    std::vector<double> dLen;
+    
+    // Center frequencies
+    std::vector<double> fc2 = { 31, 44.2, 63.0, 88.7, 125, 176.8, 250, 353.6, 500, 707.1, 1000, 1414.2, 2000, 2828.4, 4000, 5656.9, 8000, 11313.7, 16000 };
+    
+    std::vector<double> Goptdb;
+    std::vector<double> Gopt;
+    std::vector<double> G2optdb;
+    std::vector<double> G2opt;
+    std::vector<double> G2woptdb;
+    std::vector<double> G2wopt;
+    
+    std::vector<std::vector<double>> leak;
+    std::vector<std::vector<double>> leak2;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };

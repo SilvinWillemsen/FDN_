@@ -9,11 +9,11 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "PluginProcessor.h"
+//#include "PluginProcessor.h"
 
-/*#include "PluginProcessor.h"
+#include "PluginProcessor.h"
 #include "PluginEditor.h"
-*/
+
 //==============================================================================
 Fdn_AudioProcessor::Fdn_AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -27,19 +27,19 @@ Fdn_AudioProcessor::Fdn_AudioProcessor()
                        )
 #endif
 {
-    fdn = std::make_unique<FDN> ();
+    fdn = std::make_shared<FDN> ();
     
-    addParameter (dryGain = new AudioParameterFloat("dryGain", "Dry Gain", 0.0f, 1.0f, 0.55f));
-    addParameter (RT31 = new AudioParameterFloat("RT31", "T60 for 31.5 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT63 = new AudioParameterFloat("RT63", "T60 for 63 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT125 = new AudioParameterFloat("RT125", "T60 for 125 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT250 = new AudioParameterFloat("RT250", "T60 for 250 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT500 = new AudioParameterFloat("RT500", "T60 for 500 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT1000 = new AudioParameterFloat("RT1000", "T60 for 1000 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT2000 = new AudioParameterFloat("RT2000", "T60 for 2000 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT4000 = new AudioParameterFloat("RT4000", "T60 for 4000 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT8000 = new AudioParameterFloat("RT8000", "T60 for 8000 Hz", 0.2f, 10.0f, 1.0f));
-    addParameter (RT16000 = new AudioParameterFloat("RT16000", "T60 for 16000 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (dryGain = new AudioParameterFloat("dryGain", "Dry Gain", 0.0f, 1.0f, 0.55f));
+//    addParameter (RT31 = new AudioParameterFloat("RT31", "T60 for 31.5 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT63 = new AudioParameterFloat("RT63", "T60 for 63 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT125 = new AudioParameterFloat("RT125", "T60 for 125 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT250 = new AudioParameterFloat("RT250", "T60 for 250 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT500 = new AudioParameterFloat("RT500", "T60 for 500 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT1000 = new AudioParameterFloat("RT1000", "T60 for 1000 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT2000 = new AudioParameterFloat("RT2000", "T60 for 2000 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT4000 = new AudioParameterFloat("RT4000", "T60 for 4000 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT8000 = new AudioParameterFloat("RT8000", "T60 for 8000 Hz", 0.2f, 10.0f, 1.0f));
+//    addParameter (RT16000 = new AudioParameterFloat("RT16000", "T60 for 16000 Hz", 0.2f, 10.0f, 1.0f));
 }
 
 Fdn_AudioProcessor::~Fdn_AudioProcessor()
@@ -157,7 +157,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     
     for (int i = 0; i < buffer.getNumSamples(); ++i)
     {
-        if (t == fs)
+        if (t == 0)
         {
             init = true;
         }
@@ -165,26 +165,39 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         init = false;
 //        for (int j = 0; j < channelData.size(); ++i)
         channelData[i] = Global::limit (output, -1, 1);
+//        std::cout << channelData[i] << std::endl;
         ++t;
 //        if (t % fdn->getEQComb(0)->getDelayLineLength() == 0)
 //        {
 //            std::cout << "wait" << std::endl;
 //        }
     }
+    fdn->recalculateCoeffs();
+    if (recalculateCoeffsFlag == true)
+    {
+        fdn->zeroCoefficients();
+        recalculateCoeffsFlag = false;
+        t = 0;
+    }
 
 }
+
+//AudioProcessorEditor* Fdn_AudioProcessor::createEditor()
+//{
+//    return new Fdn_AudioProcessorEditor (*this);
+//}
 
 //==============================================================================
 bool Fdn_AudioProcessor::hasEditor() const
 {
-    return false; // (change this to false if you choose to not supply an editor)
+    return true; // (change this to false if you choose to not supply an editor)
 }
 
-/*AudioProcessorEditor* Fdn_AudioProcessor::createEditor()
+AudioProcessorEditor* Fdn_AudioProcessor::createEditor()
 {
     return new Fdn_AudioProcessorEditor (*this);
 }
-*/
+
 //==============================================================================
 void Fdn_AudioProcessor::getStateInformation (MemoryBlock& destData)
 {

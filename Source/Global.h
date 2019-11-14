@@ -19,9 +19,13 @@ namespace Global
     
     static const int numDesignFreqs = numOctaveBands * 2 - 1;
 
-    static const float RT = 10.0;
+    static const double RT = 0.4;
+    static const double RTmin = 0.2;
+    static const double RTmax = 15.0;
     
-    static const std::vector<float> fc1 = { 31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 };
+    // Make this dynamic!! (using 125*2^(n-3))
+    static const std::vector<double> fc1 = { 31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 };
+    static const double sliderCoeff = 0.6;
     
     static double limit (double val, double min, double max)
     {
@@ -37,4 +41,7 @@ namespace Global
         }
         return val;
     }
+    
+    // GUI
+    static const int sliderHeight = 40;
 }

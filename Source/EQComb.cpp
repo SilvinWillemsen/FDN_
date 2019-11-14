@@ -65,7 +65,7 @@ float EQComb::filter (float x)
     float out;
 //    if (y != 0)
 //        std::cout << "one moment" << std::endl;
-    for (int i = 0; i < Global::numOctaveBands; ++i)
+    for (int i = 0; i < Global::numOctaveBands + 1; ++i)
     {
         y = eqFilters[i]->filter (y);
         
