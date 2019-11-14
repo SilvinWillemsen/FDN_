@@ -149,11 +149,12 @@ bool Fdn_AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
+    const int totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    float* const channeldataL = buffer.getWritePointer(0);
+    float* const channeldataR = getTotalNumInputChannels() > 1 ? buffer.getWritePointer(1) : nullptr;
     ScopedNoDenormals noDenormals;
     const float* input = buffer.getReadPointer (0);
-    
-    float* channelData = buffer.getWritePointer (0);
-//    float input = t < fs ? (rand.nextFloat() * 2.0 - 1) : 0;
     
     for (int i = 0; i < buffer.getNumSamples(); ++i)
     {
@@ -162,11 +163,12 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
             init = true;
         }
         totInput = (input[i] + (init ? 1.0 : 0.0)) * inputGain;
-        
+    
         output = fdn->calculate (totInput);
         init = false;
-//        for (int j = 0; j < channelData.size(); ++i)
-        channelData[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
+        channeldataL[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
+        if (channeldataR != nullptr)
+            channeldataR[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
 //        std::cout << channelData[i] << std::endl;
         ++t;
 //        if (t % fdn->getEQComb(0)->getDelayLineLength() == 0)
