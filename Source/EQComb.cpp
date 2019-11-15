@@ -77,3 +77,12 @@ float EQComb::filter (float x)
     }
     return y;
 }
+
+void EQComb::zeroCoefficients()
+{
+    for (auto filter : eqFilters)
+        filter->zeroCoefficients();
+    
+    for (int i = 0; i < delayLine.size(); ++i)
+        delayLine[i] = 0;
+}

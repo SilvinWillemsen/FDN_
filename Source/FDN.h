@@ -35,7 +35,7 @@ public:
     void recalculateCoeffs (bool init = false);
     
     std::vector<double> pareq (double G, double GB, double w0, double bw);//, double num[], double den[])
-    void interactionMatrix (double* G, double gw, double* wg, double* wc, double* bw, std::vector<std::vector<double>>& leak);
+    void interactionMatrix (double* G, double gw, double* wg, double* wc, double* bw);
     void aceq (int idx);
     void getAttenuation();
     
@@ -49,6 +49,11 @@ public:
 
     // makes sure that the states of the filters and the delay lines are reset
     void zeroCoefficients() { for (auto eqComb : eqCombs) { eqComb->zeroCoefficients(); }};
+    
+    std::vector<double> getCoefficients (int combIdx, int filterIdx) // filterIdx should be all coefficients
+    {
+        return eqCombs[combIdx]->getCoefficientsOfFilter (filterIdx);
+    }
     
 private:
     OwnedArray<EQComb> eqCombs;

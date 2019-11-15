@@ -40,13 +40,9 @@ public:
     void addScatOutput (float val) { delayLine[writeLoc] += val; };
     void zeroWritePointer() { delayLine[writeLoc] = 0; };
     
-    void zeroCoefficients() {
-        for (auto filter : eqFilters)
-            filter->zeroCoefficients();
-        
-        for (int i = 0; i < delayLine.size(); ++i)
-            delayLine[i] = 0;
-    };
+    void zeroCoefficients();
+    
+    std::vector<double> getCoefficientsOfFilter (int filterIdx) { return eqFilters[filterIdx]->getCoefficients(); }
 private:
     
     OwnedArray<EQFilter> eqFilters;

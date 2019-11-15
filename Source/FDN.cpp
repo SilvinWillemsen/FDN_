@@ -18,6 +18,7 @@ FDN::FDN()
     b.resize (Global::FDNorder, 1.0);
     c.resize (Global::FDNorder, 1.0);
     
+    // initialise scattering matrix
     std::vector<std::vector<double>> tmpMatrix (4, std::vector<double> (4, -1));
     for (int i = 0; i < 4; ++i)
         tmpMatrix[i][i] = 1;
@@ -130,25 +131,25 @@ void FDN::initialise (double sampleRate)
 
     recalculateCoeffs (true);
     
-//    std::vector<double> vals;
-//    
-//    for (int i = 0; i < Global::FDNorder; ++i)
-//    {
-//        for (int j = 0; j < Global::numOctaveBands + 1; ++j)
-//        {
-//            std::cout << "Comb filter " << i+1 << ", octaveband " << j+1 << " Numerators: ";
-//            vals = eqCombs[i]->getFilter(j)->getNums();
-//            for (int k = 0; k < 3; ++k)
-//                std::cout << vals[k] << " ";
-//            std::cout << std::endl << "Denominators: ";
-//            vals = eqCombs[i]->getFilter(j)->getDens();
-//            for (int k = 0; k < 3; ++k)
-//                std::cout << vals[k] << " ";
-//            
-//            std::cout << std::endl;
-//        }
-//    }
-//    std::cout << "YAY" << std::endl;
+    std::vector<double> vals;
+    
+    for (int i = 0; i < Global::FDNorder; ++i)
+    {
+        for (int j = 0; j < Global::numOctaveBands + 1; ++j)
+        {
+            std::cout << "Comb filter " << i+1 << ", octaveband " << j+1 << " Numerators: ";
+            vals = eqCombs[i]->getFilter(j)->getNums();
+            for (int k = 0; k < 3; ++k)
+                std::cout << vals[k] << " ";
+            std::cout << std::endl << "Denominators: ";
+            vals = eqCombs[i]->getFilter(j)->getDens();
+            for (int k = 0; k < 3; ++k)
+                std::cout << vals[k] << " ";
+            
+            std::cout << std::endl;
+        }
+    }
+    std::cout << "YAY" << std::endl;
 }
 
 void FDN::recalculateCoeffs (bool init)
@@ -200,7 +201,7 @@ std::vector<double> FDN::pareq (double G, double GB, double w0, double bw)
     return std::vector<double> {num1, num2, num3, den1, den2, den3};
 }
 
-void FDN::interactionMatrix (double* G, double gw, double *wg, double *wc, double *bw, std::vector<std::vector<double>>& leak)
+void FDN::interactionMatrix (double* G, double gw, double *wg, double *wc, double *bw)
 {
     std::vector<std::complex<double>> dummyVect (Global::numOctaveBands, 0);
     //leak = zeros(M, N);// Initialize interaction matrix
@@ -276,7 +277,7 @@ void FDN::aceq (int idx)
     
     const double c = pow(10, 17.0 / 20.0);
     std::vector<double> inG (Global::numOctaveBands, c);
-    interactionMatrix (&inG[0], gw, &wg[0], &wc[0], &bw[0], leak); //Estimate leakage b / w bands
+    interactionMatrix (&inG[0], gw, &wg[0], &wc[0], &bw[0]); //Estimate leakage b / w bands
     
     std::vector<double> Gdb2 (Global::numDesignFreqs, 0);
     
@@ -306,7 +307,7 @@ void FDN::aceq (int idx)
         Gopt[k] = pow(10, Goptdb[k] / 20.0); // Convert to linear gain factors
     
     // (Second interaction matrix) Iterate once
-    interactionMatrix (&Gopt[0], gw, &wg[0], &wc[0], &bw[0], leak2); // Use previous gains
+    interactionMatrix (&Gopt[0], gw, &wg[0], &wc[0], &bw[0]); // Use previous gains
     
     Eigen::MatrixXd leakMat2 (Global::numDesignFreqs, Global::numOctaveBands);
     // transpose matrix

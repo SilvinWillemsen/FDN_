@@ -32,6 +32,10 @@ public:
     
     void zeroCoefficients() { yn = 0; ynMin1 = 0; ynMin2 = 0; xn = 0; xnMin1 = 0; xnMin2 = 0; };
     
+    std::vector<double> getCoefficients() {
+        return std::vector<double> {nums[0], nums[1], nums[2], dens[0], dens[1], dens[2]};
+    };
+    
 private:
     std::vector<double> nums;
     std::vector<double> dens;

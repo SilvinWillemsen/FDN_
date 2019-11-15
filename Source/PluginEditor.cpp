@@ -63,11 +63,19 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     calculateBtn = std::make_unique<TextButton> ("Calculate");
     calculateBtn->addListener (this);
     addAndMakeVisible (calculateBtn.get());
-    setSize (400, height);
+    
+    response = std::make_unique<Response> (processor.getSampleRate());
+    addAndMakeVisible (response.get());
+//    double R = 0.99;
+//    response->setCoefficients ({1, 0, 0, 1, -2.0 * R * cos(double_Pi * 1000.0 / 22050.0), R * R});
+//    response->setCoefficients ({0.5, 0.5, 0, 1, 0, 0});
+    startTimerHz (15);
+    setSize (800, height);
 }
 
 Fdn_AudioProcessorEditor::~Fdn_AudioProcessorEditor()
 {
+    stopTimer();
 }
 
 //==============================================================================
@@ -75,10 +83,16 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-
-//    g.setColour (Colours::white);
-//    g.setFont (15.0f);
-//    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
+    
+    response->setDataToZero();
+    for (int i = 0; i < Global::numOctaveBands + 1; ++i)
+    {
+        std::vector<double> coeffs = processor.getFDN()->getCoefficients (0, i);
+//        std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
+        response->calculateResponse (coeffs);
+    }
+    response->linearGainToDB();
+    
 }
 
 void Fdn_AudioProcessorEditor::resized()
@@ -86,7 +100,9 @@ void Fdn_AudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     Rectangle<int> totArea = getLocalBounds();
-    calculateBtn->setBounds(totArea.removeFromBottom (Global::sliderHeight));
+    
+    response->setBounds (totArea.removeFromRight (getWidth() * 0.5));
+    calculateBtn->setBounds (totArea.removeFromBottom (Global::sliderHeight));
     totArea.removeFromLeft (120);
     sliders[sliders.size() - 1]->setBounds (totArea.removeFromTop (Global::sliderHeight));
     sliders[sliders.size() - 2]->setBounds (totArea.removeFromTop (Global::sliderHeight));
@@ -95,6 +111,7 @@ void Fdn_AudioProcessorEditor::resized()
     {
         sliders[i]->setBounds (totArea.removeFromTop (Global::sliderHeight));
     }
+    
     
 }
 
@@ -130,12 +147,15 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
     
     processor.getFDN()->setRT (curSliderIdx, curSlider->getValue());
     
-    for (int j = 0; j < sliders.size() - 2; ++j)
+    if (Global::sliderDependency)
     {
-        if (curSliderIdx != j)
+        for (int j = 0; j < sliders.size() - 2; ++j)
         {
-            sliders[j]->setValue (sliderValuesAtStartDrag[j] + (curSlider->getValue() - sliderValuesAtStartDrag[curSliderIdx]) * pow(sliderCoeff, abs(j-curSliderIdx)));
-            processor.getFDN()->setRT (j, sliders[j]->getValue());
+            if (curSliderIdx != j)
+            {
+                sliders[j]->setValue (sliderValuesAtStartDrag[j] + (curSlider->getValue() - sliderValuesAtStartDrag[curSliderIdx]) * pow(sliderCoeff, abs(j-curSliderIdx)));
+                processor.getFDN()->setRT (j, sliders[j]->getValue());
+            }
         }
     }
 }
@@ -146,4 +166,9 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
     {
         processor.setRecalculateFlag();
     }
+}
+
+void Fdn_AudioProcessorEditor::timerCallback()
+{
+    repaint();
 }

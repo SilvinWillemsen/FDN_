@@ -4,6 +4,8 @@
               pluginFormats="buildAU,buildStandalone">
   <MAINGROUP id="SOc3ba" name="FDN_">
     <GROUP id="{6620E8CE-0269-4766-9F48-378FA259DA6A}" name="Source">
+      <FILE id="O2QIDh" name="Response.cpp" compile="1" resource="0" file="Source/Response.cpp"/>
+      <FILE id="ywqClq" name="Response.h" compile="0" resource="0" file="Source/Response.h"/>
       <FILE id="rzWsBR" name="Global.h" compile="0" resource="0" file="Source/Global.h"/>
       <FILE id="UsAvXQ" name="EQFilter.cpp" compile="1" resource="0" file="Source/EQFilter.cpp"/>
       <FILE id="jnWzX5" name="EQFilter.h" compile="0" resource="0" file="Source/EQFilter.h"/>

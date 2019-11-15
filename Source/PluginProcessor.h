@@ -73,6 +73,7 @@ public:
     
     void setDryGain (double val) { dryGain = val; };
     void setInputGain (double val) { inputGain = val; };
+    
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;

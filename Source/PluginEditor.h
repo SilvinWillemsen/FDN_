@@ -11,13 +11,15 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Response.h"
 
 //==============================================================================
 /**
 */
 class Fdn_AudioProcessorEditor  : public AudioProcessorEditor,
                                   public Slider::Listener,
-                                  public Button::Listener
+                                  public Button::Listener,
+                                  public Timer
 {
 public:
     Fdn_AudioProcessorEditor (Fdn_AudioProcessor&);
@@ -31,11 +33,15 @@ public:
     void sliderDragStarted (Slider* slider) override;
     
     void buttonClicked (Button* button) override;
+    
+    void timerCallback() override;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     Fdn_AudioProcessor& processor;
+    std::unique_ptr<Response> response;
+    
     OwnedArray<Slider> sliders;
     OwnedArray<Label> labels;
     std::unique_ptr<TextButton> calculateBtn;
