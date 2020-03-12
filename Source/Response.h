@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Global.h"
+#include "FDN.h"
 #include <valarray>
 #include <complex>
 //==============================================================================
@@ -36,15 +37,20 @@ public:
         }
     }
     void calculateResponse (std::vector<double> coefficients);
-    
+	void Response::calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT);
     void linearGainToDB();
+
     
 private:
-    int fftOrder = 4096;
+    int fftOrder = 4000;
     double fs;
+	std::vector<double> dLen;
+	std::vector<std::vector<double>> gainDB;
     
     std::vector<std::complex<double>> linearData;
     std::vector<double> dBData;
+	std::vector<double> RTData;
+	std::vector<double> targetRT;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

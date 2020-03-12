@@ -18,6 +18,8 @@ Response::Response (double fs) : fs (fs)
     // initialise any special settings that your component needs.
     linearData.resize (fftOrder, 0);
     dBData.resize (fftOrder, 0);
+	RTData.resize(fftOrder, 0);
+	targetRT.resize(fftOrder, 0);
 }
 
 Response::~Response()
@@ -26,14 +28,7 @@ Response::~Response()
 
 void Response::paint (Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (Colours::white);   // clear the background
+       g.fillAll (Colours::white);   // clear the background
     g.strokePath (generateResponsePath(), PathStrokeType(2.0f));
     g.setColour (Colours::lightgrey);
     g.drawLine (0, getHeight() * 0.5, getWidth(), getHeight() * 0.5, 1.0);
@@ -43,15 +38,19 @@ Path Response::generateResponsePath()
 {
     auto zeroDbHeight = getHeight() * 0.5;
     Path response;
-    double visualScaling = 10;
-    response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
+	double visualScaling = 1;// 10;
+    //response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
+	response.startNewSubPath(0, -RTData[0] * visualScaling + zeroDbHeight); // draw RT instead od filter magnitude
    
     auto spacing = getWidth() / static_cast<double> (fftOrder);
     auto x = spacing;
     float newY;
+	float newYY;
     for (int y = 0; y < fftOrder; y++)
     {
-        newY = -dBData[y] * visualScaling + zeroDbHeight;
+        //newY = -dBData[y] * visualScaling + zeroDbHeight;
+		newY = -RTData[y] * visualScaling + zeroDbHeight;// draw RT instead od filter magnitude
+		
         response.lineTo(x, newY);
         x += spacing;
     }
@@ -83,8 +82,28 @@ void Response::calculateResponse (std::vector<double> coefficients)
     }
 }
 
+//void Response::calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT)
+//{
+//	double delta;
+//	double vecLen = fftOrder / 10.0f;
+//	std::vector<double> linVec;
+//
+//	for (int i = 0; i < 9; ++i)
+//	{
+//		delta = (RT[i+1] - RT[i]) / vecLen;
+//		for (int j = 0; j < vecLen; ++j)
+//			linVec.push_back(RT[i] + j * delta);
+//	}
+//}
+
+
 void Response::linearGainToDB()
 {
-    for (int i = 0; i < fftOrder; ++i)
-        dBData[i] = Global::limit (20.0 * log10 (abs(linearData[i])), -60.0, 10.0);
+	for (int i = 0; i < fftOrder; ++i) {
+		dBData[i] = Global::limit(20.0 * log10(abs(linearData[i])), -60.0, 10.0);
+		
+		RTData[i] = -60.0  / (dBData[i]); // calculate RT - this should be -60*dLen/RT*fs
+
+	}
+        
 }

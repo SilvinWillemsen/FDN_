@@ -38,6 +38,7 @@ public:
     void interactionMatrix (double* G, double gw, double* wg, double* wc, double* bw);
     void aceq (int idx);
     void getAttenuation();
+	void getDelayLines();
     
     EQComb* getEQComb (int idx) { return eqCombs[idx]; };
     

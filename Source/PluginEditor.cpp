@@ -85,11 +85,14 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     
     response->setDataToZero();
+	
     for (int i = 0; i < Global::numOctaveBands + 1; ++i)
     {
         std::vector<double> coeffs = processor.getFDN()->getCoefficients (0, i);
+	
 //        std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
         response->calculateResponse (coeffs);
+		
     }
     response->linearGainToDB();
     
@@ -103,7 +106,7 @@ void Fdn_AudioProcessorEditor::resized()
     
     response->setBounds (totArea.removeFromRight (getWidth() * 0.5));
     calculateBtn->setBounds (totArea.removeFromBottom (Global::sliderHeight));
-    totArea.removeFromLeft (120);
+    totArea.removeFromLeft (100);
     sliders[sliders.size() - 1]->setBounds (totArea.removeFromTop (Global::sliderHeight));
     sliders[sliders.size() - 2]->setBounds (totArea.removeFromTop (Global::sliderHeight));
     

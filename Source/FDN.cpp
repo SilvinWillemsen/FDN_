@@ -22,7 +22,9 @@ FDN::FDN()
     std::vector<std::vector<double>> tmpMatrix (4, std::vector<double> (4, -1));
     for (int i = 0; i < 4; ++i)
         tmpMatrix[i][i] = 1;
+		
     
+	
     A.resize (Global::FDNorder, std::vector<double> (Global::FDNorder, 0));
     for (int i = 0; i < Global::FDNorder; ++i)
     {
@@ -32,7 +34,7 @@ FDN::FDN()
                 A[i][j] = 0.25 * tmpMatrix[i % 4][j % 4];
             else
                 A[i][j] = -0.25 * tmpMatrix[i % 4][j % 4];
-//            std::cout << A[i][j] << " ";
+         std::cout << A[i][j] << " ";
 //            if (j % 4 == 3)
 //                std::cout << "   ";
         }
@@ -40,6 +42,24 @@ FDN::FDN()
 //        if (i % 4 == 3)
 //            std::cout << std::endl;
     }
+
+	// Hadamard matrix - we can enable choosing between the two
+	//A[0][0] = 1.0f;
+	//double scaleFactor = 1 / sqrt(Global::FDNorder);
+	//for (int n = 1; n < Global::FDNorder; n += n) 
+	//{
+	//	for (int i = 0; i < n; ++i)
+	//	{
+	//		for (int j = 0; j < n; ++j)
+	//		{
+	//			A[i + n][j] = A[i][j] * scaleFactor;
+	//			A[i][j + n] = A[i][j] * scaleFactor;
+	//			A[i + n][j + n] = - A[i][j] * scaleFactor;
+	//		}
+	//	}
+	//}
+
+
 }
 
 FDN::~FDN()
@@ -48,12 +68,7 @@ FDN::~FDN()
 
 void FDN::paint (Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
+    
 
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
 
@@ -128,6 +143,7 @@ void FDN::initialise (double sampleRate)
     leak2.resize (Global::numOctaveBands, std::vector<double> (Global::numDesignFreqs, 0));
     
     dLen.resize (Global::FDNorder, 0);
+	getDelayLines(); // DO NOT recalculate delay lines each time
 
     recalculateCoeffs (true);
     
@@ -154,7 +170,7 @@ void FDN::initialise (double sampleRate)
 
 void FDN::recalculateCoeffs (bool init)
 {
-//    zeroCoefficients(); // makes sure that the states of the filters and the delay lines are reset
+//    zeroCoefficients(); // makes sure that the states of the filters are and delay lines reset 
     getAttenuation();
     
     if (init)
@@ -346,7 +362,7 @@ void FDN::aceq (int idx)
     }
     
     // High Shelving filter
-    double GHdb = gainDB[idx][Global::numOctaveBands - 1] - G0;// min(gDB);
+	double GHdb = gainDB[idx][Global::numOctaveBands - 1];// -G0;// min(gDB); There should be no "-G0" here
     double fH = 20200.f; // 20200;
     double GH = pow(10, GHdb / 20.0); // linear gain
     double wH = 2.0 * double_Pi * fH / fs; // frequency in[rad]
@@ -365,15 +381,18 @@ void FDN::aceq (int idx)
     
 }
 
+void FDN::getDelayLines()
+{
+	Random rand;
+	// make a random-length delay line
+	for (int i = 0; i < Global::FDNorder; ++i)
+		dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+
+}
 
 void FDN::getAttenuation()
 {
-    // make a random-length delay line
-    Random rand;
-    
-    for (int i = 0; i < Global::FDNorder; ++i)
-        dLen[i] = round (Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
-    
+       
     // get attenuation depending on length of the delay line
     for (int k = 0; k < Global::FDNorder; k++)
     {
