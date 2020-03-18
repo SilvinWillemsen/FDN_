@@ -37,7 +37,7 @@ public:
         }
     }
     void calculateResponse (std::vector<double> coefficients);
-	void Response::calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT);
+	void calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT);
     void linearGainToDB();
 
     

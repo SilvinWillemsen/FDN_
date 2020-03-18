@@ -331,7 +331,7 @@ void FDN::aceq (int idx)
     // transpose matrix
     for (int i = 0; i < Global::numOctaveBands; i++)
         for (int j = 0; j < Global::numDesignFreqs; j++)
-            leakMat2(j, i) = leak2[i][j];
+            leakMat2(j, i) = leak[i][j];
     
     // Linear least squares
     Eigen::VectorXd G2optdbVect;
