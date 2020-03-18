@@ -15,6 +15,8 @@
 FDN::FDN()
 {
     RT.resize (Global::numOctaveBands, Global::RT);
+	
+
     b.resize (Global::FDNorder, 1.0);
     c.resize (Global::FDNorder, 1.0);
     
@@ -34,7 +36,7 @@ FDN::FDN()
                 A[i][j] = 0.25 * tmpMatrix[i % 4][j % 4];
             else
                 A[i][j] = -0.25 * tmpMatrix[i % 4][j % 4];
-         std::cout << A[i][j] << " ";
+//		      std::cout << A[i][j] << " ";
 //            if (j % 4 == 3)
 //                std::cout << "   ";
         }
@@ -264,7 +266,7 @@ void FDN::interactionMatrix (double* G, double gw, double *wg, double *wc, doubl
 void FDN::aceq (int idx)
 {
     int halfOctaveBands = floor (Global::numOctaveBands * 0.5);
-    double G0 = (gainDB[idx][halfOctaveBands] + gainDB[idx][halfOctaveBands + 1]) * 0.5;
+	double G0 = (gainDB[idx][halfOctaveBands] + gainDB[idx][halfOctaveBands + 1]) * 0.5;
     
     for (int i = 0; i < Global::numOctaveBands; i++)
         gainDB[idx][i] = -G0 + gainDB[idx][i];
@@ -288,10 +290,10 @@ void FDN::aceq (int idx)
     {
         bw[Global::numOctaveBands - 3] = 0.93 * bw[Global::numOctaveBands - 3];
         bw[Global::numOctaveBands - 2] = 0.78 * bw[Global::numOctaveBands - 2];
-        bw[Global::numOctaveBands - 1] = 0.76 * bw[Global::numOctaveBands - 1]; // Additional adjustmenst due to asymmetry
+        bw[Global::numOctaveBands - 1] = 0.76 * wg[Global::numOctaveBands - 1]; // Additional adjustmenst due to asymmetry
     }
     
-    const double c = pow(10, 17.0 / 20.0);
+    const double c = pow(10, 19.0 / 20.0);
     std::vector<double> inG (Global::numOctaveBands, c);
     interactionMatrix (&inG[0], gw, &wg[0], &wc[0], &bw[0]); //Estimate leakage b / w bands
     
@@ -362,7 +364,7 @@ void FDN::aceq (int idx)
     }
     
     // High Shelving filter
-	double GHdb = gainDB[idx][Global::numOctaveBands - 1];// -G0;// min(gDB); There should be no "-G0" here
+	double GHdb = gainDB[idx][Global::numOctaveBands - 1];// min(gDB); There should be no "-G0" here
     double fH = 20200.f; // 20200;
     double GH = pow(10, GHdb / 20.0); // linear gain
     double wH = 2.0 * double_Pi * fH / fs; // frequency in[rad]

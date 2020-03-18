@@ -19,7 +19,7 @@ Response::Response (double fs) : fs (fs)
     linearData.resize (fftOrder, 0);
     dBData.resize (fftOrder, 0);
 	RTData.resize(fftOrder, 0);
-	targetRT.resize(fftOrder, 0);
+	//targetRT.resize(fftOrder, 0);
 }
 
 Response::~Response()
@@ -28,7 +28,7 @@ Response::~Response()
 
 void Response::paint (Graphics& g)
 {
-       g.fillAll (Colours::white);   // clear the background
+    g.fillAll (Colours::white);   // clear the background
     g.strokePath (generateResponsePath(), PathStrokeType(2.0f));
     g.setColour (Colours::lightgrey);
     g.drawLine (0, getHeight() * 0.5, getWidth(), getHeight() * 0.5, 1.0);
@@ -48,8 +48,8 @@ Path Response::generateResponsePath()
 	float newYY;
     for (int y = 0; y < fftOrder; y++)
     {
-        //newY = -dBData[y] * visualScaling + zeroDbHeight;
-		newY = -RTData[y] * visualScaling + zeroDbHeight;// draw RT instead od filter magnitude
+        newY = -dBData[y] * visualScaling + zeroDbHeight;
+		//newY = -RTData[y] * visualScaling + zeroDbHeight;// draw RT instead od filter magnitude
 		
         response.lineTo(x, newY);
         x += spacing;
@@ -73,9 +73,9 @@ void Response::calculateResponse (std::vector<double> coefficients)
 //    double testDiv = abs(log10(1.0 / static_cast<double>(fftOrder)));
     for (int k = 1; k <= fftOrder; ++k)
     {
-//        omega.real (k / static_cast<double>(fftOrder) * double_Pi);
+       omega.real (k / static_cast<double>(fftOrder) * double_Pi);
         double linearVal = k / static_cast<double>(fftOrder);
-        omega.real (double_Pi * ((pow (10, linearVal) - 1.0) / 9.0));
+        //omega.real (double_Pi * ((pow (10, linearVal) - 1.0) / 9.0));
 //        omega.real ((log10(k / static_cast<double>(fftOrder)) / testDiv + 1) * double_Pi);
         linearData[k-1] *= (coefficients[0] + coefficients[1] * exp(-i * omega) + coefficients[2] * exp(-2.0 * i * omega))
                                      / (coefficients[3] + coefficients[4] * exp(-i * omega) + coefficients[5] * exp(-2.0 * i * omega));

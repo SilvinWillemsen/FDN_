@@ -86,11 +86,12 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
     
     response->setDataToZero();
 	
-    for (int i = 0; i < Global::numOctaveBands + 1; ++i)
+    for (int i = 0; i < Global::numOctaveBands + 1; ++i)	
     {
         std::vector<double> coeffs = processor.getFDN()->getCoefficients (0, i);
 	
-//        std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
+       //std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
+	   //std::vector<double> coeffs = { 1.0178, 0.7291, 0.1023, 1,0.7547, 0.1595 };
         response->calculateResponse (coeffs);
 		
     }

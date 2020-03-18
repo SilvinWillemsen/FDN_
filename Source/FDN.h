@@ -63,7 +63,7 @@ private:
     double d = 0.5;
     
     double output;
-    
+	
     double fs;
     
     std::vector<std::vector<double>> A;
@@ -77,7 +77,7 @@ private:
     std::vector<double> dLen;
     
     // Center frequencies
-    std::vector<double> fc2 = { 31, 44.2, 63.0, 88.7, 125, 176.8, 250, 353.6, 500, 707.1, 1000, 1414.2, 2000, 2828.4, 4000, 5656.9, 8000, 11313.7, 16000 };
+    std::vector<double> fc2 = { 31.25, 44.2, 62.5, 88.39, 125, 176.78, 250, 353.55, 500, 707.11, 1000, 1414.2, 2000, 2828.4, 4000, 5656.9, 8000, 11313.7, 16000 };
     
     std::vector<double> Goptdb;
     std::vector<double> Gopt;
