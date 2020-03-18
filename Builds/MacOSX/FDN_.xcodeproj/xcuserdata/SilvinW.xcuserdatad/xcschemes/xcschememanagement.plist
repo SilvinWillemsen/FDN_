@@ -12,12 +12,12 @@
 		<key>FDN_ - All.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<key>FDN_ - Shared Code.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>2</integer>
 		</dict>
 		<key>FDN_ - Standalone Plugin.xcscheme_^#shared#^_</key>
 		<dict>

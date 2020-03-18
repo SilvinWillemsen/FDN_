@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="SVjOjm" name="FDN_" projectType="audioplug" jucerVersion="5.4.4"
+<JUCERPROJECT id="SVjOjm" name="FDN_" projectType="audioplug" jucerVersion="5.4.7"
               pluginFormats="buildAU,buildStandalone">
   <MAINGROUP id="SOc3ba" name="FDN_">
     <GROUP id="{6620E8CE-0269-4766-9F48-378FA259DA6A}" name="Source">

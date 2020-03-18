@@ -38,9 +38,9 @@ Path Response::generateResponsePath()
 {
     auto zeroDbHeight = getHeight() * 0.5;
     Path response;
-	double visualScaling = 1;// 10;
+	double visualScaling = 10;// 10;
     //response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
-	response.startNewSubPath(0, -RTData[0] * visualScaling + zeroDbHeight); // draw RT instead od filter magnitude
+	response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight); // draw RT instead od filter magnitude
    
     auto spacing = getWidth() / static_cast<double> (fftOrder);
     auto x = spacing;
@@ -73,9 +73,9 @@ void Response::calculateResponse (std::vector<double> coefficients)
 //    double testDiv = abs(log10(1.0 / static_cast<double>(fftOrder)));
     for (int k = 1; k <= fftOrder; ++k)
     {
-       omega.real (k / static_cast<double>(fftOrder) * double_Pi);
+//       omega.real (k / static_cast<double>(fftOrder) * double_Pi);
         double linearVal = k / static_cast<double>(fftOrder);
-        //omega.real (double_Pi * ((pow (10, linearVal) - 1.0) / 9.0));
+        omega.real (double_Pi * ((pow (1000, linearVal) - 1.0) / 999.0));
 //        omega.real ((log10(k / static_cast<double>(fftOrder)) / testDiv + 1) * double_Pi);
         linearData[k-1] *= (coefficients[0] + coefficients[1] * exp(-i * omega) + coefficients[2] * exp(-2.0 * i * omega))
                                      / (coefficients[3] + coefficients[4] * exp(-i * omega) + coefficients[5] * exp(-2.0 * i * omega));
