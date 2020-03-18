@@ -20,7 +20,7 @@ namespace Global
     static const int numDesignFreqs = numOctaveBands * 2 - 1;
 
     static const double RT = 1.0;
-    static const double RTmin = 0.01;
+    static const double RTmin = 0.03;
     static const double RTmax = 15.0;
     
     static const double dryGainInit = 0.55;

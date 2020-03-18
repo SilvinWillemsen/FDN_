@@ -18,7 +18,7 @@
 //==============================================================================
 /*
 */
-class Response    : public Component
+class Response    : public Component, public Button::Listener
 {
 public:
     Response (double fs);
@@ -27,7 +27,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
-    Path generateResponsePath();
+    Path generateResponsePath (std::vector<double>& data, bool drawdB);
     
     void setDataToZero() {
         for (int i = 0; i < fftOrder; ++i)
@@ -40,7 +40,7 @@ public:
 	void calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT);
     void linearGainToDB();
 
-    
+    void buttonClicked (Button* button) override;
 private:
     int fftOrder = 4000;
     double fs;
@@ -51,6 +51,13 @@ private:
     std::vector<double> dBData;
 	std::vector<double> RTData;
 	std::vector<double> targetRT;
+
+    OwnedArray<TextButton> buttons;
+    std::vector<bool> drawToggles;
+    
+    bool unstable = false;
+    double zeroDbRatio = 0.6;
+    double zeroDbHeight;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

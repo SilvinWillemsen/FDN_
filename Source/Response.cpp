@@ -20,6 +20,21 @@ Response::Response (double fs) : fs (fs)
     dBData.resize (fftOrder, 0);
 	RTData.resize(fftOrder, 0);
 	//targetRT.resize(fftOrder, 0);
+    
+    drawToggles.resize(2, true);
+    
+    for (int i = 0; i < 2; ++i)
+    {
+        buttons.add (new TextButton());
+        buttons[i]->setButtonText (i == 0 ? "Gain" : "Reverb Time");
+        buttons[i]->setColour(TextButton::buttonColourId, Colours::white);
+        buttons[i]->setColour(TextButton::textColourOnId, i == 0 ? Colours::red : Colours::black);
+        buttons[i]->setColour(TextButton::textColourOffId, i == 0 ? Colours::red : Colours::black);
+
+        buttons[i]->addListener (this);
+        addAndMakeVisible (buttons[i]);
+    }
+    
 }
 
 Response::~Response()
@@ -28,29 +43,43 @@ Response::~Response()
 
 void Response::paint (Graphics& g)
 {
+    
     g.fillAll (Colours::white);   // clear the background
-    g.strokePath (generateResponsePath(), PathStrokeType(2.0f));
+    if (unstable)
+    {
+        g.setColour (Colours::red.withAlpha (0.5f));
+        g.fillRect (getLocalBounds());
+    }
+    if (drawToggles[0])
+    {
+        g.setColour (Colours::red);
+        g.strokePath (generateResponsePath (dBData, true), PathStrokeType(2.0f));
+    }
+    
+    if (drawToggles[1])
+    {
+        g.setColour(Colours::black);
+        g.strokePath (generateResponsePath (RTData, false), PathStrokeType(2.0f));
+    }
+    
     g.setColour (Colours::lightgrey);
-    g.drawLine (0, getHeight() * 0.5, getWidth(), getHeight() * 0.5, 1.0);
-
+    g.drawLine (0, zeroDbHeight, getWidth(), zeroDbHeight, 1.0);
+    
 }
-Path Response::generateResponsePath()
+Path Response::generateResponsePath (std::vector<double>& data, bool drawdB)
 {
-    auto zeroDbHeight = getHeight() * 0.5;
     Path response;
-	double visualScaling = 10;// 10;
+    float visualScaling = drawdB ? 10 : 1;
     //response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
-	response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight); // draw RT instead od filter magnitude
-   
+	response.startNewSubPath(0, -data[0] * visualScaling + zeroDbHeight); // draw RT instead of filter magnitude
     auto spacing = getWidth() / static_cast<double> (fftOrder);
     auto x = spacing;
     float newY;
-	float newYY;
     for (int y = 0; y < fftOrder; y++)
     {
-        newY = -dBData[y] * visualScaling + zeroDbHeight;
-		//newY = -RTData[y] * visualScaling + zeroDbHeight;// draw RT instead od filter magnitude
-		
+//        newY = -dBData[y] * visualScaling + zeroDbHeight;
+        
+        newY = -data[y] * visualScaling + zeroDbHeight;// draw RT instead od filter magnitude
         response.lineTo(x, newY);
         x += spacing;
     }
@@ -63,6 +92,13 @@ void Response::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
+    zeroDbHeight = getHeight() * zeroDbRatio;
+    Rectangle<int> legendArea (getWidth() - 100, 0, 100, 100);
+    
+    legendArea.reduce (10, 10);
+    buttons[0]->setBounds(legendArea.removeFromBottom (35));
+    legendArea.removeFromBottom (10);
+    buttons[1]->setBounds(legendArea.removeFromBottom (35));
 
 }
 
@@ -99,11 +135,22 @@ void Response::calculateResponse (std::vector<double> coefficients)
 
 void Response::linearGainToDB()
 {
-	for (int i = 0; i < fftOrder; ++i) {
-		dBData[i] = Global::limit(20.0 * log10(abs(linearData[i])), -60.0, 10.0);
-		
-		RTData[i] = -60.0  / (dBData[i]); // calculate RT - this should be -60*dLen/RT*fs
-
+    unstable = false;
+	for (int i = 0; i < fftOrder; ++i)
+    {
+		dBData[i] = Global::limit (20.0 * log10(abs(linearData[i])), -60.0, 10.0);
+        if (dBData[i] >= 0)
+            unstable = true;
+		RTData[i] = -60.0 / Global::limit(dBData[i], -1e10, -1e-10); // calculate RT - this should be -60*dLen/RT*fs
 	}
         
+}
+
+void Response::buttonClicked (Button* button)
+{
+    for (int i = 0; i < buttons.size(); ++i)
+        if (button == buttons[i])
+        {
+            drawToggles[i] = !drawToggles[i];
+        }
 }
