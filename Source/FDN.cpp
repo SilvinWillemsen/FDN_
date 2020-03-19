@@ -418,3 +418,36 @@ void FDN::debugPrint (std::vector<std::vector<double>>& vect)
     }
     std::cout << std::endl;
 }
+
+double FDN::getAvgDLen()
+{
+    double tmp = 0;
+    for (int i = 0; i < dLen.size(); ++i)
+    {
+        tmp += dLen[i];
+    }
+    return tmp / static_cast<double> (dLen.size());
+}
+
+double FDN::getMaxDLen()
+{
+    double tmp = 0;
+    for (int i = 0; i < dLen.size(); ++i)
+    {
+        if (dLen[i] > tmp)
+            tmp = dLen[i];
+    }
+    return tmp;
+}
+
+double FDN::getMinDLen()
+{
+    double tmp = Global::maxDelayLength;
+    for (int i = 0; i < dLen.size(); ++i)
+    {
+        if (dLen[i] < tmp)
+            tmp = dLen[i];
+    }
+    return tmp;
+}
+

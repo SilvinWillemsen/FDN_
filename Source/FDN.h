@@ -56,6 +56,10 @@ public:
         return eqCombs[combIdx]->getCoefficientsOfFilter (filterIdx);
     }
     
+    double getAvgDLen();
+    double getMinDLen();
+    double getMaxDLen();
+
 private:
     OwnedArray<EQComb> eqCombs;
     std::vector<double> b;

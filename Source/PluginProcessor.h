@@ -73,6 +73,8 @@ public:
     
     void setDryGain (double val) { dryGain = val; };
     void setInputGain (double val) { inputGain = val; };
+
+    double getFs() { return fs; };
     
 private:
     //==============================================================================
@@ -101,7 +103,6 @@ private:
     
     bool recalculateCoeffsFlag = false;
     double dryGain = Global::dryGainInit;
-
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

@@ -49,5 +49,8 @@ namespace Global
     static const bool horSliders = false;
 //    static const int sliderHeight = 40;
     static const bool sliderDependency = false;
-    static const double logBase = 1000;    
+    static const double logBase = 1000;
+    static const int axisMargin = 40;
+    static const double zeroDbRatio = 0.7;
+
 }

@@ -12,7 +12,7 @@
 #include "Response.h"
 
 //==============================================================================
-Response::Response (double fs) : fs (fs)
+Response::Response (double dLen, double fs) : dLen (dLen), fs (fs)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -34,9 +34,19 @@ Response::Response (double fs) : fs (fs)
         buttons[i]->addListener (this);
         addAndMakeVisible (buttons[i]);
     }
-    //// Calculate grid-lines ////
-    setLogBase (Global::logBase, true);
     
+    gainLabel = std::make_unique<Label> ("Gain", "Gain (dB)");
+    gainLabel->setColour(Label::textColourId, Colours::red);
+    gainLabel->setColour(Label::backgroundColourId, Colours::white.withAlpha(0.0f));
+    gainLabel->setJustificationType(Justification::centred);
+    addAndMakeVisible (gainLabel.get());
+    
+    RTLabel = std::make_unique<Label> ("RT", "RT (s)");
+    RTLabel->setColour(Label::textColourId, Colours::black);
+    RTLabel->setColour(Label::backgroundColourId, Colours::white.withAlpha(0.0f));
+    RTLabel->setJustificationType(Justification::centred);
+    addAndMakeVisible (RTLabel.get());
+
 }
 
 Response::~Response()
@@ -54,43 +64,59 @@ void Response::paint (Graphics& g)
         g.fillRect (getLocalBounds());
     }
     
-    //// Draw gridlines
+    //// Draw gridlines ////
+
+    g.setColour (Colours::black);
+    g.drawLine (Global::axisMargin, 0, Global::axisMargin, getHeight(), 1.0f);
+    g.drawLine (Global::axisMargin, zeroDbHeight, getWidth(), zeroDbHeight, 1.0);
 
     g.setColour (Colours::lightgrey);
     for (int n = 0; n < gridLineCoords.size(); ++n)
     {
-        g.drawLine (gridLineCoords[n] * getWidth(), 0, gridLineCoords[n] * getWidth(), getHeight(), 1.0f);
+        g.drawLine (gridLineCoords[n] * plotWidth + Global::axisMargin, 0, gridLineCoords[n] * plotWidth + Global::axisMargin, getHeight(), 1.0f);
     }
     if (drawToggles[0])
     {
+        int visualScaling = 10;
         g.setColour (Colours::red);
         g.strokePath (generateResponsePath (dBData, true), PathStrokeType(2.0f));
+        g.setColour (Colours::red.withAlpha (0.3f));
+        for (int i = -2; i >= -8; i = i - 2)
+        {
+            g.drawLine(Global::axisMargin, -i * visualScaling + zeroDbHeight, getWidth(), -i * visualScaling + zeroDbHeight);
+            g.drawText(String(i), 0, -i * visualScaling + zeroDbHeight - 10, Global::axisMargin - 5.0, 20, Justification::centredRight);
+        }
     }
-    
+    g.setColour(Colours::black);
+    g.drawText(String(0), 0, zeroDbHeight - 10, Global::axisMargin - 5.0, 20, Justification::centredRight);
     if (drawToggles[1])
     {
+        int visualScaling = 15;
+
         g.setColour(Colours::black);
         g.strokePath (generateResponsePath (RTData, false), PathStrokeType(2.0f));
+        g.setColour(Colours::black.withAlpha (0.3f));
+        for (int i = 2; i <= 15; i = i + 2)
+        {
+            g.drawLine(Global::axisMargin, -i * visualScaling + zeroDbHeight, getWidth(), -i * visualScaling + zeroDbHeight);
+            g.drawText(String(i), 0, -i * visualScaling + zeroDbHeight - 10, Global::axisMargin - 5.0, 20, Justification::centredRight);
+        }
     }
     
     g.setColour (Colours::lightgrey);
-    g.drawLine (0, zeroDbHeight, getWidth(), zeroDbHeight, 1.0);
-    
 }
 Path Response::generateResponsePath (std::vector<double>& data, bool drawdB)
 {
     Path response;
-    float visualScaling = drawdB ? 10 : 1;
+    float visualScaling = drawdB ? 10 : 15;
     //response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
-	response.startNewSubPath(0, -data[0] * visualScaling + zeroDbHeight); // draw RT instead of filter magnitude
-    auto spacing = getWidth() / static_cast<double> (fftOrder);
-    auto x = spacing;
+    response.startNewSubPath(Global::axisMargin, -data[0] * visualScaling + zeroDbHeight); // draw RT instead of filter magnitude
+    auto spacing = (plotWidth) / static_cast<double> (fftOrder);
+    auto x = spacing + Global::axisMargin;
     float newY;
     for (int y = 0; y < fftOrder; y++)
     {
-//        newY = -dBData[y] * visualScaling + zeroDbHeight;
-        
-        newY = -data[y] * visualScaling + zeroDbHeight;// draw RT instead od filter magnitude
+        newY = -data[y] * visualScaling + zeroDbHeight;
         response.lineTo(x, newY);
         x += spacing;
     }
@@ -103,14 +129,31 @@ void Response::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-    zeroDbHeight = getHeight() * zeroDbRatio;
+    zeroDbHeight = getHeight() * Global::zeroDbRatio;
     Rectangle<int> legendArea (getWidth() - 100, 0, 100, 100);
+    plotWidth = getWidth() - Global::axisMargin;
+    
+    //// Calculate grid-lines ////
+    setLogBase (Global::logBase, true);
     
     legendArea.reduce (10, 10);
     buttons[0]->setBounds(legendArea.removeFromBottom (35));
     legendArea.removeFromBottom (10);
     buttons[1]->setBounds(legendArea.removeFromBottom (35));
 
+    Rectangle<int> leftAxis = getLocalBounds().removeFromLeft (Global::axisMargin * 2.0);
+    AffineTransform transformRT;
+    transformRT = transformRT.rotated (-0.5 * double_Pi, Global::axisMargin, zeroDbHeight * 0.5);
+    transformRT = transformRT.translated(-Global::axisMargin * 0.75, 0);
+    RTLabel->setTransform (transformRT);
+
+    AffineTransform transformGain;
+    transformGain = transformGain.rotated (-0.5 * double_Pi, Global::axisMargin, getHeight() - (getHeight()-zeroDbHeight) * 0.5);
+    transformGain = transformGain.translated(-Global::axisMargin * 0.75, 0);
+    gainLabel->setTransform (transformGain);
+    
+    RTLabel->setBounds(leftAxis.removeFromTop (zeroDbHeight));
+    gainLabel->setBounds(leftAxis);
 }
 
 void Response::calculateResponse (std::vector<double> coefficients)
@@ -152,9 +195,15 @@ void Response::linearGainToDB()
 		dBData[i] = Global::limit (20.0 * log10(abs(linearData[i])), -60.0, 10.0);
         if (dBData[i] >= 0)
             unstable = true;
-		RTData[i] = -60.0 / Global::limit(dBData[i], -1e10, -1e-10); // calculate RT - this should be -60*dLen/RT*fs
+        RTData[i] = -60.0 * (dLen) / (Global::limit(dBData[i], -1e10, -1e-10) * fs); // calculate RT - this should be -60*dLen/RT*fs
 	}
-        
+    if (init) // update the delay line length based on RT = 1
+    {
+        dLen = (Global::limit (dBData[0], -1e10, -1e-10) * fs) / (-60.0);
+        std::cout << "Delay line length used for RT = " << dLen << std::endl;
+        init = false;
+        linearGainToDB();
+    }
 }
 
 void Response::buttonClicked (Button* button)

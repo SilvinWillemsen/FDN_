@@ -75,7 +75,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     logBaseSlider = std::make_unique<Slider>(Slider::RotaryVerticalDrag, Slider::TextBoxBelow);
     logBaseSlider->setName ("logBase");
     
-    logBaseSlider->setRange (1.0, 10000.0, 0.001);
+    logBaseSlider->setRange (1.001, 10000.0, 0.001);
     logBaseSlider->setSkewFactorFromMidPoint (100.0);
     logBaseSlider->setValue (Global::logBase);
     
@@ -99,11 +99,19 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     addAndMakeVisible (smoothVals.get());
     defaultButtonColour = smoothVals->getLookAndFeel().findColour (TextButton::buttonColourId);
     
+    allSliders = std::make_unique<TextButton> ("All Sliders");
+    allSliders->addListener (this);
+    addAndMakeVisible (allSliders.get());
+    
     logButton = std::make_unique<TextButton> ("Grid Type");
     logButton->addListener (this);
     addAndMakeVisible (logButton.get());
     
-    response = std::make_unique<Response> (processor.getSampleRate());
+    response = std::make_unique<Response> (processor.getFDN()->getMaxDLen(), processor.getSampleRate());
+    std::cout << "Max dLen = " << processor.getFDN()->getMaxDLen() << std::endl;
+    std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
+    std::cout << "Min dLen = " << processor.getFDN()->getMinDLen() << std::endl;
+
     addAndMakeVisible (response.get());
 //    double R = 0.99;
 //    response->setCoefficients ({1, 0, 0, 1, -2.0 * R * cos(double_Pi * 1000.0 / 22050.0), R * R});
@@ -173,6 +181,8 @@ void Fdn_AudioProcessorEditor::resized()
         sidePanel.removeFromBottom (margin);
         smoothVals->setBounds (sidePanel.removeFromBottom(40));
         sidePanel.removeFromBottom (margin);
+        allSliders->setBounds (sidePanel.removeFromBottom(40));
+        
         logBaseSlider->setBounds (sidePanel.removeFromTop(knobHeight));
         sidePanel.removeFromTop (margin);
         logButton->setBounds(sidePanel.removeFromTop(40));
@@ -242,6 +252,17 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
             }
         }
     }
+    else if (allSlidersBool)
+    {
+        for (int j = 0; j < sliders.size() - 2; ++j)
+        {
+            if (curSliderIdx != j)
+            {
+                sliders[j]->setValue (curSlider->getValue());
+                processor.getFDN()->setRT (j, sliders[j]->getValue());
+            }
+        }
+    }
 }
 
 void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
@@ -256,12 +277,33 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
         if (!smoothValsBool)
             smoothVals->setColour (TextButton::buttonColourId, defaultButtonColour);
         else
+        {
             smoothVals->setColour (TextButton::buttonColourId, Colours::darkgreen);
+            // if allsliders button is on, disable
+            if (allSlidersBool)
+                buttonClicked (allSliders.get());
+        }
+        
     }
     if (button == logButton.get())
     {
         response->changeGrid();
     }
+    if (button == allSliders.get())
+    {
+        allSlidersBool = !allSlidersBool;
+        if (!allSlidersBool)
+            allSliders->setColour (TextButton::buttonColourId, defaultButtonColour);
+        else
+        {
+            allSliders->setColour (TextButton::buttonColourId, Colours::darkgreen);
+            // if smooth values button is on, disable
+            if (smoothValsBool)
+                buttonClicked (smoothVals.get());
+        }
+        
+    }
+    
 }
 
 void Fdn_AudioProcessorEditor::timerCallback()
