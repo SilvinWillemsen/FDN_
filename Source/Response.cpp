@@ -44,7 +44,8 @@ Response::~Response()
 void Response::paint (Graphics& g)
 {
     
-    g.fillAll (Colours::white);   // clear the background
+//    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll(Colours::white);
     if (unstable)
     {
         g.setColour (Colours::red.withAlpha (0.5f));

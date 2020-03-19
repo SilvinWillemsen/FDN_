@@ -22,7 +22,13 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     for (int i = 0; i < Global::numOctaveBands; ++i)
     {
         String name = "RT" + String(Global::fc1[i]);
-        sliders.add (new Slider (name));
+        if (Global::horSliders)
+            sliders.add (new Slider (name));
+        else
+        {
+            sliders.add (new Slider (Slider::LinearBarVertical, Slider::TextBoxBelow));
+            sliders[i]->setName (name);
+        }
         sliders[i]->setRange (Global::RTmin, Global::RTmax, 0.01f);
 //        sliders[i]->setSkewFactorFromMidPoint (1);
         sliders[i]->setValue (Global::RT);
@@ -31,10 +37,16 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         
         labels.add (new Label (name, name));
         addAndMakeVisible (labels[i]);
-        labels[i]->attachToComponent (sliders[i], true);
+        labels[i]->attachToComponent (sliders[i], false);
         
     }
-    sliders.add (new Slider ("dryGain"));
+    if (Global::horSliders)
+        sliders.add (new Slider ("dryGain"));
+    else
+    {
+        sliders.add (new Slider (Slider::LinearBarVertical, Slider::TextBoxBelow));
+        sliders[sliders.size() - 1]->setName ("dryGain");
+    }
     sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
     sliders[sliders.size() - 1]->setValue (Global::dryGainInit);
     
@@ -43,9 +55,16 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     
     labels.add (new Label ("dryGain", "Dry Gain"));
     addAndMakeVisible (labels[labels.size() - 1]);
-    labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], true);
+    labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
-    sliders.add (new Slider ("inputGain"));
+    if (Global::horSliders)
+        sliders.add (new Slider ("inputGain"));
+    else
+    {
+        sliders.add (new Slider (Slider::LinearBarVertical, Slider::TextBoxBelow));
+        sliders[sliders.size() - 1]->setName ("inputGain");
+    }
+    
     sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
     sliders[sliders.size() - 1]->setValue (Global::initInputGain);
     
@@ -54,11 +73,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     
     labels.add (new Label ("inputGain", "Input Gain"));
     addAndMakeVisible (labels[labels.size() - 1]);
-    labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], true);
-    
-    int height = (sliders.size() + 1) * Global::sliderHeight;
-    if (height > 700)
-        height = 700;
+    labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
     calculateBtn = std::make_unique<TextButton> ("Calculate");
     calculateBtn->addListener (this);
@@ -70,7 +85,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
 //    response->setCoefficients ({1, 0, 0, 1, -2.0 * R * cos(double_Pi * 1000.0 / 22050.0), R * R});
 //    response->setCoefficients ({0.5, 0.5, 0, 1, 0, 0});
     startTimerHz (15);
-    setSize (800, height);
+    setSize (800, 700);
 }
 
 Fdn_AudioProcessorEditor::~Fdn_AudioProcessorEditor()
@@ -105,17 +120,37 @@ void Fdn_AudioProcessorEditor::resized()
     // subcomponents in your editor..
     Rectangle<int> totArea = getLocalBounds();
     
-    response->setBounds (totArea.removeFromRight (getWidth() * 0.5));
-    calculateBtn->setBounds (totArea.removeFromBottom (Global::sliderHeight));
-    totArea.removeFromLeft (100);
-    sliders[sliders.size() - 1]->setBounds (totArea.removeFromTop (Global::sliderHeight));
-    sliders[sliders.size() - 2]->setBounds (totArea.removeFromTop (Global::sliderHeight));
-    
-    for (int i = 0; i < sliders.size() - 2; ++i)
+    if (Global::horSliders)
     {
-        sliders[i]->setBounds (totArea.removeFromTop (Global::sliderHeight));
+        int sliderHeight = 40;
+        response->setBounds (totArea.removeFromRight (getWidth() * 0.5));
+        calculateBtn->setBounds (totArea.removeFromBottom (sliderHeight));
+        totArea.removeFromLeft (100);
+        sliders[sliders.size() - 1]->setBounds (totArea.removeFromTop (sliderHeight));
+        sliders[sliders.size() - 2]->setBounds (totArea.removeFromTop (sliderHeight));
+        
+        for (int i = 0; i < sliders.size() - 2; ++i)
+        {
+            sliders[i]->setBounds (totArea.removeFromTop (sliderHeight));
+        }
+    } else {
+        int margin = 5;
+        int sliderWidth = floor ((getWidth() - (14 * margin)) / 13.0);
+        Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
+        responseArea.reduce(10, 10);
+        response->setBounds (responseArea);
+        totArea.removeFromTop (15);
+        calculateBtn->setBounds (totArea.removeFromRight (sliderWidth));
+        totArea.removeFromBottom (20);
+        sliders[sliders.size() - 1]->setBounds (totArea.removeFromLeft (sliderWidth));
+        sliders[sliders.size() - 2]->setBounds (totArea.removeFromLeft(sliderWidth));
+        
+        for (int i = 0; i < sliders.size() - 2; ++i)
+        {
+            totArea.removeFromLeft (margin);
+            sliders[i]->setBounds (totArea.removeFromLeft (sliderWidth));
+        }
     }
-    
     
 }
 

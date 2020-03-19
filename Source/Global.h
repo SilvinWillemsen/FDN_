@@ -46,6 +46,8 @@ namespace Global
     }
     
     // GUI
-    static const int sliderHeight = 40;
+    static const bool horSliders = false;
+//    static const int sliderHeight = 40;
     static const bool sliderDependency = false;
+    
 }
