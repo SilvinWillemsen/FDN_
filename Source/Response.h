@@ -41,6 +41,9 @@ public:
     void linearGainToDB();
 
     void buttonClicked (Button* button) override;
+    
+    void setLogBase (double val, bool init = false);
+    void changeGrid() { drawBandLines = !drawBandLines; setLogBase(logBase, true); };
 private:
     int fftOrder = 4000;
     double fs;
@@ -58,6 +61,11 @@ private:
     bool unstable = false;
     double zeroDbRatio = 0.6;
     double zeroDbHeight;
+
+    std::vector<double> gridLineCoords;
+    
+    double logBase = Global::logBase;
+    bool drawBandLines = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

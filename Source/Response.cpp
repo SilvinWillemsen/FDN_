@@ -34,6 +34,8 @@ Response::Response (double fs) : fs (fs)
         buttons[i]->addListener (this);
         addAndMakeVisible (buttons[i]);
     }
+    //// Calculate grid-lines ////
+    setLogBase (Global::logBase, true);
     
 }
 
@@ -50,6 +52,14 @@ void Response::paint (Graphics& g)
     {
         g.setColour (Colours::red.withAlpha (0.5f));
         g.fillRect (getLocalBounds());
+    }
+    
+    //// Draw gridlines
+
+    g.setColour (Colours::lightgrey);
+    for (int n = 0; n < gridLineCoords.size(); ++n)
+    {
+        g.drawLine (gridLineCoords[n] * getWidth(), 0, gridLineCoords[n] * getWidth(), getHeight(), 1.0f);
     }
     if (drawToggles[0])
     {
@@ -112,7 +122,7 @@ void Response::calculateResponse (std::vector<double> coefficients)
     {
 //       omega.real (k / static_cast<double>(fftOrder) * double_Pi);
         double linearVal = k / static_cast<double>(fftOrder);
-        omega.real (double_Pi * ((pow (1000, linearVal) - 1.0) / 999.0));
+        omega.real (double_Pi * ((pow (logBase, linearVal) - 1.0) / (logBase - 1.0)));
 //        omega.real ((log10(k / static_cast<double>(fftOrder)) / testDiv + 1) * double_Pi);
         linearData[k-1] *= (coefficients[0] + coefficients[1] * exp(-i * omega) + coefficients[2] * exp(-2.0 * i * omega))
                                      / (coefficients[3] + coefficients[4] * exp(-i * omega) + coefficients[5] * exp(-2.0 * i * omega));
@@ -154,4 +164,45 @@ void Response::buttonClicked (Button* button)
         {
             drawToggles[i] = !drawToggles[i];
         }
+}
+
+void Response::setLogBase (double val, bool init)
+{
+    logBase = val;
+    
+    if (drawBandLines)
+    {
+        if (init)
+        {
+            std::vector<double> tmp (Global::numOctaveBands, 0);
+            gridLineCoords = tmp;
+        }
+        
+        for (int n = 1; n <= Global::numOctaveBands; ++n)
+        {
+            double y = 125 * pow(2,n-3);
+            gridLineCoords[n-1] = log(y * (logBase - 1.0) / (fs * 0.5) + 1.0) / log(logBase);
+        }
+    } else {
+        if (init)
+        {
+            std::vector<double> tmp (32, 0);
+            gridLineCoords = tmp;
+        }
+        int m = 10;
+        int n = 0;
+        for (int i = 1; i <= gridLineCoords.size(); ++i)
+        {
+            ++n;
+            double y = m * n;
+            gridLineCoords[i-1] = log(y * (logBase - 1.0) / (fs * 0.5) + 1.0) / log(logBase);
+            if (n % 10 == 0)
+            {
+                m *= 10;
+                n = 0;
+            }
+            
+        }
+    }
+        
 }

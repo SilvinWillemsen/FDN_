@@ -34,6 +34,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         sliders[i]->setValue (Global::RT);
         addAndMakeVisible (sliders[i]);
         sliders[i]->addListener (this);
+        sliders[i]->setTextBoxIsEditable (false);
         
         labels.add (new Label (name, name));
         addAndMakeVisible (labels[i]);
@@ -44,7 +45,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         sliders.add (new Slider ("dryGain"));
     else
     {
-        sliders.add (new Slider (Slider::LinearBarVertical, Slider::TextBoxBelow));
+        sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
         sliders[sliders.size() - 1]->setName ("dryGain");
     }
     sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
@@ -61,7 +62,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         sliders.add (new Slider ("inputGain"));
     else
     {
-        sliders.add (new Slider (Slider::LinearBarVertical, Slider::TextBoxBelow));
+        sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
         sliders[sliders.size() - 1]->setName ("inputGain");
     }
     
@@ -71,13 +72,36 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     sliders[sliders.size() - 1]->addListener (this);
     addAndMakeVisible (sliders[sliders.size() - 1]);
     
+    logBaseSlider = std::make_unique<Slider>(Slider::RotaryVerticalDrag, Slider::TextBoxBelow);
+    logBaseSlider->setName ("logBase");
+    
+    logBaseSlider->setRange (1.0, 10000.0, 0.001);
+    logBaseSlider->setSkewFactorFromMidPoint (100.0);
+    logBaseSlider->setValue (Global::logBase);
+    
+    logBaseSlider->addListener (this);
+    addAndMakeVisible (logBaseSlider.get());
+    
+    labels.add (new Label ("logBase", "Log Base"));
+    addAndMakeVisible (labels[labels.size() - 1]);
+    labels[labels.size() - 1]->attachToComponent (logBaseSlider.get(), false);
+    
     labels.add (new Label ("inputGain", "Input Gain"));
     addAndMakeVisible (labels[labels.size() - 1]);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
-    calculateBtn = std::make_unique<TextButton> ("Calculate");
+    calculateBtn = std::make_unique<TextButton> ("Test");
     calculateBtn->addListener (this);
     addAndMakeVisible (calculateBtn.get());
+    
+    smoothVals = std::make_unique<TextButton> ("Smooth");
+    smoothVals->addListener (this);
+    addAndMakeVisible (smoothVals.get());
+    defaultButtonColour = smoothVals->getLookAndFeel().findColour (TextButton::buttonColourId);
+    
+    logButton = std::make_unique<TextButton> ("Grid Type");
+    logButton->addListener (this);
+    addAndMakeVisible (logButton.get());
     
     response = std::make_unique<Response> (processor.getSampleRate());
     addAndMakeVisible (response.get());
@@ -134,20 +158,36 @@ void Fdn_AudioProcessorEditor::resized()
             sliders[i]->setBounds (totArea.removeFromTop (sliderHeight));
         }
     } else {
-        int margin = 5;
-        int sliderWidth = floor ((getWidth() - (14 * margin)) / 13.0);
+        int margin = 20;
+        Rectangle<int> sidePanel = totArea.removeFromRight (120);
+        sidePanel.reduce(margin, margin);
+        sidePanel.removeFromTop (margin);
+
+        int knobHeight = sidePanel.getHeight() * 0.2 - margin;
+        sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
+        sidePanel.removeFromTop (margin * 2.0);
+        sliders[sliders.size() - 2]->setBounds (sidePanel.removeFromTop (knobHeight));
+        sidePanel.removeFromTop (margin * 2.0);
+        
+        calculateBtn->setBounds (sidePanel.removeFromBottom(40));
+        sidePanel.removeFromBottom (margin);
+        smoothVals->setBounds (sidePanel.removeFromBottom(40));
+        sidePanel.removeFromBottom (margin);
+        logBaseSlider->setBounds (sidePanel.removeFromTop(knobHeight));
+        sidePanel.removeFromTop (margin);
+        logButton->setBounds(sidePanel.removeFromTop(40));
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
         responseArea.reduce(10, 10);
         response->setBounds (responseArea);
-        totArea.removeFromTop (15);
-        calculateBtn->setBounds (totArea.removeFromRight (sliderWidth));
-        totArea.removeFromBottom (20);
-        sliders[sliders.size() - 1]->setBounds (totArea.removeFromLeft (sliderWidth));
-        sliders[sliders.size() - 2]->setBounds (totArea.removeFromLeft(sliderWidth));
+        totArea.removeFromTop (margin);
         
+        totArea.removeFromBottom (margin);
+//        sliders[sliders.size() - 1]->setBounds (totArea.removeFromLeft (sliderWidth));
+//        sliders[sliders.size() - 2]->setBounds (totArea.removeFromLeft (sliderWidth));
+        int sliderWidth = floor ((totArea.getWidth() - (11.0 * margin * 0.5)) / 10.0);
         for (int i = 0; i < sliders.size() - 2; ++i)
         {
-            totArea.removeFromLeft (margin);
+            totArea.removeFromLeft (margin * 0.5);
             sliders[i]->setBounds (totArea.removeFromLeft (sliderWidth));
         }
     }
@@ -181,12 +221,17 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
         return;
     }
     
+    if (slider == logBaseSlider.get())
+    {
+        response->setLogBase (slider->getValue());
+    }
+    
     if (curSlider == nullptr)
         return;
     
     processor.getFDN()->setRT (curSliderIdx, curSlider->getValue());
     
-    if (Global::sliderDependency)
+    if (smoothValsBool)
     {
         for (int j = 0; j < sliders.size() - 2; ++j)
         {
@@ -204,6 +249,18 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
     if (button == calculateBtn.get())
     {
         processor.setRecalculateFlag();
+    }
+    if (button == smoothVals.get())
+    {
+        smoothValsBool = !smoothValsBool;
+        if (!smoothValsBool)
+            smoothVals->setColour (TextButton::buttonColourId, defaultButtonColour);
+        else
+            smoothVals->setColour (TextButton::buttonColourId, Colours::darkgreen);
+    }
+    if (button == logButton.get())
+    {
+        response->changeGrid();
     }
 }
 

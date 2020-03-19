@@ -45,10 +45,17 @@ private:
     OwnedArray<Slider> sliders;
     OwnedArray<Label> labels;
     std::unique_ptr<TextButton> calculateBtn;
-    
+    std::unique_ptr<TextButton> smoothVals;
+    std::unique_ptr<TextButton> logButton;
+
+    Colour defaultButtonColour;
+    bool smoothValsBool = false;
+
     std::vector<double> sliderValuesAtStartDrag;
     float sliderCoeff = Global::sliderCoeff;
     Slider* curSlider = nullptr;
     int curSliderIdx;
+    
+    std::unique_ptr<Slider> logBaseSlider;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };
