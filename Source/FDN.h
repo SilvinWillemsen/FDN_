@@ -60,6 +60,7 @@ public:
     double getMinDLen();
     double getMaxDLen();
 
+    void setScatteringMatrix (MatrixType matType);
 private:
     OwnedArray<EQComb> eqCombs;
     std::vector<double> b;

@@ -102,7 +102,7 @@ private:
     Random rand;
     
     bool recalculateCoeffsFlag = false;
-    double dryGain = Global::dryGainInit;
+    double dryGain = Global::dryWetInit;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

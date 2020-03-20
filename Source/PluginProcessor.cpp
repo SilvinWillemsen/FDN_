@@ -22,7 +22,7 @@ Fdn_AudioProcessor::Fdn_AudioProcessor()
                       #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  AudioChannelSet::mono(), true)
                       #endif
-                       .withOutput ("Output", AudioChannelSet::mono(), true)
+                       .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        )
 #endif
@@ -152,7 +152,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     
     float* const channeldataL = buffer.getWritePointer(0);
-    float* const channeldataR = getTotalNumInputChannels() > 1 ? buffer.getWritePointer(1) : nullptr;
+    float* const channeldataR = getTotalNumOutputChannels() > 1 ? buffer.getWritePointer(1) : nullptr;
     ScopedNoDenormals noDenormals;
     const float* input = buffer.getReadPointer (0);
     

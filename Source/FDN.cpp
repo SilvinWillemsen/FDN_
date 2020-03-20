@@ -15,52 +15,12 @@
 FDN::FDN()
 {
     RT.resize (Global::numOctaveBands, Global::RT);
-	
 
     b.resize (Global::FDNorder, 1.0);
     c.resize (Global::FDNorder, 1.0);
     
     // initialise scattering matrix
-    std::vector<std::vector<double>> tmpMatrix (4, std::vector<double> (4, -1));
-    for (int i = 0; i < 4; ++i)
-        tmpMatrix[i][i] = 1;
-		
-    
-	
-    A.resize (Global::FDNorder, std::vector<double> (Global::FDNorder, 0));
-    for (int i = 0; i < Global::FDNorder; ++i)
-    {
-        for (int j = 0; j < Global::FDNorder; ++j)
-        {
-            if (i / 4 == j / 4)
-                A[i][j] = 0.25 * tmpMatrix[i % 4][j % 4];
-            else
-                A[i][j] = -0.25 * tmpMatrix[i % 4][j % 4];
-//		      std::cout << A[i][j] << " ";
-//            if (j % 4 == 3)
-//                std::cout << "   ";
-        }
-//        std::cout << std::endl;
-//        if (i % 4 == 3)
-//            std::cout << std::endl;
-    }
-
-	// Hadamard matrix - we can enable choosing between the two
-	//A[0][0] = 1.0f;
-	//double scaleFactor = 1 / sqrt(Global::FDNorder);
-	//for (int n = 1; n < Global::FDNorder; n += n) 
-	//{
-	//	for (int i = 0; i < n; ++i)
-	//	{
-	//		for (int j = 0; j < n; ++j)
-	//		{
-	//			A[i + n][j] = A[i][j] * scaleFactor;
-	//			A[i][j + n] = A[i][j] * scaleFactor;
-	//			A[i + n][j + n] = - A[i][j] * scaleFactor;
-	//		}
-	//	}
-	//}
-
+    setScatteringMatrix (hadamard);
 
 }
 
@@ -70,24 +30,11 @@ FDN::~FDN()
 
 void FDN::paint (Graphics& g)
 {
-    
 
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("FDN", getLocalBounds(),
-                Justification::centred, true);   // draw some placeholder text
 }
 
 void FDN::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
 }
 
 double FDN::calculate (double input)
@@ -451,3 +398,49 @@ double FDN::getMinDLen()
     return tmp;
 }
 
+
+void FDN::setScatteringMatrix (MatrixType matType)
+{
+    A.resize (Global::FDNorder, std::vector<double> (Global::FDNorder, 0));
+
+    double scaleFactor = 1 / sqrt(Global::FDNorder);
+    switch (matType)
+    {
+        case householder:
+        {
+            std::vector<std::vector<double>> tmpMatrix (4, std::vector<double> (4, -1));
+            for (int i = 0; i < 4; ++i)
+                tmpMatrix[i][i] = 1;
+            
+            for (int i = 0; i < Global::FDNorder; ++i)
+            {
+                for (int j = 0; j < Global::FDNorder; ++j)
+                {
+                    if (i / 4 == j / 4)
+                        A[i][j] = scaleFactor * tmpMatrix[i % 4][j % 4];
+                    else
+                        A[i][j] = -scaleFactor * tmpMatrix[i % 4][j % 4];
+                }
+            }
+
+            break;
+        }
+        case hadamard:
+        {
+            A[0][0] = 1.0f * scaleFactor;
+            for (int n = 1; n < Global::FDNorder; n += n)
+            {
+                for (int i = 0; i < n; ++i)
+                {
+                    for (int j = 0; j < n; ++j)
+                    {
+                        A[i + n][j] = A[i][j];
+                        A[i][j + n] = A[i][j];
+                        A[i + n][j + n] = - A[i][j];
+                    }
+                }
+            }
+            break;
+        }
+    }
+}

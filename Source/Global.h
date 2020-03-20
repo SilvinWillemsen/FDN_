@@ -9,6 +9,11 @@
 */
 
 #pragma once
+enum MatrixType
+{
+    hadamard,
+    householder
+};
 
 namespace Global
 {
@@ -23,7 +28,7 @@ namespace Global
     static const double RTmin = 0.03;
     static const double RTmax = 15.0;
     
-    static const double dryGainInit = 0.55;
+    static const double dryWetInit = 0.45;
     static const double initInputGain = 0.5;
     
     // Make this dynamic!! (using 125*2^(n-3))
@@ -51,6 +56,8 @@ namespace Global
     static const bool sliderDependency = false;
     static const double logBase = 1000;
     static const int axisMargin = 40;
-    static const double zeroDbRatio = 0.7;
+    static const double zeroDbRatio = 0.6;
 
+    static const bool showRTGainButtons = false;
+    static const bool showLogSlider = true;
 }

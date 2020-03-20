@@ -47,7 +47,6 @@ private:
     std::unique_ptr<TextButton> calculateBtn;
     std::unique_ptr<TextButton> smoothVals;
     std::unique_ptr<TextButton> allSliders;
-    std::unique_ptr<TextButton> logButton;
 
     Colour defaultButtonColour;
     bool smoothValsBool = false;
@@ -57,8 +56,6 @@ private:
     float sliderCoeff = Global::sliderCoeff;
     Slider* curSlider = nullptr;
     int curSliderIdx;
-    
-    std::unique_ptr<Slider> logBaseSlider;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

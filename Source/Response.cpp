@@ -12,7 +12,7 @@
 #include "Response.h"
 
 //==============================================================================
-Response::Response (double dLen, double fs) : dLen (dLen), fs (fs)
+Response::Response (double dLen, double fs) : fs (fs), dLen (dLen)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -20,19 +20,21 @@ Response::Response (double dLen, double fs) : dLen (dLen), fs (fs)
     dBData.resize (fftOrder, 0);
 	RTData.resize(fftOrder, 0);
 	//targetRT.resize(fftOrder, 0);
-    
     drawToggles.resize(2, true);
     
-    for (int i = 0; i < 2; ++i)
+    if (Global::showRTGainButtons)
     {
-        buttons.add (new TextButton());
-        buttons[i]->setButtonText (i == 0 ? "Gain" : "Reverb Time");
-        buttons[i]->setColour(TextButton::buttonColourId, Colours::white);
-        buttons[i]->setColour(TextButton::textColourOnId, i == 0 ? Colours::red : Colours::black);
-        buttons[i]->setColour(TextButton::textColourOffId, i == 0 ? Colours::red : Colours::black);
+        for (int i = 0; i < 2; ++i)
+        {
+            buttons.add (new TextButton());
+            buttons[i]->setButtonText (i == 0 ? "Gain" : "Reverb Time");
+            buttons[i]->setColour(TextButton::buttonColourId, Colours::white);
+            buttons[i]->setColour(TextButton::textColourOnId, i == 0 ? Colours::red : Colours::black);
+            buttons[i]->setColour(TextButton::textColourOffId, i == 0 ? Colours::red : Colours::black);
 
-        buttons[i]->addListener (this);
-        addAndMakeVisible (buttons[i]);
+            buttons[i]->addListener (this);
+            addAndMakeVisible (buttons[i]);
+        }
     }
     
     gainLabel = std::make_unique<Label> ("Gain", "Gain (dB)");
@@ -46,6 +48,39 @@ Response::Response (double dLen, double fs) : dLen (dLen), fs (fs)
     RTLabel->setColour(Label::backgroundColourId, Colours::white.withAlpha(0.0f));
     RTLabel->setJustificationType(Justification::centred);
     addAndMakeVisible (RTLabel.get());
+    
+    //// For changing the logbase of the plot
+    logBaseSlider = std::make_unique<Slider>(Slider::LinearHorizontal, Slider::TextBoxLeft);
+    logBaseSlider->setName ("logBase");
+    
+    logBaseSlider->setRange (1.001, 10000.0, 0.001);
+    logBaseSlider->setSkewFactorFromMidPoint (100.0);
+    logBaseSlider->setValue (Global::logBase);
+    logBaseSlider->setColour (Slider::textBoxTextColourId, Colours::black);
+//    logBaseSlider->setColour (Slider::textBoxBackgroundColourId, Colours::lightgrey);
+//    logBaseSlider->setColour (Slider::textBoxOutlineColourId, Colours::lightgrey);
+    
+//    logBaseSlider->setTextBoxStyle(logBaseSlider->getTextBoxPosition(), true, logBaseSlider->getTextBoxWidth(), 40);
+    logBaseSlider->addListener (this);
+    addAndMakeVisible (logBaseSlider.get());
+    
+    logLabel = std::make_unique<Label> ("logBase", "Log Base");
+    addAndMakeVisible (logLabel.get());
+    logLabel->setColour (Label::backgroundColourId, Colours::white);
+    logLabel->setColour (Label::textColourId, Colours::black);
+    logLabel->attachToComponent (logBaseSlider.get(), true);
+
+    logButton = std::make_unique<TextButton> ("Grid Type");
+    logButton->addListener (this);
+    addAndMakeVisible (logButton.get());
+    
+//    for (int n = 1; n <= Global::numOctaveBands; ++n)
+//    {
+//        double val = 125 * pow(2.0, n - 3);
+//        bandLabels.add (new Label ("n", String(val)));
+//        bandLabels[n-1]->setColour (Label::backgroundColourId, Colours::white.withAlpha(0.0f));
+//        bandLabels[n-1]->setColour (Label::textColourId, Colours::lightgrey);
+//    }
 
 }
 
@@ -60,26 +95,23 @@ void Response::paint (Graphics& g)
     g.fillAll(Colours::white);
     if (unstable)
     {
-        g.setColour (Colours::red.withAlpha (0.5f));
+        g.setColour (unstableColour);
         g.fillRect (getLocalBounds());
     }
-    
+
     //// Draw gridlines ////
-
-    g.setColour (Colours::black);
-    g.drawLine (Global::axisMargin, 0, Global::axisMargin, getHeight(), 1.0f);
-    g.drawLine (Global::axisMargin, zeroDbHeight, getWidth(), zeroDbHeight, 1.0);
-
     g.setColour (Colours::lightgrey);
     for (int n = 0; n < gridLineCoords.size(); ++n)
     {
         g.drawLine (gridLineCoords[n] * plotWidth + Global::axisMargin, 0, gridLineCoords[n] * plotWidth + Global::axisMargin, getHeight(), 1.0f);
     }
+    
+    //// Draw dB data ////
     if (drawToggles[0])
     {
         int visualScaling = 10;
         g.setColour (Colours::red);
-        g.strokePath (generateResponsePath (dBData, true), PathStrokeType(2.0f));
+        g.strokePath (generateResponsePath (dBData, visualScaling), PathStrokeType(2.0f));
         g.setColour (Colours::red.withAlpha (0.3f));
         for (int i = -2; i >= -8; i = i - 2)
         {
@@ -89,26 +121,72 @@ void Response::paint (Graphics& g)
     }
     g.setColour(Colours::black);
     g.drawText(String(0), 0, zeroDbHeight - 10, Global::axisMargin - 5.0, 20, Justification::centredRight);
+    
+    //// Draw Reverb Time data ////
     if (drawToggles[1])
     {
-        int visualScaling = 15;
+        int visualScaling = 10;
 
         g.setColour(Colours::black);
-        g.strokePath (generateResponsePath (RTData, false), PathStrokeType(2.0f));
+        g.strokePath (generateResponsePath (RTData, visualScaling), PathStrokeType(2.0f));
         g.setColour(Colours::black.withAlpha (0.3f));
-        for (int i = 2; i <= 15; i = i + 2)
+        for (int i = 2; i <= 19; i = i + 2)
         {
             g.drawLine(Global::axisMargin, -i * visualScaling + zeroDbHeight, getWidth(), -i * visualScaling + zeroDbHeight);
             g.drawText(String(i), 0, -i * visualScaling + zeroDbHeight - 10, Global::axisMargin - 5.0, 20, Justification::centredRight);
         }
     }
     
-    g.setColour (Colours::lightgrey);
+    if (Global::showLogSlider)
+    {
+        g.setColour (Colours::white);
+        Rectangle<int> bounds = logBaseSlider->getBounds();
+        bounds.setX(bounds.getX() - logLabel->getWidth() - 1);
+        bounds.setY(bounds.getY() - 10);
+        bounds.setHeight(bounds.getHeight() + 20);
+        bounds.setWidth(bounds.getWidth() + 120 + logLabel->getWidth() + 1);
+        g.fillRect (bounds);
+        g.setColour(Colours::black);
+        g.drawRect (bounds);
+    }
+    
+    g.setColour (unstable ? unstableColour : Colours::white);
+    g.fillRect(Global::axisMargin, getHeight() - Global::axisMargin, getWidth() - Global::axisMargin, getHeight() - Global::axisMargin);
+    
+    g.setColour (Colours::black);
+    // Draw axis lines
+    g.drawLine (Global::axisMargin, 0, Global::axisMargin, getHeight() - Global::axisMargin, 1.0f);
+    g.drawLine (Global::axisMargin, getHeight() - Global::axisMargin, getWidth(), getHeight() - Global::axisMargin, 1.0f);
+    
+    // Draw zero DB / RT line
+    g.drawLine (Global::axisMargin, zeroDbHeight, getWidth(), zeroDbHeight, 1.0);
+    
+    g.setColour (Colours::darkgrey);
+    int j = 1;
+    for (int n = 0; n < gridLineCoords.size(); ++n)
+    {
+        if (drawBandLines)
+            g.drawText(String(125.0 * pow(2.0, n-2)), gridLineCoords[n] * plotWidth + Global::axisMargin - 20, getHeight() - Global::axisMargin, 40, 20, Justification::centred);
+        else
+        {
+//            g.drawText(String(pow(10, j)), gridLineCoords[n] * plotWidth + Global::axisMargin - 20, getHeight() - Global::axisMargin, 40, 20, Justification::centred);
+//            n += 9;
+//            ++j;
+            int lim = 0;
+            g.drawText(String(pow(10, j) * ((n+1) % 10)), gridLineCoords[n] * plotWidth + Global::axisMargin - 20, getHeight() - Global::axisMargin, 40, 20, Justification::centred);
+            
+            if (n % 10 == lim)
+            {
+                n += (9 - lim);
+                ++j;
+            }
+        }
+    }
+    g.drawText("frequency (Hz)", getWidth() * 0.5 - 50, getHeight() - Global::axisMargin * 0.5 - 10, 100, 30, Justification::centred);
 }
-Path Response::generateResponsePath (std::vector<double>& data, bool drawdB)
+Path Response::generateResponsePath (std::vector<double>& data, float visualScaling)
 {
     Path response;
-    float visualScaling = drawdB ? 10 : 15;
     //response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
     response.startNewSubPath(Global::axisMargin, -data[0] * visualScaling + zeroDbHeight); // draw RT instead of filter magnitude
     auto spacing = (plotWidth) / static_cast<double> (fftOrder);
@@ -130,17 +208,31 @@ void Response::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
     zeroDbHeight = getHeight() * Global::zeroDbRatio;
-    Rectangle<int> legendArea (getWidth() - 100, 0, 100, 100);
     plotWidth = getWidth() - Global::axisMargin;
     
     //// Calculate grid-lines ////
     setLogBase (Global::logBase, true);
     
-    legendArea.reduce (10, 10);
-    buttons[0]->setBounds(legendArea.removeFromBottom (35));
-    legendArea.removeFromBottom (10);
-    buttons[1]->setBounds(legendArea.removeFromBottom (35));
-
+    Rectangle<int> topControlArea (0, 0, getWidth(), 100);
+    topControlArea.reduce(10, 10);
+    if (Global::showRTGainButtons)
+    {
+        Rectangle<int> legendArea = topControlArea.removeFromRight (100);
+        buttons[0]->setBounds(legendArea.removeFromBottom (35));
+        legendArea.removeFromBottom (10);
+        buttons[1]->setBounds(legendArea.removeFromBottom (35));
+        topControlArea.removeFromLeft(30);
+    }
+    
+    if (Global::showLogSlider)
+    {
+        topControlArea.removeFromRight (20);
+        topControlArea.removeFromBottom (topControlArea.getHeight() * 0.5);
+        logButton->setBounds (topControlArea.removeFromRight(100));
+        topControlArea.removeFromRight (10);
+        logBaseSlider->setBounds (topControlArea.removeFromRight (getWidth() * 0.4));
+    }
+    
     Rectangle<int> leftAxis = getLocalBounds().removeFromLeft (Global::axisMargin * 2.0);
     AffineTransform transformRT;
     transformRT = transformRT.rotated (-0.5 * double_Pi, Global::axisMargin, zeroDbHeight * 0.5);
@@ -154,6 +246,7 @@ void Response::resized()
     
     RTLabel->setBounds(leftAxis.removeFromTop (zeroDbHeight));
     gainLabel->setBounds(leftAxis);
+    
 }
 
 void Response::calculateResponse (std::vector<double> coefficients)
@@ -208,11 +301,26 @@ void Response::linearGainToDB()
 
 void Response::buttonClicked (Button* button)
 {
+    if (button == logButton.get())
+    {
+        changeGrid();
+        return;
+    }
+    
     for (int i = 0; i < buttons.size(); ++i)
         if (button == buttons[i])
         {
             drawToggles[i] = !drawToggles[i];
+            return;
         }
+}
+
+void Response::sliderValueChanged (Slider* slider)
+{
+    if (slider == logBaseSlider.get())
+    {
+        setLogBase (slider->getValue());
+    }
 }
 
 void Response::setLogBase (double val, bool init)

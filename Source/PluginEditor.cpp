@@ -49,13 +49,14 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         sliders[sliders.size() - 1]->setName ("dryGain");
     }
     sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
-    sliders[sliders.size() - 1]->setValue (Global::dryGainInit);
+    sliders[sliders.size() - 1]->setValue (Global::dryWetInit);
     
     sliders[sliders.size() - 1]->addListener (this);
     addAndMakeVisible (sliders[sliders.size() - 1]);
     
-    labels.add (new Label ("dryGain", "Dry Gain"));
+    labels.add (new Label ("dryGain", "Dry/Wet"));
     addAndMakeVisible (labels[labels.size() - 1]);
+    labels[labels.size() - 1]->setJustificationType(Justification::centred);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
     if (Global::horSliders)
@@ -72,22 +73,9 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     sliders[sliders.size() - 1]->addListener (this);
     addAndMakeVisible (sliders[sliders.size() - 1]);
     
-    logBaseSlider = std::make_unique<Slider>(Slider::RotaryVerticalDrag, Slider::TextBoxBelow);
-    logBaseSlider->setName ("logBase");
-    
-    logBaseSlider->setRange (1.001, 10000.0, 0.001);
-    logBaseSlider->setSkewFactorFromMidPoint (100.0);
-    logBaseSlider->setValue (Global::logBase);
-    
-    logBaseSlider->addListener (this);
-    addAndMakeVisible (logBaseSlider.get());
-    
-    labels.add (new Label ("logBase", "Log Base"));
-    addAndMakeVisible (labels[labels.size() - 1]);
-    labels[labels.size() - 1]->attachToComponent (logBaseSlider.get(), false);
-    
     labels.add (new Label ("inputGain", "Input Gain"));
     addAndMakeVisible (labels[labels.size() - 1]);
+    labels[labels.size() - 1]->setJustificationType(Justification::centred);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
     calculateBtn = std::make_unique<TextButton> ("Test");
@@ -102,10 +90,6 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     allSliders = std::make_unique<TextButton> ("All Sliders");
     allSliders->addListener (this);
     addAndMakeVisible (allSliders.get());
-    
-    logButton = std::make_unique<TextButton> ("Grid Type");
-    logButton->addListener (this);
-    addAndMakeVisible (logButton.get());
     
     response = std::make_unique<Response> (processor.getFDN()->getMaxDLen(), processor.getSampleRate());
     std::cout << "Max dLen = " << processor.getFDN()->getMaxDLen() << std::endl;
@@ -183,17 +167,13 @@ void Fdn_AudioProcessorEditor::resized()
         sidePanel.removeFromBottom (margin);
         allSliders->setBounds (sidePanel.removeFromBottom(40));
         
-        logBaseSlider->setBounds (sidePanel.removeFromTop(knobHeight));
-        sidePanel.removeFromTop (margin);
-        logButton->setBounds(sidePanel.removeFromTop(40));
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
         responseArea.reduce(10, 10);
         response->setBounds (responseArea);
         totArea.removeFromTop (margin);
         
         totArea.removeFromBottom (margin);
-//        sliders[sliders.size() - 1]->setBounds (totArea.removeFromLeft (sliderWidth));
-//        sliders[sliders.size() - 2]->setBounds (totArea.removeFromLeft (sliderWidth));
+
         int sliderWidth = floor ((totArea.getWidth() - (11.0 * margin * 0.5)) / 10.0);
         for (int i = 0; i < sliders.size() - 2; ++i)
         {
@@ -221,7 +201,7 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
     if (slider == sliders[sliders.size() - 2])
     {
-        processor.setDryGain (slider->getValue());
+        processor.setDryGain (1.0-slider->getValue());
         return;
     }
     
@@ -229,11 +209,6 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
     {
         processor.setInputGain (slider->getValue());
         return;
-    }
-    
-    if (slider == logBaseSlider.get())
-    {
-        response->setLogBase (slider->getValue());
     }
     
     if (curSlider == nullptr)
@@ -285,10 +260,7 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
         }
         
     }
-    if (button == logButton.get())
-    {
-        response->changeGrid();
-    }
+    
     if (button == allSliders.get())
     {
         allSlidersBool = !allSlidersBool;
