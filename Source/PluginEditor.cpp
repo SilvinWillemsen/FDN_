@@ -100,7 +100,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
 //    double R = 0.99;
 //    response->setCoefficients ({1, 0, 0, 1, -2.0 * R * cos(double_Pi * 1000.0 / 22050.0), R * R});
 //    response->setCoefficients ({0.5, 0.5, 0, 1, 0, 0});
-    startTimerHz (15);
+    startTimerHz (1.0 / Global::updatePerSecondRatio);
     setSize (800, 700);
 }
 
@@ -117,16 +117,20 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
     
     response->setDataToZero();
 	
-    for (int i = 0; i < Global::numOctaveBands + 1; ++i)	
+    if (paintResponse)
     {
-        std::vector<double> coeffs = processor.getFDN()->getCoefficients (0, i);
-	
-       //std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
-	   //std::vector<double> coeffs = { 1.0178, 0.7291, 0.1023, 1,0.7547, 0.1595 };
-        response->calculateResponse (coeffs);
-		
+        for (int i = 0; i < Global::numOctaveBands + 1; ++i)
+        {
+            std::vector<double> coeffs = processor.getFDN()->getCoefficients (0, i);
+        
+           //std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
+           //std::vector<double> coeffs = { 1.0178, 0.7291, 0.1023, 1,0.7547, 0.1595 };
+            response->calculateResponse (coeffs);
+            
+        }
+        response->linearGainToDB();
+        paintResponse = false;
     }
-    response->linearGainToDB();
     
 }
 
@@ -216,6 +220,7 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
     
     processor.getFDN()->setRT (curSliderIdx, curSlider->getValue());
     
+    // Affect all sliders smoothly
     if (smoothValsBool)
     {
         for (int j = 0; j < sliders.size() - 2; ++j)
@@ -227,6 +232,7 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
             }
         }
     }
+    // Set all sliders to the current slider value
     else if (allSlidersBool)
     {
         for (int j = 0; j < sliders.size() - 2; ++j)
@@ -244,7 +250,7 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
 {
     if (button == calculateBtn.get())
     {
-        processor.setRecalculateFlag();
+        processor.setZeroCoeffsFlag();
     }
     if (button == smoothVals.get())
     {
@@ -280,5 +286,6 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
 
 void Fdn_AudioProcessorEditor::timerCallback()
 {
+    paintResponse = true;
     repaint();
 }

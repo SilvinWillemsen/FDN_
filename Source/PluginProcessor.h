@@ -69,7 +69,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     std::shared_ptr<FDN> getFDN() { return fdn; };    
-    void setRecalculateFlag() { recalculateCoeffsFlag = true; };
+    void setZeroCoeffsFlag() { zeroCoeffsFlag = true; };
     
     void setDryGain (double val) { dryGain = val; };
     void setInputGain (double val) { inputGain = val; };
@@ -99,9 +99,11 @@ private:
 	
     bool init = false;
     unsigned long t = 0;
+    unsigned long tt = 0;
     Random rand;
     
-    bool recalculateCoeffsFlag = false;
+    bool zeroCoeffsFlag = false;
+    int recalculateMod;
     double dryGain = Global::dryWetInit;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)

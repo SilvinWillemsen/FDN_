@@ -50,6 +50,9 @@ namespace Global
         return val;
     }
     
+    static const double updatePerSecondRatio = 0.1;
+    
+    
     // GUI
     static const bool horSliders = false;
 //    static const int sliderHeight = 40;
@@ -57,6 +60,8 @@ namespace Global
     static const double logBase = 1000;
     static const int axisMargin = 40;
     static const double zeroDbRatio = 0.6;
+    static const int fftOrder = 1024;
+
 
     static const bool showRTGainButtons = false;
     static const bool showLogSlider = true;

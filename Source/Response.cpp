@@ -16,10 +16,10 @@ Response::Response (double dLen, double fs) : fs (fs), dLen (dLen)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-    linearData.resize (fftOrder, 0);
-    dBData.resize (fftOrder, 0);
-	RTData.resize(fftOrder, 0);
-	//targetRT.resize(fftOrder, 0);
+    linearData.resize (Global::fftOrder, 0);
+    dBData.resize (Global::fftOrder, 0);
+	RTData.resize(Global::fftOrder, 0);
+	//targetRT.resize(Global::fftOrder, 0);
     drawToggles.resize(2, true);
     
     if (Global::showRTGainButtons)
@@ -189,10 +189,10 @@ Path Response::generateResponsePath (std::vector<double>& data, float visualScal
     Path response;
     //response.startNewSubPath(0, -dBData[0] * visualScaling + zeroDbHeight);
     response.startNewSubPath(Global::axisMargin, -data[0] * visualScaling + zeroDbHeight); // draw RT instead of filter magnitude
-    auto spacing = (plotWidth) / static_cast<double> (fftOrder);
+    auto spacing = (plotWidth) / static_cast<double> (Global::fftOrder);
     auto x = spacing + Global::axisMargin;
     float newY;
-    for (int y = 0; y < fftOrder; y++)
+    for (int y = 0; y < Global::fftOrder; y++)
     {
         newY = -data[y] * visualScaling + zeroDbHeight;
         response.lineTo(x, newY);
@@ -240,10 +240,11 @@ void Response::resized()
     RTLabel->setTransform (transformRT);
 
     AffineTransform transformGain;
-    transformGain = transformGain.rotated (-0.5 * double_Pi, Global::axisMargin, getHeight() - (getHeight()-zeroDbHeight) * 0.5);
+    transformGain = transformGain.rotated (-0.5 * double_Pi, Global::axisMargin, getHeight() - (Global::axisMargin + getHeight()-zeroDbHeight) * 0.5);
     transformGain = transformGain.translated(-Global::axisMargin * 0.75, 0);
     gainLabel->setTransform (transformGain);
     
+    leftAxis.removeFromBottom (Global::axisMargin);
     RTLabel->setBounds(leftAxis.removeFromTop (zeroDbHeight));
     gainLabel->setBounds(leftAxis);
     
@@ -253,13 +254,13 @@ void Response::calculateResponse (std::vector<double> coefficients)
 {
     std::complex<double> i (0.0, 1.0);
     std::complex<double> omega (0.0, 0.0);
-//    double testDiv = abs(log10(1.0 / static_cast<double>(fftOrder)));
-    for (int k = 1; k <= fftOrder; ++k)
+//    double testDiv = abs(log10(1.0 / static_cast<double>(Global::fftOrder)));
+    for (int k = 1; k <= Global::fftOrder; ++k)
     {
-//       omega.real (k / static_cast<double>(fftOrder) * double_Pi);
-        double linearVal = k / static_cast<double>(fftOrder);
+//       omega.real (k / static_cast<double>(Global::fftOrder) * double_Pi);
+        double linearVal = k / static_cast<double>(Global::fftOrder);
         omega.real (double_Pi * ((pow (logBase, linearVal) - 1.0) / (logBase - 1.0)));
-//        omega.real ((log10(k / static_cast<double>(fftOrder)) / testDiv + 1) * double_Pi);
+//        omega.real ((log10(k / static_cast<double>(Global::fftOrder)) / testDiv + 1) * double_Pi);
         linearData[k-1] *= (coefficients[0] + coefficients[1] * exp(-i * omega) + coefficients[2] * exp(-2.0 * i * omega))
                                      / (coefficients[3] + coefficients[4] * exp(-i * omega) + coefficients[5] * exp(-2.0 * i * omega));
     }
@@ -268,7 +269,7 @@ void Response::calculateResponse (std::vector<double> coefficients)
 //void Response::calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT)
 //{
 //	double delta;
-//	double vecLen = fftOrder / 10.0f;
+//	double vecLen = Global::fftOrder / 10.0f;
 //	std::vector<double> linVec;
 //
 //	for (int i = 0; i < 9; ++i)
@@ -283,7 +284,7 @@ void Response::calculateResponse (std::vector<double> coefficients)
 void Response::linearGainToDB()
 {
     unstable = false;
-	for (int i = 0; i < fftOrder; ++i)
+	for (int i = 0; i < Global::fftOrder; ++i)
     {
 		dBData[i] = Global::limit (20.0 * log10(abs(linearData[i])), -60.0, 10.0);
         if (dBData[i] >= 0)

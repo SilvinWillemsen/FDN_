@@ -32,7 +32,7 @@ public:
     Path generateResponsePath (std::vector<double>& data, float visualScaling);
     
     void setDataToZero() {
-        for (int i = 0; i < fftOrder; ++i)
+        for (int i = 0; i < Global::fftOrder; ++i)
         {
             linearData[i].real (1.0);
             linearData[i].imag (0.0);
@@ -48,7 +48,6 @@ public:
     void changeGrid() { drawBandLines = !drawBandLines; setLogBase(logBase, true); };
     
 private:
-    int fftOrder = 4000;
     double fs;
 //    std::vector<double> dLen;
 	std::vector<std::vector<double>> gainDB;
@@ -84,5 +83,6 @@ private:
     std::unique_ptr<Label> logLabel;
     
     Colour unstableColour {255, 128, 128};
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

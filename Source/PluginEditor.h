@@ -57,5 +57,6 @@ private:
     Slider* curSlider = nullptr;
     int curSliderIdx;
     
+    bool paintResponse = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

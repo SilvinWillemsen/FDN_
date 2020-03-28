@@ -115,6 +115,7 @@ void Fdn_AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // initialisation that you need..
     fs = sampleRate;
     fdn->initialise (fs);
+    recalculateMod = Global::updatePerSecondRatio * fs;
 }
 
 void Fdn_AudioProcessor::releaseResources()
@@ -175,12 +176,18 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 //        {
 //            std::cout << "wait" << std::endl;
 //        }
+        ++tt;
     }
-    fdn->recalculateCoeffs();
-    if (recalculateCoeffsFlag == true)
+    if (tt >= recalculateMod)
+    {
+        tt -= recalculateMod;
+        fdn->recalculateCoeffs();
+    }
+    
+    if (zeroCoeffsFlag == true)
     {
         fdn->zeroCoefficients();
-        recalculateCoeffsFlag = false;
+        zeroCoeffsFlag = false;
         t = 0;
     }
 
