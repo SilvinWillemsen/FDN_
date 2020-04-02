@@ -52,7 +52,7 @@ namespace Global
     
     static const double updatePerSecondRatio = 0.1;
     
-    
+    static const MatrixType initMatType = hadamard;
     // GUI
     static const bool horSliders = false;
 //    static const int sliderHeight = 40;
@@ -65,4 +65,5 @@ namespace Global
 
     static const bool showRTGainButtons = false;
     static const bool showLogSlider = true;
+    
 }

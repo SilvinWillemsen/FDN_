@@ -91,6 +91,10 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     allSliders->addListener (this);
     addAndMakeVisible (allSliders.get());
     
+    matButton = std::make_unique<TextButton> (curMatType == householder ? "Householder" : "Hadamard");
+    matButton->addListener (this);
+    addAndMakeVisible (matButton.get());
+    
     response = std::make_unique<Response> (processor.getFDN()->getMaxDLen(), processor.getSampleRate());
     std::cout << "Max dLen = " << processor.getFDN()->getMaxDLen() << std::endl;
     std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
@@ -170,6 +174,8 @@ void Fdn_AudioProcessorEditor::resized()
         smoothVals->setBounds (sidePanel.removeFromBottom(40));
         sidePanel.removeFromBottom (margin);
         allSliders->setBounds (sidePanel.removeFromBottom(40));
+        sidePanel.removeFromBottom (margin);
+        matButton->setBounds (sidePanel.removeFromBottom(40));
         
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
         responseArea.reduce(10, 10);
@@ -252,7 +258,7 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
     {
         processor.setZeroCoeffsFlag();
     }
-    if (button == smoothVals.get())
+    else if (button == smoothVals.get())
     {
         smoothValsBool = !smoothValsBool;
         if (!smoothValsBool)
@@ -266,8 +272,7 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
         }
         
     }
-    
-    if (button == allSliders.get())
+    else if (button == allSliders.get())
     {
         allSlidersBool = !allSlidersBool;
         if (!allSlidersBool)
@@ -279,9 +284,14 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
             if (smoothValsBool)
                 buttonClicked (smoothVals.get());
         }
-        
     }
-    
+    else if (button == matButton.get())
+
+    {
+        curMatType = curMatType == householder ? hadamard : householder;
+        processor.changeMatType (curMatType);
+        matButton->setButtonText (curMatType == householder ? "Householder" : "Hadamard");
+    }
 }
 
 void Fdn_AudioProcessorEditor::timerCallback()

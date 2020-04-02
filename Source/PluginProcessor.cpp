@@ -190,6 +190,11 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         zeroCoeffsFlag = false;
         t = 0;
     }
+    if (changeMatTypeFlag == true)
+    {
+        changeMatTypeFlag = false;
+        fdn->setScatteringMatrix (matType);
+    }
 
 }
 

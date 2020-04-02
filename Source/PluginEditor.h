@@ -47,6 +47,7 @@ private:
     std::unique_ptr<TextButton> calculateBtn;
     std::unique_ptr<TextButton> smoothVals;
     std::unique_ptr<TextButton> allSliders;
+    std::unique_ptr<TextButton> matButton;
 
     Colour defaultButtonColour;
     bool smoothValsBool = false;
@@ -58,5 +59,6 @@ private:
     int curSliderIdx;
     
     bool paintResponse = false;
+    MatrixType curMatType = Global::initMatType;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

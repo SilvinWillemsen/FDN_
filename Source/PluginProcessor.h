@@ -75,6 +75,7 @@ public:
     void setInputGain (double val) { inputGain = val; };
 
     double getFs() { return fs; };
+    void changeMatType (MatrixType mt) { changeMatTypeFlag = true; matType = mt; };
     
 private:
     //==============================================================================
@@ -105,6 +106,9 @@ private:
     bool zeroCoeffsFlag = false;
     int recalculateMod;
     double dryGain = Global::dryWetInit;
+    
+    bool changeMatTypeFlag = false;
+    MatrixType matType = Global::initMatType;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

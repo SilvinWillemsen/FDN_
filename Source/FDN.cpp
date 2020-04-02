@@ -20,7 +20,7 @@ FDN::FDN()
     c.resize (Global::FDNorder, 1.0);
     
     // initialise scattering matrix
-    setScatteringMatrix (hadamard);
+    setScatteringMatrix (Global::initMatType);
 
 }
 
@@ -58,6 +58,7 @@ double FDN::calculate (double input)
     // output of eqComb goes out and back into scattering matrix
         
     }
+
     for (int i = 0; i < Global::FDNorder; ++i)
     {
         eqCombs[i]->increment();
