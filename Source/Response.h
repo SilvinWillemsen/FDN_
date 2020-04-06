@@ -39,7 +39,8 @@ public:
         }
     }
     void calculateResponse (std::vector<double> coefficients);
-	void calculateTargetResponse(std::vector<double> gainDB, std::vector<double> RT);
+    void setIRData (std::vector<double>& irData);
+//    void calculateTargetResponse (std::vector<double> gainDB, std::vector<double> RT);
     void linearGainToDB();
 
     void buttonClicked (Button* button) override;
@@ -47,6 +48,11 @@ public:
     void setLogBase (double val, bool init = false);
     void changeGrid() { drawBandLines = !drawBandLines; setLogBase(logBase, true); };
     
+    void initialiseIRComb();
+    bool isShowingIR() { return showingIR; };
+    std::shared_ptr<EQComb>& getIRComb() { return IRComb; };
+    
+    void calculateIR();
 private:
     double fs;
 //    std::vector<double> dLen;
@@ -57,8 +63,12 @@ private:
 	std::vector<double> RTData;
 	std::vector<double> targetRT;
     
+    std::vector<double> IRdata;
+
     std::unique_ptr<Label> RTLabel;
     std::unique_ptr<Label> gainLabel;
+    std::unique_ptr<Label> ampLabel;
+
 
     OwnedArray<TextButton> buttons;
     std::vector<bool> drawToggles;
@@ -76,13 +86,17 @@ private:
     double dLen;
     double multiplicationFactor = 1;
     
-    bool init = true;
+//    bool init = true;
     
     std::unique_ptr<TextButton> logButton;
     std::unique_ptr<Slider> logBaseSlider;
     std::unique_ptr<Label> logLabel;
     
+    std::unique_ptr<TextButton> IRButton;
+    bool showingIR = Global::initShowIR;
     Colour unstableColour {255, 128, 128};
     
+    std::shared_ptr<EQComb> IRComb;
+    std::vector<double> noiseBurst;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

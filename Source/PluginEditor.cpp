@@ -95,11 +95,13 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     matButton->addListener (this);
     addAndMakeVisible (matButton.get());
     
-    response = std::make_unique<Response> (processor.getFDN()->getMaxDLen(), processor.getSampleRate());
     std::cout << "Max dLen = " << processor.getFDN()->getMaxDLen() << std::endl;
     std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
     std::cout << "Min dLen = " << processor.getFDN()->getMinDLen() << std::endl;
 
+    closestToAVGdLenIdx = processor.getFDN()->getClosestToAvgDLenIdx();
+    
+    response = std::make_unique<Response> (processor.getFDN()->getEQComb(closestToAVGdLenIdx)->getDelayLineLength(), processor.getSampleRate());
     addAndMakeVisible (response.get());
 //    double R = 0.99;
 //    response->setCoefficients ({1, 0, 0, 1, -2.0 * R * cos(double_Pi * 1000.0 / 22050.0), R * R});
@@ -123,9 +125,19 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
 	
     if (paintResponse)
     {
+        if (response->isShowingIR())
+        {
+            if (response->getIRComb() != nullptr)
+            {
+                for (int i = 0; i < Global::numOctaveBands + 1; ++i)
+                    response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(closestToAVGdLenIdx, i));
+                response->calculateIR();
+            }
+        }
+        //// there is no 'else' here so that instablility can be calculated
         for (int i = 0; i < Global::numOctaveBands + 1; ++i)
         {
-            std::vector<double> coeffs = processor.getFDN()->getCoefficients (0, i);
+            std::vector<double> coeffs = processor.getFDN()->getCoefficients (closestToAVGdLenIdx, i);
         
            //std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
            //std::vector<double> coeffs = { 1.0178, 0.7291, 0.1023, 1,0.7547, 0.1595 };
@@ -133,6 +145,7 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
             
         }
         response->linearGainToDB();
+        ////
         paintResponse = false;
     }
     

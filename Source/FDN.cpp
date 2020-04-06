@@ -220,16 +220,15 @@ void FDN::aceq (int idx)
         gainDB[idx][i] = -G0 + gainDB[idx][i];
     
     // wg = [.0044 .009 .0178 .0356 .0712 .01425 0.2850 0.5699 1.1398 2.28];
-    std::vector<double> wg (Global::numOctaveBands, 0);
-    std::vector<double> wc (Global::numDesignFreqs, 0);
+    wg.resize (Global::numOctaveBands, 0);
+    wc.resize (Global::numDesignFreqs, 0);
     for (int i = 0; i < Global::numOctaveBands; i++)
         wg[i] = 2.0 * double_Pi * Global::fc1[i] / fs; // Command gain frequencies in radians
     
     for (int j = 0; j < Global::numDesignFreqs; j++)
         wc[j] = 2.0 * double_Pi * fc2[j] / fs; // Center frequencies in radians for iterative design with extra points
     
-    double gw = 0.3f; //Gain factor at bandwidth(parameter c)
-    std::vector<double> bw (Global::numOctaveBands, 0); // EQ filter bandwidths
+    bw.resize (Global::numOctaveBands, 0); // EQ filter bandwidths
     
     for (int m = 0; m < Global::numOctaveBands; m++)
         bw[m] = 1.5 * wg[m];
@@ -241,11 +240,10 @@ void FDN::aceq (int idx)
         bw[Global::numOctaveBands - 1] = 0.76 * wg[Global::numOctaveBands - 1]; // Additional adjustmenst due to asymmetry
     }
     
-    const double c = pow(10, 19.0 / 20.0);
-    std::vector<double> inG (Global::numOctaveBands, c);
+    inG.resize(Global::numOctaveBands, cc);
     interactionMatrix (&inG[0], gw, &wg[0], &wc[0], &bw[0]); //Estimate leakage b / w bands
     
-    std::vector<double> Gdb2 (Global::numDesignFreqs, 0);
+    Gdb2.resize(Global::numDesignFreqs, 0);
     
     for (int k = 0; k < Global::numDesignFreqs; ++k)
         if (k % 2 == 0)
@@ -254,17 +252,16 @@ void FDN::aceq (int idx)
             Gdb2[k] = (Gdb2[k-1] + Gdb2[k+1]) / 2.0; // Interpolate target gains linearly b / w command gains
     
     //// Linear least squares ////
-    Eigen::MatrixXd leakMat (Global::numDesignFreqs, Global::numOctaveBands);
+    
     // transpose matrix
     for (int i = 0; i < Global::numOctaveBands; i++)
         for (int j = 0; j < Global::numDesignFreqs; j++)
             leakMat(j, i) = leak[i][j];
     
     // Linear least squares
-    Eigen::VectorXd Gdb2Vect;
     Gdb2Vect = Eigen::VectorXd::Map (&Gdb2[0], Gdb2.size());
     Gdb2Vect = Gdb2Vect.transpose();
-    Eigen::VectorXd solution = leakMat.bdcSvd (Eigen::ComputeThinU | Eigen::ComputeThinV).solve(Gdb2Vect);
+    solution = leakMat.bdcSvd (Eigen::ComputeThinU | Eigen::ComputeThinV).solve(Gdb2Vect);
     
     for (int i = 0; i < Global::numOctaveBands; ++i)
         Goptdb[i] = solution(i);
@@ -275,30 +272,28 @@ void FDN::aceq (int idx)
     // (Second interaction matrix) Iterate once
     interactionMatrix (&Gopt[0], gw, &wg[0], &wc[0], &bw[0]); // Use previous gains
     
-    Eigen::MatrixXd leakMat2 (Global::numDesignFreqs, Global::numOctaveBands);
     // transpose matrix
     for (int i = 0; i < Global::numOctaveBands; i++)
         for (int j = 0; j < Global::numDesignFreqs; j++)
             leakMat2(j, i) = leak[i][j];
     
     // Linear least squares
-    Eigen::VectorXd G2optdbVect;
     G2optdbVect = Eigen::VectorXd::Map (&Gdb2[0], Gdb2.size());
     G2optdbVect = G2optdbVect.transpose();
-    Eigen::VectorXd solution2 = leakMat2.bdcSvd (Eigen::ComputeThinU | Eigen::ComputeThinV).solve(G2optdbVect);
+    solution2 = leakMat2.bdcSvd (Eigen::ComputeThinU | Eigen::ComputeThinV).solve(G2optdbVect);
     
     for (int i = 0; i < Global::numOctaveBands; ++i)
-        G2optdb[i] = solution2(i);
+        G2optdb[i] = solution2 (i);
     
     for (int k = 0; k < Global::numOctaveBands; k++)
     {
-        G2opt[k] = pow(10, G2optdb[k] / 20.0); // Convert to linear gain factors
+        G2opt[k] = pow (10, G2optdb[k] / 20.0); // Convert to linear gain factors
         G2woptdb[k] = gw * G2optdb[k];        // Gain at bandwidth wg
         G2wopt[k] = pow(10, G2woptdb[k] / 20.0); //Convert to linear gain factor
     }
     
     // Design filters with optimized gains
-    std::vector<double> coeffsFromPareq (6, 0);
+    coeffsFromPareq.resize (6, 0);
     for (int k = 0; k < Global::numOctaveBands; k++)
     {
         coeffsFromPareq = pareq (G2opt[k], G2wopt[k], wg[k], bw[k]); // Design filters
@@ -337,7 +332,25 @@ void FDN::getDelayLines()
 	// make a random-length delay line
 	for (int i = 0; i < Global::FDNorder; ++i)
 		dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+}
 
+int FDN::getClosestToAvgDLenIdx()
+{
+    // find closest delayline length
+    double avgDLen = getAvgDLen();
+    int closestDLen = 0;
+    int diffDLen = 10000;
+    for (int i = 0; i < Global::FDNorder; ++i)
+    {
+        std::cout << i << " " << dLen[i] << std::endl;
+        if (abs(avgDLen - dLen[i]) < diffDLen)
+        {
+            closestDLen = i;
+            diffDLen = abs(avgDLen - dLen[i]);
+        }
+    }
+    std::cout << "closest DLen index: " << closestDLen << std::endl;
+    return closestDLen;
 }
 
 void FDN::getAttenuation()
@@ -380,11 +393,16 @@ double FDN::getAvgDLen()
 double FDN::getMaxDLen()
 {
     double tmp = 0;
+//    int idx = 0;
     for (int i = 0; i < dLen.size(); ++i)
     {
         if (dLen[i] > tmp)
+//        {
             tmp = dLen[i];
+//            idx = i;
+//        }
     }
+//    return idx;
     return tmp;
 }
 

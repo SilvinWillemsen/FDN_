@@ -60,5 +60,6 @@ private:
     
     bool paintResponse = false;
     MatrixType curMatType = Global::initMatType;
+    int closestToAVGdLenIdx;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

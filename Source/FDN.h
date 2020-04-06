@@ -39,6 +39,7 @@ public:
     void aceq (int idx);
     void getAttenuation();
 	void getDelayLines();
+    int getClosestToAvgDLenIdx();
     
     EQComb* getEQComb (int idx) { return eqCombs[idx]; };
     
@@ -82,6 +83,14 @@ private:
     
     std::vector<double> dLen;
     
+    std::vector<double> wg;
+    std::vector<double> wc;
+    std::vector<double> bw;
+    std::vector<double> inG;
+    std::vector<double> Gdb2;
+    
+    const double cc = pow (10, 19.0 / 20.0);
+    const double gw = 0.3f; //Gain factor at bandwidth(parameter c)
     // Center frequencies
     std::vector<double> fc2 = { 31.25, 44.2, 62.5, 88.39, 125, 176.78, 250, 353.55, 500, 707.11, 1000, 1414.2, 2000, 2828.4, 4000, 5656.9, 8000, 11313.7, 16000 };
     
@@ -91,6 +100,16 @@ private:
     std::vector<double> G2opt;
     std::vector<double> G2woptdb;
     std::vector<double> G2wopt;
+    
+    Eigen::MatrixXd leakMat { Global::numDesignFreqs, Global::numOctaveBands };
+    Eigen::MatrixXd leakMat2 { Global::numDesignFreqs, Global::numOctaveBands };
+
+    Eigen::VectorXd Gdb2Vect;
+    Eigen::VectorXd solution;
+    Eigen::VectorXd G2optdbVect;
+    Eigen::VectorXd solution2;
+    
+    std::vector<double> coeffsFromPareq;
     
     std::vector<std::vector<double>> leak;
     std::vector<std::vector<double>> leak2;
