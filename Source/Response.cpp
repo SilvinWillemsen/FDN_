@@ -19,7 +19,7 @@ Response::Response (double dLen, double fs) : fs (fs), dLen (dLen)
     linearData.resize (Global::fftOrder, 0);
     dBData.resize (Global::fftOrder, 0);
 	RTData.resize (Global::fftOrder, 0);
-    IRdata.resize (Global::IRseconds * Global::IRsamplesPerSecond, 0);
+    IRdata.resize (Global::IRplotDataPoints, 0);
 
     noiseBurst.resize (dLen, 0);
     
@@ -120,9 +120,9 @@ void Response::paint (Graphics& g)
         //// Draw gridlines ////
         g.setColour (Colours::lightgrey);
         int xLoc = 0;
-        for (int i = 1; i < Global::IRseconds; ++i)
+        for (int i = 1; i < IRseconds; ++i)
         {
-            xLoc = (i / Global::IRseconds) * plotWidth + Global::axisMargin;
+            xLoc = (i / IRseconds) * plotWidth + Global::axisMargin;
             g.drawLine (xLoc, 0, xLoc, getHeight() - Global::axisMargin, 1.0f);
         }
     } else {
@@ -177,9 +177,9 @@ void Response::paint (Graphics& g)
     {
         int xLoc = 0;
         g.setColour (Colours::darkgrey);
-        for (int i = 1; i <= Global::IRseconds; ++i)
+        for (int i = 1; i <= IRseconds; ++i)
         {
-            xLoc = (i / Global::IRseconds) * plotWidth + Global::axisMargin;
+            xLoc = (i / IRseconds) * plotWidth + Global::axisMargin;
             g.drawText(String(i), xLoc - 20, getHeight() - Global::axisMargin, 40, 20, Justification::centred);
         }
         g.drawText ("Time (s)", (getWidth() + Global::axisMargin) * 0.5 - 40, getHeight() - 0.5 * Global::axisMargin - 10, 80, 30, Justification::centred);
@@ -424,14 +424,17 @@ void Response::calculateIR()
     double output;
     int idx = 0;
     IRComb->zeroCoefficients();
-    for (int i = 0; i < Global::IRseconds * fs; ++i)
+    int t = 0;
+    for (int i = 0; i < IRseconds * fs; ++i)
     {
         output = IRComb->filter (i < dLen ? noiseBurst[i] : 0);
         IRComb->addScatOutput (output);
         IRComb->increment();
         IRComb->zeroWritePointer();
-        if (i % static_cast<int> (fs / Global::IRsamplesPerSecond) == 0)
+        ++t;
+        if (t > fs / IRsamplesPerSecond)
         {
+            t -= fs / IRsamplesPerSecond;
             IRdata[idx] = output;
             ++idx;
         }

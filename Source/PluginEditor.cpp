@@ -129,6 +129,13 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
         {
             if (response->getIRComb() != nullptr)
             {
+                double maxVal = 0;
+                for (int i = 0; i < Global::numOctaveBands; ++i)
+                    if (sliders[i]->getValue() > maxVal)
+                        maxVal = sliders[i]->getValue();
+                
+                response->setIRseconds (round (maxVal) + 0.5);
+                
                 for (int i = 0; i < Global::numOctaveBands + 1; ++i)
                     response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(closestToAVGdLenIdx, i));
                 response->calculateIR();

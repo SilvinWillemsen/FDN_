@@ -53,6 +53,7 @@ public:
     std::shared_ptr<EQComb>& getIRComb() { return IRComb; };
     
     void calculateIR();
+    void setIRseconds (double seconds) { IRseconds = seconds; IRsamplesPerSecond = Global::IRplotDataPoints / seconds; };
 private:
     double fs;
 //    std::vector<double> dLen;
@@ -98,5 +99,10 @@ private:
     
     std::shared_ptr<EQComb> IRComb;
     std::vector<double> noiseBurst;
+    double IRseconds;
+    double IRsamplesPerSecond;
+    
+    double maxSliderValue = 1.0; 
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

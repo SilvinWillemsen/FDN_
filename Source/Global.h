@@ -50,7 +50,7 @@ namespace Global
         return val;
     }
     
-    static const double updatePerSecondRatio = 0.1;
+    static const double updatePerSecondRatio = 0.2;
     
     static const MatrixType initMatType = hadamard;
     // GUI
@@ -68,7 +68,8 @@ namespace Global
     
     static const bool initShowIR = false;
     
-    static const double IRseconds = 5.5;
-    static const double IRsamplesPerSecond = 100;
+//    static const double IRseconds = 5.5;
+//    static const double IRsamplesPerSecond = 200;
+    static const double IRplotDataPoints = 1000;
     
 }
