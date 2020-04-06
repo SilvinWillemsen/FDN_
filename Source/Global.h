@@ -68,7 +68,7 @@ namespace Global
     
     static const bool initShowIR = false;
     
-    static const double IRseconds = 10.5;
+    static const double IRseconds = 5.5;
     static const double IRsamplesPerSecond = 100;
     
 }
