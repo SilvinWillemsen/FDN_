@@ -103,15 +103,16 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     response = std::make_unique<Response> (processor.getFDN()->getEQComb(dLenIdx)->getDelayLineLength(), processor.getSampleRate());
     addAndMakeVisible (response.get());
 
-    
+    //// Presets ////
     presets = std::make_unique<ComboBox> ("Presets");
     presets->addItem ("-- no preset --", noPreset);
+    presets->setItemEnabled (1, false);
     presets->addItem ("Small Room", smallRoom);
     presets->addItem ("Medium Room", mediumRoom);
     presets->addItem ("Large Room", largeRoom);
     presets->addItem ("Concert Hall", concertHall);
     presets->addItem ("Church", church);
-    presets->setSelectedId (1);
+    presets->setSelectedId (3);
     addAndMakeVisible (presets.get());
 
     presetsLabel = std::make_unique<Label> ("presets", "Presets:");
@@ -150,11 +151,10 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
                     if (sliders[i]->getValue() > maxVal)
                         maxVal = sliders[i]->getValue();
                 
-                response->setIRseconds (round (maxVal) + 0.5);
-                
                 for (int i = 0; i < Global::numOctaveBands + 1; ++i)
                     response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(dLenIdx, i));
                 response->calculateIR();
+                response->setIRseconds (round (maxVal) + 0.5);
             }
         }
         //// there is no 'else' here so that instablility can be calculated
