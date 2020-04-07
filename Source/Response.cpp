@@ -88,8 +88,8 @@ Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (min
         addAndMakeVisible (logButton.get());
         
     } else {
-//        IRButton = std::make_unique<TextButton> (Global::initShowIR ? "Show EQ" : "Show IR");
-        IRButton = std::make_unique<TextButton> (curIRIsLong ? "Use shortest dLen" : "Use longest dLen");
+        IRButton = std::make_unique<TextButton> (Global::initShowIR ? "Show EQ" : "Show IR");
+//        IRButton = std::make_unique<TextButton> (curIRIsLong ? "Use shortest dLen" : "Use longest dLen");
         IRButton->addListener (this);
         addAndMakeVisible (IRButton.get());
     }
@@ -352,11 +352,11 @@ void Response::buttonClicked (Button* button)
     }
     else if (button == IRButton.get())
     {
-//        IRButton->setButtonText(showingIR ? "Show IR" : "Show EQ");
-//        showingIR = !showingIR;
-//        resized();
-        IRButton->setButtonText(curIRIsLong ? "Use longest dLen" : "Use shortest dLen");
-        curIRIsLong = !curIRIsLong;
+        IRButton->setButtonText(showingIR ? "Show IR" : "Show EQ");
+        showingIR = !showingIR;
+        resized();
+//        IRButton->setButtonText(curIRIsLong ? "Use longest dLen" : "Use shortest dLen");
+//        curIRIsLong = !curIRIsLong;
     }
     
     for (int i = 0; i < buttons.size(); ++i)
@@ -418,26 +418,27 @@ void Response::setLogBase (double val, bool init)
 
 void Response::initialiseIRComb()
 {
-    IRCombLong = std::make_shared<EQComb> (maxDLen);
-    IRCombShort = std::make_shared<EQComb> (minDLen);
+//    IRCombLong = std::make_shared<EQComb> (maxDLen);
+//    IRCombShort = std::make_shared<EQComb> (minDLen);
+    IRComb = std::make_shared<EQComb> (maxDLen);
 }
 
 void Response::calculateIR()
 {
     double output;
     int idx = 0;
-    IRCombLong->zeroCoefficients();
-    IRCombShort->zeroCoefficients();
-
+//    IRCombLong->zeroCoefficients();
+//    IRCombShort->zeroCoefficients();
+    IRComb->zeroCoefficients();
     int t = 0;
-    std::shared_ptr<EQComb> curIRComb = curIRIsLong ? IRCombLong : IRCombShort;
-    int dLen = curIRIsLong ? maxDLen : minDLen;
+//    std::shared_ptr<EQComb> curIRComb = curIRIsLong ? IRCombLong : IRCombShort;
+//    int dLen = curIRIsLong ? maxDLen : minDLen;
     for (int i = 0; i < IRseconds * fs; ++i)
     {
-        output = curIRComb->filter (i < dLen ? noiseBurst[i] : 0);
-        curIRComb->addScatOutput (output);
-        curIRComb->increment();
-        curIRComb->zeroWritePointer();
+        output = IRComb->filter (i < maxDLen ? noiseBurst[i] : 0);
+        IRComb->addScatOutput (output);
+        IRComb->increment();
+        IRComb->zeroWritePointer();
         ++t;
         if (t > fs / IRsamplesPerSecond)
         {

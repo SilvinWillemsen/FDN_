@@ -50,7 +50,7 @@ public:
     
     void initialiseIRComb();
     bool isShowingIR() { return showingIR; };
-    std::shared_ptr<EQComb>& getIRComb() { return curIRIsLong ? IRCombLong : IRCombShort; };
+    std::shared_ptr<EQComb>& getIRComb() { return IRComb; };
     
     void calculateIR();
     void setIRseconds (double seconds) { IRseconds = seconds; IRsamplesPerSecond = Global::IRplotDataPoints / seconds; };
@@ -95,8 +95,9 @@ private:
     bool showingIR = Global::initShowIR;
     Colour unstableColour {255, 128, 128};
     
-    std::shared_ptr<EQComb> IRCombLong;
-    std::shared_ptr<EQComb> IRCombShort;
+//    std::shared_ptr<EQComb> IRCombLong;
+//    std::shared_ptr<EQComb> IRCombShort;
+    std::shared_ptr<EQComb> IRComb;
     bool curIRIsLong = true;
 
     std::vector<double> noiseBurst;
