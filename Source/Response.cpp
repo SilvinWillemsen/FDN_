@@ -12,7 +12,7 @@
 #include "Response.h"
 
 //==============================================================================
-Response::Response (double dLen, double fs) : fs (fs), dLen (dLen)
+Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (minDLen), maxDLen (maxDLen)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -21,11 +21,11 @@ Response::Response (double dLen, double fs) : fs (fs), dLen (dLen)
 	RTData.resize (Global::fftOrder, 0);
     IRdata.resize (Global::IRplotDataPoints, 0);
 
-    noiseBurst.resize (dLen, 0);
+    noiseBurst.resize (maxDLen, 0);
     
 	//targetRT.resize(Global::fftOrder, 0);
     Random r;
-    for (int i = 0; i < dLen; ++i)
+    for (int i = 0; i < maxDLen; ++i)
     {
         noiseBurst[i] = 2.0 * r.nextDouble() - 1;
     }
@@ -88,7 +88,9 @@ Response::Response (double dLen, double fs) : fs (fs), dLen (dLen)
         addAndMakeVisible (logButton.get());
         
     } else {
-        IRButton = std::make_unique<TextButton> (Global::initShowIR ? "Show EQ" : "Show IR");
+//        IRButton = std::make_unique<TextButton> (Global::initShowIR ? "Show EQ" : "Show IR");
+        IRButton = std::make_unique<TextButton> (curIRIsLong ? "Use shortest dLen" : "Use longest dLen");
+
         IRButton->addListener (this);
         addAndMakeVisible (IRButton.get());
     }
@@ -241,6 +243,7 @@ Path Response::generateResponsePath (std::vector<double>& data, float visualScal
 
 void Response::resized()
 {
+    plotWidth = getWidth() - Global::axisMargin;
     if (showingIR)
     {
         zeroDbHeight = (getHeight() - Global::axisMargin) * 0.5;
@@ -260,8 +263,6 @@ void Response::resized()
         gainLabel->setVisible (true);
 
         zeroDbHeight = getHeight() * Global::zeroDbRatio;
-        plotWidth = getWidth() - Global::axisMargin;
-        
         //// Calculate grid-lines ////
         setLogBase (Global::logBase, true);
         
@@ -331,7 +332,7 @@ void Response::linearGainToDB()
 		dBData[i] = Global::limit (20.0 * log10(abs(linearData[i])), -60.0, 10.0);
         if (dBData[i] >= 0)
             unstable = true;
-        RTData[i] = -60.0 * (dLen) / (Global::limit(dBData[i], -1e10, -1e-10) * fs); // calculate RT - this should be -60*dLen/RT*fs
+        RTData[i] = -60.0 * (minDLen) / (Global::limit(dBData[i], -1e10, -1e-10) * fs); // calculate RT - this should be -60*dLen/RT*fs
 	}
 //    if (init) // update the delay line length based on RT = 1
 //    {
@@ -352,9 +353,11 @@ void Response::buttonClicked (Button* button)
     }
     else if (button == IRButton.get())
     {
-        IRButton->setButtonText(showingIR ? "Show IR" : "Show EQ");
-        showingIR = !showingIR;
-        resized();
+//        IRButton->setButtonText(showingIR ? "Show IR" : "Show EQ");
+//        showingIR = !showingIR;
+//        resized();
+        IRButton->setButtonText(curIRIsLong ? "Use longest dLen" : "Use shortest dLen");
+        curIRIsLong = !curIRIsLong;
     }
     
     for (int i = 0; i < buttons.size(); ++i)
@@ -416,21 +419,26 @@ void Response::setLogBase (double val, bool init)
 
 void Response::initialiseIRComb()
 {
-    IRComb = std::make_shared<EQComb> (dLen);
+    IRCombLong = std::make_shared<EQComb> (maxDLen);
+    IRCombShort = std::make_shared<EQComb> (minDLen);
 }
 
 void Response::calculateIR()
 {
     double output;
     int idx = 0;
-    IRComb->zeroCoefficients();
+    IRCombLong->zeroCoefficients();
+    IRCombShort->zeroCoefficients();
+
     int t = 0;
+    std::shared_ptr<EQComb> curIRComb = curIRIsLong ? IRCombLong : IRCombShort;
+    int dLen = curIRComb ? maxDLen : minDLen;
     for (int i = 0; i < IRseconds * fs; ++i)
     {
-        output = IRComb->filter (i < dLen ? noiseBurst[i] : 0);
-        IRComb->addScatOutput (output);
-        IRComb->increment();
-        IRComb->zeroWritePointer();
+        output = curIRComb->filter (i < dLen ? noiseBurst[i] : 0);
+        curIRComb->addScatOutput (output);
+        curIRComb->increment();
+        curIRComb->zeroWritePointer();
         ++t;
         if (t > fs / IRsamplesPerSecond)
         {

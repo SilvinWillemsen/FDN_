@@ -23,7 +23,7 @@ class Response    : public Component,
                     public Slider::Listener
 {
 public:
-    Response (double avgDLen, double fs);
+    Response (int minDLen, int maxDLen, double fs);
     ~Response();
 
     void paint (Graphics&) override;
@@ -50,7 +50,7 @@ public:
     
     void initialiseIRComb();
     bool isShowingIR() { return showingIR; };
-    std::shared_ptr<EQComb>& getIRComb() { return IRComb; };
+    std::shared_ptr<EQComb>& getIRComb() { return curIRIsLong ? IRCombLong : IRCombShort; };
     
     void calculateIR();
     void setIRseconds (double seconds) { IRseconds = seconds; IRsamplesPerSecond = Global::IRplotDataPoints / seconds; };
@@ -84,10 +84,8 @@ private:
 //    OwnedArray<Label> bandLabels;
     
     double plotWidth;
-    double dLen;
+    int minDLen, maxDLen;
     double multiplicationFactor = 1;
-    
-//    bool init = true;
     
     std::unique_ptr<TextButton> logButton;
     std::unique_ptr<Slider> logBaseSlider;
@@ -97,7 +95,10 @@ private:
     bool showingIR = Global::initShowIR;
     Colour unstableColour {255, 128, 128};
     
-    std::shared_ptr<EQComb> IRComb;
+    std::shared_ptr<EQComb> IRCombLong;
+    std::shared_ptr<EQComb> IRCombShort;
+    bool curIRIsLong = true;
+
     std::vector<double> noiseBurst;
     double IRseconds;
     double IRsamplesPerSecond;

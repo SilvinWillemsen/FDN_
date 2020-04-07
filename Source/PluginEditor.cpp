@@ -99,8 +99,9 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
     std::cout << "Min dLen = " << processor.getFDN()->getMinDLen() << std::endl;
 
-    dLenIdx = processor.getFDN()->getMaxDLenIdx();
-    response = std::make_unique<Response> (processor.getFDN()->getEQComb(dLenIdx)->getDelayLineLength(), processor.getSampleRate());
+    minDLenIdx = processor.getFDN()->getMinDLenIdx();
+    maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
+    response = std::make_unique<Response> (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen(), processor.getSampleRate());
     addAndMakeVisible (response.get());
 
     //// Presets ////
@@ -138,10 +139,9 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     
-    response->setDataToZero();
-	
     if (paintResponse)
     {
+        response->setDataToZero();
         if (response->isShowingIR())
         {
             if (response->getIRComb() != nullptr)
@@ -152,23 +152,20 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
                         maxVal = sliders[i]->getValue();
                 
                 for (int i = 0; i < Global::numOctaveBands + 1; ++i)
-                    response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(dLenIdx, i));
+                    response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(maxDLenIdx, i));
                 response->calculateIR();
                 response->setIRseconds (round (maxVal) + 0.5);
             }
         }
-        //// there is no 'else' here so that instablility can be calculated
+        //// there is no 'else' here so that instablility can be calculated {
         for (int i = 0; i < Global::numOctaveBands + 1; ++i)
         {
-            std::vector<double> coeffs = processor.getFDN()->getCoefficients (dLenIdx, i);
-        
-           //std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
-           //std::vector<double> coeffs = { 1.0178, 0.7291, 0.1023, 1,0.7547, 0.1595 };
+            std::vector<double> coeffs = processor.getFDN()->getCoefficients (minDLenIdx, i);
             response->calculateResponse (coeffs);
             
         }
         response->linearGainToDB();
-        ////
+        ////}
         paintResponse = false;
     }
     
@@ -362,13 +359,9 @@ void Fdn_AudioProcessorEditor::timerCallback()
 
 void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-    curSliderIdx = -1;
-//    if (presets->getSelectedId() == 0)
-//    {
-//        std::cout << "impossible" << std::endl;
-//    }
     if (comboBoxThatHasChanged == presets.get() && presets->getSelectedId() != 1)
     {
+        curSliderIdx = -1;
         for (int i = 0; i < Global::numOctaveBands; ++i)
         {
             sliders[i]->setValue (Global::presetValues[presets->getSelectedId() - 2][i]);

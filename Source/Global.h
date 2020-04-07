@@ -94,7 +94,7 @@ namespace Global
     static const bool showRTGainButtons = false;
     static const bool showLogSlider = false;
     
-    static const bool initShowIR = false;
+    static const bool initShowIR = true;
     
 //    static const double IRseconds = 5.5;
 //    static const double IRsamplesPerSecond = 200;
