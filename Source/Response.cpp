@@ -20,16 +20,10 @@ Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (min
     dBData.resize (Global::fftOrder, 0);
 	RTData.resize (Global::fftOrder, 0);
     IRdata.resize (Global::IRplotDataPoints, 0);
-
-    noiseBurst.resize (maxDLen, 0);
     
-	//targetRT.resize(Global::fftOrder, 0);
-    Random r;
-    for (int i = 0; i < maxDLen; ++i)
-    {
-        noiseBurst[i] = 2.0 * r.nextDouble() - 1;
-    }
-    drawToggles.resize(2, true);
+    setDLens (minDLen, maxDLen);
+    
+    drawToggles.resize (2, true);
     
     if (Global::showRTGainButtons)
     {
@@ -446,5 +440,18 @@ void Response::calculateIR()
             IRdata[idx] = output;
             ++idx;
         }
+    }
+}
+
+void Response::setDLens (int min, int max)
+{
+    minDLen = min;
+    maxDLen = max;
+    noiseBurst.resize (maxDLen, 0);
+
+    Random r;
+    for (int i = 0; i < maxDLen; ++i)
+    {
+        noiseBurst[i] = 2.0 * r.nextDouble() - 1;
     }
 }

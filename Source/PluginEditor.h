@@ -49,10 +49,17 @@ private:
     std::unique_ptr<TextButton> calculateBtn;
     std::unique_ptr<TextButton> smoothVals;
     std::unique_ptr<TextButton> allSliders;
-    std::unique_ptr<TextButton> matButton;
     
     std::unique_ptr<ComboBox> presets;
     std::unique_ptr<Label> presetsLabel;
+    
+    std::unique_ptr<ComboBox> fdnOrder;
+    std::unique_ptr<Label> fdnOrderLabel;
+    
+    std::unique_ptr<ComboBox> scatMats;
+
+    bool changingFDNorder = false;
+    
     Colour defaultButtonColour;
     bool smoothValsBool = false;
     bool allSlidersBool = false;
@@ -63,7 +70,6 @@ private:
     int curSliderIdx = -1;
     
     bool paintResponse = false;
-    MatrixType curMatType = Global::initMatType;
     int minDLenIdx, maxDLenIdx;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

@@ -54,6 +54,9 @@ public:
     
     void calculateIR();
     void setIRseconds (double seconds) { IRseconds = seconds; IRsamplesPerSecond = Global::IRplotDataPoints / seconds; };
+    
+    void setDLens (int min, int max);
+    
 private:
     double fs;
 //    std::vector<double> dLen;

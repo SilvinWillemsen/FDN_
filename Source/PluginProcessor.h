@@ -77,21 +77,11 @@ public:
     double getFs() { return fs; };
     void changeMatType (MatrixType mt) { changeMatTypeFlag = true; matType = mt; };
     
+    void changeFDNorder (int order, MatrixType matType);
+    
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
-//
-//    AudioParameterFloat* dryGain;
-//    AudioParameterFloat* RT31;
-//    AudioParameterFloat* RT63;
-//    AudioParameterFloat* RT125;
-//    AudioParameterFloat* RT250;
-//    AudioParameterFloat* RT500;
-//    AudioParameterFloat* RT1000;
-//    AudioParameterFloat* RT2000;
-//    AudioParameterFloat* RT4000;
-//    AudioParameterFloat* RT8000;
-//    AudioParameterFloat* RT16000;
     
     double fs;
     float totInput;
@@ -109,6 +99,11 @@ private:
     
     bool changeMatTypeFlag = false;
     MatrixType matType = Global::initMatType;
+    
+    bool changeFDNorderFlag = false;
+    int orderToChangeTo = 0;
+    MatrixType matTypeToChangeTo;
+
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

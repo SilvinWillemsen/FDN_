@@ -24,7 +24,8 @@
 class FDN    : public Component
 {
 public:
-    FDN();
+    FDN ();
+    void constructor (MatrixType matType);
     ~FDN();
 
     void paint (Graphics&) override;
@@ -65,10 +66,16 @@ public:
     double getMaxDLen();
     int getMaxDLenIdx();
 
-
     void setScatteringMatrix (MatrixType matType);
     
+    void changeFDNorder (int order, MatrixType matType);
+    int getFDNorder() { return FDNorder; };
+    
+    bool isInitialised() { return initialised; };
+    
+    void printScatteringMatrix();
 private:
+    int FDNorder;
     OwnedArray<EQComb> eqCombs;
     std::vector<double> b;
     std::vector<double> c;
@@ -119,5 +126,6 @@ private:
     std::vector<std::vector<double>> leak;
     std::vector<std::vector<double>> leak2;
     
+    bool initialised = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };

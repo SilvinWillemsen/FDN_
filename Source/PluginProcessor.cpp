@@ -27,19 +27,7 @@ Fdn_AudioProcessor::Fdn_AudioProcessor()
                        )
 #endif
 {
-    fdn = std::make_shared<FDN> ();
-    
-//    addParameter (dryGain = new AudioParameterFloat("dryGain", "Dry Gain", 0.0f, 1.0f, 0.55f));
-//    addParameter (RT31 = new AudioParameterFloat("RT31", "T60 for 31.5 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT63 = new AudioParameterFloat("RT63", "T60 for 63 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT125 = new AudioParameterFloat("RT125", "T60 for 125 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT250 = new AudioParameterFloat("RT250", "T60 for 250 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT500 = new AudioParameterFloat("RT500", "T60 for 500 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT1000 = new AudioParameterFloat("RT1000", "T60 for 1000 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT2000 = new AudioParameterFloat("RT2000", "T60 for 2000 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT4000 = new AudioParameterFloat("RT4000", "T60 for 4000 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT8000 = new AudioParameterFloat("RT8000", "T60 for 8000 Hz", 0.2f, 10.0f, 1.0f));
-//    addParameter (RT16000 = new AudioParameterFloat("RT16000", "T60 for 16000 Hz", 0.2f, 10.0f, 1.0f));
+    fdn = std::make_shared<FDN>();
 }
 
 Fdn_AudioProcessor::~Fdn_AudioProcessor()
@@ -150,32 +138,25 @@ bool Fdn_AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
+    if (fdn == nullptr)
+        return;
+    
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     
     float* const channeldataL = buffer.getWritePointer(0);
     float* const channeldataR = getTotalNumOutputChannels() > 1 ? buffer.getWritePointer(1) : nullptr;
     ScopedNoDenormals noDenormals;
     const float* input = buffer.getReadPointer (0);
-    
+    if (fdn == nullptr)
+        return;
     for (int i = 0; i < buffer.getNumSamples(); ++i)
     {
-        if (t == 0)
-        {
-            init = true;
-        }
-        totInput = (input[i] + (init ? 1.0 : 0.0)) * inputGain;
-    
+        totInput = (input[i] + (t == 0 ? 1.0 : 0.0)) * inputGain;
         output = fdn->calculate (totInput);
-        init = false;
         channeldataL[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
         if (channeldataR != nullptr)
             channeldataR[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
-//        std::cout << channelData[i] << std::endl;
         ++t;
-//        if (t % fdn->getEQComb(0)->getDelayLineLength() == 0)
-//        {
-//            std::cout << "wait" << std::endl;
-//        }
         ++tt;
     }
     if (tt >= recalculateMod)
@@ -184,16 +165,23 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         fdn->recalculateCoeffs();
     }
     
-    if (zeroCoeffsFlag == true)
+    if (zeroCoeffsFlag)
     {
         fdn->zeroCoefficients();
         zeroCoeffsFlag = false;
         t = 0;
     }
-    if (changeMatTypeFlag == true)
+    
+    if (changeMatTypeFlag)
     {
         changeMatTypeFlag = false;
         fdn->setScatteringMatrix (matType);
+    }
+    
+    if (changeFDNorderFlag)
+    {
+        fdn->changeFDNorder (orderToChangeTo, matTypeToChangeTo);
+        changeFDNorderFlag = !changeFDNorderFlag;
     }
 
 }
@@ -233,4 +221,11 @@ void Fdn_AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Fdn_AudioProcessor();
+}
+
+void Fdn_AudioProcessor::changeFDNorder (int order, MatrixType matType)
+{
+    orderToChangeTo = order;
+    matTypeToChangeTo = matType;
+    changeFDNorderFlag = true;
 }

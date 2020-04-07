@@ -11,7 +11,7 @@
 #pragma once
 enum MatrixType
 {
-    hadamard,
+    hadamard = 1,
     householder
 };
 
@@ -27,7 +27,7 @@ enum Preset
 
 namespace Global
 {
-    static const int FDNorder = 16;
+    static const int initFDNorder = 16;
     static const int numOctaveBands = 10;
     static const int minDelayLength = 1500;
     static const int maxDelayLength = 4500;
@@ -62,7 +62,7 @@ namespace Global
     
     static const double updatePerSecondRatio = 0.2;
     
-    static const MatrixType initMatType = hadamard;
+    static const MatrixType initMatType = householder;
     
     static const std::vector<std::vector<double>> presetValues
     {
@@ -74,11 +74,14 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92} // church
     };
     
-    static const bool usePredefinedDLens = true;
+    static const bool usePredefinedDLens = false;
     
     static const std::vector<int> dLens
     {
-        3141, 3350, 2157, 2551, 1624, 2032, 3909, 2181, 3069, 3156, 3133, 1557, 4345, 4498, 3457, 3416
+        1918, 3707, 1825, 3982, 3281, 3091, 1632, 1836,
+        4224, 1995, 2948, 3969, 3205, 3625, 2543, 2138,
+        2460, 1759, 4056, 3434, 3851, 2875, 3067, 3617,
+        4475, 3583, 3193, 1763, 1608, 2069, 2557, 3994
     };
     
     // GUI

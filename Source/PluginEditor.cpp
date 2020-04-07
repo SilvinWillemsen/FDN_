@@ -90,11 +90,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     allSliders = std::make_unique<TextButton> ("All Sliders");
     allSliders->addListener (this);
     addAndMakeVisible (allSliders.get());
-    
-    matButton = std::make_unique<TextButton> (curMatType == householder ? "Householder" : "Hadamard");
-    matButton->addListener (this);
-    addAndMakeVisible (matButton.get());
-    
+
     std::cout << "Max dLen = " << processor.getFDN()->getMaxDLen() << std::endl;
     std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
     std::cout << "Min dLen = " << processor.getFDN()->getMinDLen() << std::endl;
@@ -115,6 +111,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     presets->addItem ("Church", church);
     presets->setSelectedId (3);
     addAndMakeVisible (presets.get());
+    presets->addListener (this);
 
     presetsLabel = std::make_unique<Label> ("presets", "Presets:");
     Font font (18.0);
@@ -122,8 +119,47 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     addAndMakeVisible (presetsLabel.get());
     presetsLabel->setJustificationType(Justification::left);
     presetsLabel->setColour (Label::textColourId, Colours::white);
-    presets->addListener (this);
+    
+    //// FDN order ////
+    fdnOrder = std::make_unique<ComboBox> ("fdnOrder");
+    fdnOrder->addItem ("8", 1);
+    fdnOrder->addItem ("16", 2);
+    fdnOrder->addItem ("32", 3);
+    addAndMakeVisible(fdnOrder.get());
+    
+    switch (Global::initFDNorder)
+    {
+        case 8:
+            fdnOrder->setSelectedId (1);
+            break;
+        case 16:
+            fdnOrder->setSelectedId (2);
+            break;
+        case 32:
+            fdnOrder->setSelectedId (3);
+            break;
+        default:
+            break;
+    }
+    addAndMakeVisible (fdnOrder.get());
+    fdnOrder->addListener (this);
 
+    
+    //// Scattering Matrices ////
+    scatMats = std::make_unique<ComboBox> ("scatMats");
+    scatMats->addItem ("Hadamard", hadamard);
+    scatMats->addItem ("Householder", householder);
+    scatMats->setSelectedId (Global::initMatType);
+
+    if (Global::initFDNorder != 16)
+    {
+        scatMats->setItemEnabled (householder, false);
+        scatMats->setSelectedId (hadamard);
+    }
+    
+    scatMats->addListener (this);
+    addAndMakeVisible(scatMats.get());
+    
     startTimerHz (1.0 / Global::updatePerSecondRatio);
     setSize (800, 700);
 }
@@ -224,8 +260,11 @@ void Fdn_AudioProcessorEditor::resized()
         sidePanel.removeFromBottom (margin);
         allSliders->setBounds (sidePanel.removeFromBottom (40));
         sidePanel.removeFromBottom (margin);
-        matButton->setBounds (sidePanel.removeFromBottom (40));
-        
+        scatMats->setBounds (sidePanel.removeFromBottom (40));
+        sidePanel.removeFromBottom (margin);
+        fdnOrder->setBounds (sidePanel.removeFromBottom (40));
+        sidePanel.removeFromBottom (margin);
+
         //// Response area ////
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
         responseArea.reduce(0, margin);
@@ -346,18 +385,20 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
                 buttonClicked (smoothVals.get());
         }
     }
-    else if (button == matButton.get())
-
-    {
-        curMatType = curMatType == householder ? hadamard : householder;
-        processor.changeMatType (curMatType);
-        matButton->setButtonText (curMatType == householder ? "Householder" : "Hadamard");
-    }
 }
 
 void Fdn_AudioProcessorEditor::timerCallback()
 {
-    paintResponse = true;
+    
+    if (!changingFDNorder)
+        paintResponse = true;
+    else if (processor.getFDN()->isInitialised())
+    {
+        minDLenIdx = processor.getFDN()->getMinDLenIdx();
+        maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
+        response->setDLens (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen());
+        changingFDNorder = false;
+    }
     repaint();
 }
 
@@ -371,5 +412,43 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
             sliders[i]->setValue (Global::presetValues[presets->getSelectedId() - 2][i]);
             processor.getFDN()->setRT (i, sliders[i]->getValue());
         }
+    }
+    else if (comboBoxThatHasChanged == fdnOrder.get())
+    {
+        int orderToSwitchTo;
+        switch (fdnOrder->getSelectedId())
+        {
+            case 1:
+                orderToSwitchTo = 8;
+                break;
+            case 2:
+                orderToSwitchTo = 16;
+                break;
+            case 3:
+                orderToSwitchTo = 32;
+                break;
+        }
+        
+        if (processor.getFDN()->getFDNorder() == orderToSwitchTo)
+        {
+            return;
+        }
+        
+        changingFDNorder = true;
+        if (orderToSwitchTo != 16)
+        {
+            scatMats->setSelectedId (hadamard);
+            scatMats->setItemEnabled (householder, false);
+        } else {
+            scatMats->setItemEnabled (householder, true);
+        }
+        
+        processor.changeFDNorder (orderToSwitchTo, static_cast<MatrixType> (scatMats->getSelectedId()));
+
+        std::cout << "FDN order changed" << std::endl;
+    }
+    else if (comboBoxThatHasChanged == scatMats.get())
+    {
+        processor.changeMatType (static_cast<MatrixType> (scatMats->getSelectedId()));
     }
 }

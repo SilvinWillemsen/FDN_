@@ -14,18 +14,24 @@
 //==============================================================================
 FDN::FDN()
 {
+    FDNorder = Global::initFDNorder;
     RT.resize (Global::numOctaveBands, Global::RT);
+    constructor (Global::initMatType);
+}
 
-    b.resize (Global::FDNorder, 1.0);
-    c.resize (Global::FDNorder, 1.0);
+void FDN::constructor (MatrixType matType)
+{
+    b.resize (FDNorder, 1.0);
+    c.resize (FDNorder, 1.0);
     
     // initialise scattering matrix
-    setScatteringMatrix (Global::initMatType);
+    setScatteringMatrix (matType);
 
 }
 
 FDN::~FDN()
 {
+    
 }
 
 void FDN::paint (Graphics& g)
@@ -40,12 +46,12 @@ void FDN::resized()
 double FDN::calculate (double input)
 {
     output = 0;
-    std::vector<double> intermediateOutput (Global::FDNorder, 0);
+    std::vector<double> intermediateOutput (FDNorder, 0);
     
-    for (int i = 0; i < Global::FDNorder; ++i)
+    for (int i = 0; i < FDNorder; ++i)
     {
         intermediateOutput[i] = c[i] * eqCombs[i]->filter (b[i] * input);
-        for (int j = 0; j < Global::FDNorder; ++j)
+        for (int j = 0; j < FDNorder; ++j)
         {
             eqCombs[j]->addScatOutput (A[j][i] * intermediateOutput[i]);
         }
@@ -59,7 +65,7 @@ double FDN::calculate (double input)
         
     }
 
-    for (int i = 0; i < Global::FDNorder; ++i)
+    for (int i = 0; i < FDNorder; ++i)
     {
         eqCombs[i]->increment();
         eqCombs[i]->zeroWritePointer();
@@ -78,7 +84,8 @@ void FDN::initialise (double sampleRate)
 {
     fs = sampleRate;
     
-    gainDB.resize (Global::FDNorder, std::vector<double> (Global::numOctaveBands, 0));
+    gainDB.clear();
+    gainDB.resize (FDNorder, std::vector<double> (Global::numOctaveBands, 0));
     numsOpt.resize (3, std::vector<double> (Global::numOctaveBands + 1, 0));
     densOpt.resize (3, std::vector<double> (Global::numOctaveBands + 1, 0));
     
@@ -92,14 +99,14 @@ void FDN::initialise (double sampleRate)
     leak.resize (Global::numOctaveBands, std::vector<double> (Global::numDesignFreqs, 0));
     leak2.resize (Global::numOctaveBands, std::vector<double> (Global::numDesignFreqs, 0));
     
-    dLen.resize (Global::FDNorder, 0);
+    dLen.resize (FDNorder, 0);
 	getDelayLines(); // DO NOT recalculate delay lines each time
 
     recalculateCoeffs (true);
     
     std::vector<double> vals;
     
-    for (int i = 0; i < Global::FDNorder; ++i)
+    for (int i = 0; i < FDNorder; ++i)
     {
         for (int j = 0; j < Global::numOctaveBands + 1; ++j)
         {
@@ -116,6 +123,7 @@ void FDN::initialise (double sampleRate)
         }
     }
     std::cout << "YAY" << std::endl;
+    initialised = true;
 }
 
 void FDN::recalculateCoeffs (bool init)
@@ -125,13 +133,13 @@ void FDN::recalculateCoeffs (bool init)
     
     if (init)
     {
-        for (int i = 0; i < Global::FDNorder; ++i)
+        for (int i = 0; i < FDNorder; ++i)
         {
             eqCombs.add (new EQComb (dLen[i]));
         }
     }
     
-    for (int i = 0; i < Global::FDNorder; ++i)
+    for (int i = 0; i < FDNorder; ++i)
     {
         aceq (i);
         for (int j = 0; j < Global::numOctaveBands + 1; ++j)
@@ -330,15 +338,18 @@ void FDN::getDelayLines()
 {
     if (Global::usePredefinedDLens)
     {
-        for (int i = 0; i < Global::FDNorder; ++i)
+        for (int i = 0; i < FDNorder; ++i)
             dLen[i] = Global::dLens[i];
     }
     else
     {
         Random rand;
         // make a random-length delay line
-        for (int i = 0; i < Global::FDNorder; ++i)
+        for (int i = 0; i < FDNorder; ++i)
+        {
             dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+            std::cout << i << " " << dLen[i] << std::endl;
+        }
     }
 }
 
@@ -348,16 +359,14 @@ int FDN::getClosestToAvgDLenIdx()
     double avgDLen = getAvgDLen();
     int closestDLen = 0;
     int diffDLen = 10000;
-    for (int i = 0; i < Global::FDNorder; ++i)
+    for (int i = 0; i < FDNorder; ++i)
     {
-        std::cout << i << " " << dLen[i] << std::endl;
         if (abs(avgDLen - dLen[i]) < diffDLen)
         {
             closestDLen = i;
             diffDLen = abs(avgDLen - dLen[i]);
         }
     }
-    std::cout << "closest DLen index: " << closestDLen << std::endl;
     return closestDLen;
 }
 
@@ -365,7 +374,7 @@ void FDN::getAttenuation()
 {
        
     // get attenuation depending on length of the delay line
-    for (int k = 0; k < Global::FDNorder; k++)
+    for (int k = 0; k < FDNorder; k++)
     {
         for (int m = 0; m < Global::numOctaveBands; m++)
         {
@@ -454,9 +463,10 @@ int FDN::getMinDLenIdx()
 
 void FDN::setScatteringMatrix (MatrixType matType)
 {
-    A.resize (Global::FDNorder, std::vector<double> (Global::FDNorder, 0));
+    A.clear();
+    A.resize (FDNorder, std::vector<double> (FDNorder, 0));
 
-    double scaleFactor = 1 / sqrt(Global::FDNorder);
+    double scaleFactor = 1.0 / static_cast<double> (sqrt(FDNorder));
     switch (matType)
     {
         case householder:
@@ -465,9 +475,9 @@ void FDN::setScatteringMatrix (MatrixType matType)
             for (int i = 0; i < 4; ++i)
                 tmpMatrix[i][i] = 1;
             
-            for (int i = 0; i < Global::FDNorder; ++i)
+            for (int i = 0; i < FDNorder; ++i)
             {
-                for (int j = 0; j < Global::FDNorder; ++j)
+                for (int j = 0; j < FDNorder; ++j)
                 {
                     if (i / 4 == j / 4)
                         A[i][j] = scaleFactor * tmpMatrix[i % 4][j % 4];
@@ -481,7 +491,7 @@ void FDN::setScatteringMatrix (MatrixType matType)
         case hadamard:
         {
             A[0][0] = 1.0f * scaleFactor;
-            for (int n = 1; n < Global::FDNorder; n += n)
+            for (int n = 1; n < FDNorder; n += n)
             {
                 for (int i = 0; i < n; ++i)
                 {
@@ -496,4 +506,24 @@ void FDN::setScatteringMatrix (MatrixType matType)
             break;
         }
     }
+}
+
+void FDN::printScatteringMatrix()
+{
+    for (int i = 0; i < A.size(); ++i)
+    {
+        for (int j = 0; j < A[i].size(); ++j)
+            std::cout << A[i][j] << "  ";
+        std::cout << std::endl;
+    }
+}
+
+void FDN::changeFDNorder (int order, MatrixType matType)
+{
+    initialised = false;
+    eqCombs.clear();
+    FDNorder = order;
+    constructor (matType);
+    initialise (fs);
+    printScatteringMatrix();
 }
