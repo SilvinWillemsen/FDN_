@@ -58,8 +58,13 @@ public:
     }
     
     double getAvgDLen();
+    
     double getMinDLen();
+    int getMinDLenIdx();
+    
     double getMaxDLen();
+    int getMaxDLenIdx();
+
 
     void setScatteringMatrix (MatrixType matType);
     

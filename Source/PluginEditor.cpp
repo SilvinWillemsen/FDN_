@@ -99,13 +99,29 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
     std::cout << "Min dLen = " << processor.getFDN()->getMinDLen() << std::endl;
 
-    closestToAVGdLenIdx = processor.getFDN()->getClosestToAvgDLenIdx();
-    
-    response = std::make_unique<Response> (processor.getFDN()->getEQComb(closestToAVGdLenIdx)->getDelayLineLength(), processor.getSampleRate());
+    dLenIdx = processor.getFDN()->getMaxDLenIdx();
+    response = std::make_unique<Response> (processor.getFDN()->getEQComb(dLenIdx)->getDelayLineLength(), processor.getSampleRate());
     addAndMakeVisible (response.get());
-//    double R = 0.99;
-//    response->setCoefficients ({1, 0, 0, 1, -2.0 * R * cos(double_Pi * 1000.0 / 22050.0), R * R});
-//    response->setCoefficients ({0.5, 0.5, 0, 1, 0, 0});
+
+    
+    presets = std::make_unique<ComboBox> ("Presets");
+    presets->addItem ("-- no preset --", noPreset);
+    presets->addItem ("Small Room", smallRoom);
+    presets->addItem ("Medium Room", mediumRoom);
+    presets->addItem ("Large Room", largeRoom);
+    presets->addItem ("Concert Hall", concertHall);
+    presets->addItem ("Church", church);
+    presets->setSelectedId (1);
+    addAndMakeVisible (presets.get());
+
+    presetsLabel = std::make_unique<Label> ("presets", "Presets:");
+    Font font (18.0);
+    presetsLabel->setFont (font);
+    addAndMakeVisible (presetsLabel.get());
+    presetsLabel->setJustificationType(Justification::left);
+    presetsLabel->setColour (Label::textColourId, Colours::white);
+    presets->addListener (this);
+
     startTimerHz (1.0 / Global::updatePerSecondRatio);
     setSize (800, 700);
 }
@@ -137,14 +153,14 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
                 response->setIRseconds (round (maxVal) + 0.5);
                 
                 for (int i = 0; i < Global::numOctaveBands + 1; ++i)
-                    response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(closestToAVGdLenIdx, i));
+                    response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(dLenIdx, i));
                 response->calculateIR();
             }
         }
         //// there is no 'else' here so that instablility can be calculated
         for (int i = 0; i < Global::numOctaveBands + 1; ++i)
         {
-            std::vector<double> coeffs = processor.getFDN()->getCoefficients (closestToAVGdLenIdx, i);
+            std::vector<double> coeffs = processor.getFDN()->getCoefficients (dLenIdx, i);
         
            //std::vector<double> coeffs = {0.8775, 0.7515, 0, 1, 0.6292, 0};
            //std::vector<double> coeffs = { 1.0178, 0.7291, 0.1023, 1,0.7547, 0.1595 };
@@ -178,37 +194,55 @@ void Fdn_AudioProcessorEditor::resized()
             sliders[i]->setBounds (totArea.removeFromTop (sliderHeight));
         }
     } else {
-        int margin = 20;
+        int margin = 12;
         Rectangle<int> sidePanel = totArea.removeFromRight (120);
-        sidePanel.reduce(margin, margin);
-        sidePanel.removeFromTop (margin);
+        sidePanel.reduce (margin, margin);
 
+        //// Preset Area ////
+        Rectangle<int> presetArea = totArea.removeFromTop (40);
+        presetArea.removeFromLeft (margin * 0.5);
+        presetArea.removeFromTop (margin);
+        presetsLabel->setBounds (presetArea.removeFromLeft (70));
+//        presetArea.removeFromLeft (20);
+        presets->setBounds (presetArea);
+        
+        //// Side panel ////
+        
+        // Top Half //
+        sidePanel.removeFromTop (margin);
         int knobHeight = sidePanel.getHeight() * 0.2 - margin;
         sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
-        sidePanel.removeFromTop (margin * 2.0);
+        sidePanel.removeFromTop (margin * 3.0);
         sliders[sliders.size() - 2]->setBounds (sidePanel.removeFromTop (knobHeight));
-        sidePanel.removeFromTop (margin * 2.0);
+        sidePanel.removeFromTop (margin * 3.0);
         
-        calculateBtn->setBounds (sidePanel.removeFromBottom(40));
+        // Bottom Half //
+        calculateBtn->setBounds (sidePanel.removeFromBottom (40));
         sidePanel.removeFromBottom (margin);
-        smoothVals->setBounds (sidePanel.removeFromBottom(40));
+        smoothVals->setBounds (sidePanel.removeFromBottom (40));
         sidePanel.removeFromBottom (margin);
-        allSliders->setBounds (sidePanel.removeFromBottom(40));
+        allSliders->setBounds (sidePanel.removeFromBottom (40));
         sidePanel.removeFromBottom (margin);
-        matButton->setBounds (sidePanel.removeFromBottom(40));
+        matButton->setBounds (sidePanel.removeFromBottom (40));
         
+        //// Response area ////
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
-        responseArea.reduce(10, 10);
+        responseArea.reduce(0, margin);
+        responseArea.removeFromLeft (margin);
         response->setBounds (responseArea);
-        totArea.removeFromTop (margin);
         
+        //// Sliders ////
+        totArea.removeFromTop (20);
         totArea.removeFromBottom (margin);
 
-        int sliderWidth = floor ((totArea.getWidth() - (11.0 * margin * 0.5)) / 10.0);
+        int sliderMargin = 10;
+        totArea.removeFromLeft (margin);
+        int sliderWidth = ceil ((totArea.getWidth() - (9.0 * sliderMargin)) / 10.0);
+        
         for (int i = 0; i < sliders.size() - 2; ++i)
         {
-            totArea.removeFromLeft (margin * 0.5);
             sliders[i]->setBounds (totArea.removeFromLeft (sliderWidth));
+            totArea.removeFromLeft (sliderMargin);
         }
     }
     
@@ -244,8 +278,14 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
     if (curSlider == nullptr)
         return;
     
-    processor.getFDN()->setRT (curSliderIdx, curSlider->getValue());
-    
+    if (curSliderIdx != -1)
+    {
+        presets->setSelectedId (1);
+        processor.getFDN()->setRT (curSliderIdx, curSlider->getValue());
+    } else {
+        return;
+    }
+        
     // Affect all sliders smoothly
     if (smoothValsBool)
     {
@@ -318,4 +358,21 @@ void Fdn_AudioProcessorEditor::timerCallback()
 {
     paintResponse = true;
     repaint();
+}
+
+void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+    curSliderIdx = -1;
+//    if (presets->getSelectedId() == 0)
+//    {
+//        std::cout << "impossible" << std::endl;
+//    }
+    if (comboBoxThatHasChanged == presets.get() && presets->getSelectedId() != 1)
+    {
+        for (int i = 0; i < Global::numOctaveBands; ++i)
+        {
+            sliders[i]->setValue (Global::presetValues[presets->getSelectedId() - 2][i]);
+            processor.getFDN()->setRT (i, sliders[i]->getValue());
+        }
+    }
 }

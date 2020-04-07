@@ -19,7 +19,8 @@
 class Fdn_AudioProcessorEditor  : public AudioProcessorEditor,
                                   public Slider::Listener,
                                   public Button::Listener,
-                                  public Timer
+                                  public Timer,
+                                  public ComboBox::Listener
 {
 public:
     Fdn_AudioProcessorEditor (Fdn_AudioProcessor&);
@@ -35,7 +36,8 @@ public:
     void buttonClicked (Button* button) override;
     
     void timerCallback() override;
-
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -48,7 +50,9 @@ private:
     std::unique_ptr<TextButton> smoothVals;
     std::unique_ptr<TextButton> allSliders;
     std::unique_ptr<TextButton> matButton;
-
+    
+    std::unique_ptr<ComboBox> presets;
+    std::unique_ptr<Label> presetsLabel;
     Colour defaultButtonColour;
     bool smoothValsBool = false;
     bool allSlidersBool = false;
@@ -56,10 +60,10 @@ private:
     std::vector<double> sliderValuesAtStartDrag;
     float sliderCoeff = Global::sliderCoeff;
     Slider* curSlider = nullptr;
-    int curSliderIdx;
+    int curSliderIdx = -1;
     
     bool paintResponse = false;
     MatrixType curMatType = Global::initMatType;
-    int closestToAVGdLenIdx;
+    int dLenIdx;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

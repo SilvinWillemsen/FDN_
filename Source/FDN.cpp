@@ -328,10 +328,18 @@ void FDN::aceq (int idx)
 
 void FDN::getDelayLines()
 {
-	Random rand;
-	// make a random-length delay line
-	for (int i = 0; i < Global::FDNorder; ++i)
-		dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+    if (Global::usePredefinedDLens)
+    {
+        for (int i = 0; i < Global::FDNorder; ++i)
+            dLen[i] = Global::dLens[i];
+    }
+    else
+    {
+        Random rand;
+        // make a random-length delay line
+        for (int i = 0; i < Global::FDNorder; ++i)
+            dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+    }
 }
 
 int FDN::getClosestToAvgDLenIdx()
@@ -393,28 +401,54 @@ double FDN::getAvgDLen()
 double FDN::getMaxDLen()
 {
     double tmp = 0;
-//    int idx = 0;
     for (int i = 0; i < dLen.size(); ++i)
     {
         if (dLen[i] > tmp)
-//        {
-            tmp = dLen[i];
-//            idx = i;
-//        }
+        tmp = dLen[i];
     }
-//    return idx;
     return tmp;
 }
 
+int FDN::getMaxDLenIdx()
+{
+    int idx = 0;
+    int tmp = 0;
+    for (int i = 0; i < dLen.size(); ++i)
+    {
+        if (dLen[i] > tmp)
+        {
+            tmp = dLen[i];
+            idx = i;
+        }
+    }
+    return idx;
+}
+
+
 double FDN::getMinDLen()
 {
-    double tmp = Global::maxDelayLength;
+    int tmp = Global::maxDelayLength;
     for (int i = 0; i < dLen.size(); ++i)
     {
         if (dLen[i] < tmp)
             tmp = dLen[i];
     }
     return tmp;
+}
+
+int FDN::getMinDLenIdx()
+{
+    int tmp = Global::maxDelayLength;
+    int idx;
+    for (int i = 0; i < dLen.size(); ++i)
+    {
+        if (dLen[i] < tmp)
+        {
+            tmp = dLen[i];
+            idx = i;
+        }
+    }
+    return idx;
 }
 
 

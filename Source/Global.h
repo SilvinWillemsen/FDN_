@@ -15,6 +15,16 @@ enum MatrixType
     householder
 };
 
+enum Preset
+{
+    noPreset = 1,
+    smallRoom,
+    mediumRoom,
+    largeRoom,
+    concertHall,
+    church
+};
+
 namespace Global
 {
     static const int FDNorder = 16;
@@ -53,6 +63,24 @@ namespace Global
     static const double updatePerSecondRatio = 0.2;
     
     static const MatrixType initMatType = hadamard;
+    
+    static const std::vector<std::vector<double>> presetValues
+    {
+        {0.98, 0.72, 0.51, 0.39, 0.34, 0.36, 0.25, 0.27, 0.2, 0.1}, // smallRoom
+        {1.62, 0.81, 0.76, 0.73, 0.63, 0.48, 0.41, 0.36, 0.27, 0.19}, // mediumRoom
+        {1.2, 0.95, 0.71, 0.78, 0.85, 0.88, 0.87, 0.87, 0.62, 0.39}, // largeRoom
+        {3.55, 2.28, 2.18, 2.05, 1.89, 1.86, 1.69, 1.28, 0.9, 0.52}, // concertHall
+//        {2.09, 2.08, 2.03, 2.06, 2.03, 2.1, 1.98, 1.6, 0.68, 0.18}, // (instable) concertHall
+        {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92} // church
+    };
+    
+    static const bool usePredefinedDLens = true;
+    
+    static const std::vector<int> dLens
+    {
+        3141, 3350, 2157, 2551, 1624, 2032, 3909, 2181, 3069, 3156, 3133, 1557, 4345, 4498, 3457, 3416
+    };
+    
     // GUI
     static const bool horSliders = false;
 //    static const int sliderHeight = 40;
