@@ -90,7 +90,6 @@ Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (min
     } else {
 //        IRButton = std::make_unique<TextButton> (Global::initShowIR ? "Show EQ" : "Show IR");
         IRButton = std::make_unique<TextButton> (curIRIsLong ? "Use shortest dLen" : "Use longest dLen");
-
         IRButton->addListener (this);
         addAndMakeVisible (IRButton.get());
     }
@@ -432,7 +431,7 @@ void Response::calculateIR()
 
     int t = 0;
     std::shared_ptr<EQComb> curIRComb = curIRIsLong ? IRCombLong : IRCombShort;
-    int dLen = curIRComb ? maxDLen : minDLen;
+    int dLen = curIRIsLong ? maxDLen : minDLen;
     for (int i = 0; i < IRseconds * fs; ++i)
     {
         output = curIRComb->filter (i < dLen ? noiseBurst[i] : 0);

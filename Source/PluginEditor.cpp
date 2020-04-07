@@ -146,15 +146,19 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
         {
             if (response->getIRComb() != nullptr)
             {
-                double maxVal = 0;
+//                double maxVal = 0;
+//                for (int i = 0; i < Global::numOctaveBands; ++i)
+//                    if (sliders[i]->getValue() > maxVal)
+//                        maxVal = sliders[i]->getValue();
+                double avgVal = 0;
                 for (int i = 0; i < Global::numOctaveBands; ++i)
-                    if (sliders[i]->getValue() > maxVal)
-                        maxVal = sliders[i]->getValue();
+                    avgVal += sliders[i]->getValue();
+                avgVal /= Global::numOctaveBands;
                 
                 for (int i = 0; i < Global::numOctaveBands + 1; ++i)
                     response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(maxDLenIdx, i));
                 response->calculateIR();
-                response->setIRseconds (round (maxVal) + 0.5);
+                response->setIRseconds (Global::limit (round (avgVal), 1.0, 15.0) + 0.5);
             }
         }
         //// there is no 'else' here so that instablility can be calculated {
