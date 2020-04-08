@@ -150,13 +150,11 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     scatMats->addItem ("Hadamard", hadamard);
     scatMats->addItem ("Householder", householder);
     scatMats->setSelectedId (Global::initMatType);
-
-    if (Global::initFDNorder != 16)
-    {
-        scatMats->setItemEnabled (householder, false);
-        scatMats->setSelectedId (hadamard);
-    }
-    
+//    if (Global::initFDNorder != 16)
+//    {
+//        scatMats->setItemEnabled (householder, false);
+//        scatMats->setSelectedId (hadamard);
+//    }
     scatMats->addListener (this);
     addAndMakeVisible(scatMats.get());
     
@@ -435,13 +433,13 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         }
         
         changingFDNorder = true;
-        if (orderToSwitchTo != 16)
-        {
-            scatMats->setSelectedId (hadamard);
-            scatMats->setItemEnabled (householder, false);
-        } else {
-            scatMats->setItemEnabled (householder, true);
-        }
+//        if (orderToSwitchTo != 16)
+//        {
+//            scatMats->setSelectedId (hadamard);
+//            scatMats->setItemEnabled (householder, false);
+//        } else {
+//            scatMats->setItemEnabled (householder, true);
+//        }
         
         processor.changeFDNorder (orderToSwitchTo, static_cast<MatrixType> (scatMats->getSelectedId()));
 
