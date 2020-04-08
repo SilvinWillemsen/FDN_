@@ -1,4 +1,5 @@
 /Builds/MacOSX/build/*
+/Builds/VisualStudio2019/*
 eigen/out/build/x64-Debug/VSInheritEnvironments.txt
 eigen/out/build/x64-Debug/unsupported/test/split_test_helper.h
 eigen/out/build/x64-Debug/unsupported/test/CTestTestfile.cmake
@@ -1173,3 +1174,7 @@ Builds/MacOSX/FDN_.entitlements
 Builds/MacOSX/FDN_.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
 Builds/MacOSX/FDN_.xcodeproj/project.pbxproj
 Builds/MacOSX/FDN_.entitlements
+*.pbxproj
+*.user
+*.log
+*.obj

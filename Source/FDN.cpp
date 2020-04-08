@@ -471,22 +471,42 @@ void FDN::setScatteringMatrix (MatrixType matType)
     {
         case householder:
         {
-            std::vector<std::vector<double>> tmpMatrix (4, std::vector<double> (4, -1));
-            for (int i = 0; i < 4; ++i)
-                tmpMatrix[i][i] = 1;
-            
-            for (int i = 0; i < FDNorder; ++i)
-            {
-                for (int j = 0; j < FDNorder; ++j)
-                {
-                    if (i / 4 == j / 4)
-                        A[i][j] = scaleFactor * tmpMatrix[i % 4][j % 4];
-                    else
-                        A[i][j] = -scaleFactor * tmpMatrix[i % 4][j % 4];
-                }
-            }
+			if (Global::FDNorder == 16)
+			{
+				std::vector<std::vector<double>> tmpMatrix(4, std::vector<double>(4, -1));
+				for (int i = 0; i < 4; ++i)
+					tmpMatrix[i][i] = 1;
 
-            break;
+				for (int i = 0; i < Global::FDNorder; ++i)
+				{
+					for (int j = 0; j < Global::FDNorder; ++j)
+					{
+						if (i / 4 == j / 4)
+
+							A[i][j] = scaleFactor * tmpMatrix[i % 4][j % 4];
+						else
+							A[i][j] = -scaleFactor * tmpMatrix[i % 4][j % 4];
+					}
+				}
+			}
+			else
+			{
+				double scF = 2 / Global::FDNorder;
+				std::vector<std::vector<double>> tmpMatrix(Global::FDNorder, std::vector<double>(Global::FDNorder, scF));
+				for (int i = 0; i < Global::FDNorder; ++i)
+				{
+					for (int j = 0; j < Global::FDNorder; ++j)
+					{
+						if (i == j)
+
+							A[i][j] = 1 - tmpMatrix[i][j];
+						else
+							A[i][j] = -tmpMatrix[i][j];
+					}
+				}
+			}
+
+			break;
         }
         case hadamard:
         {
