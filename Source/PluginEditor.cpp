@@ -103,8 +103,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     presets->addListener (this);
     addAndMakeVisible (presets.get());
     presets->setSelectedId (5);
-    comboBoxChanged (presets.get());
-
+    
     presetsLabel = std::make_unique<Label> ("presets", "Presets:");
     Font font (18.0);
     presetsLabel->setFont (font);
@@ -139,16 +138,25 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     }
     addAndMakeVisible (fdnOrder.get());
     fdnOrder->addListener (this);
-
+   
+    fdnOrderLabel = std::make_unique<Label> ("fdnOrderLabel", "FDN Order");
+    addAndMakeVisible (fdnOrderLabel.get());
+    fdnOrderLabel->setJustificationType(Justification::left);
+    fdnOrderLabel->setColour (Label::textColourId, Colours::white);
     
     //// Scattering Matrices ////
     scatMats = std::make_unique<ComboBox> ("scatMats");
     scatMats->addItem ("Hadamard", hadamard);
     scatMats->addItem ("Householder", householder);
     scatMats->setSelectedId (Global::initMatType);
-
     scatMats->addListener (this);
     addAndMakeVisible(scatMats.get());
+    
+    scatMatsLabel = std::make_unique<Label> ("scatMatsLabel", "Scattering Mat.");
+    addAndMakeVisible (scatMatsLabel.get());
+    scatMatsLabel->setJustificationType(Justification::left);
+    scatMatsLabel->setColour (Label::textColourId, Colours::white);
+    
     
     //// Fix coefficients ////
     fixCoeffs = std::make_unique<TextButton> ("Fix coeffs");
@@ -164,10 +172,12 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     minDLenIdx = processor.getFDN()->getMinDLenIdx();
     maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
     response = std::make_unique<Response> (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen(), processor.getSampleRate());
+    comboBoxChanged (presets.get());
+    addAndMakeVisible (response.get());
+
     processor.getFDN()->recalculateCoeffs();
     calculateImpulseResponse();
     calculateEQ();
-    addAndMakeVisible (response.get());
     
     // listen to the response IR button to refresh the coefficients asynchronously
     response->addChangeListener (this);
@@ -189,13 +199,6 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
     
     if (paintResponse)
     {
-        // always do this for smooth transition to IR
-        double avgVal = 0;
-        for (int i = 0; i < Global::numOctaveBands; ++i)
-            avgVal += sliders[i]->getValue();
-        avgVal /= Global::numOctaveBands;
-        
-        response->setIRseconds (Global::limit (round (avgVal), 1.0, 15.0) + 0.5);
         response->setDataToZero();
         if (response->isShowingIR())
         {
@@ -204,6 +207,15 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
                 calculateImpulseResponse();
             }
         }
+        
+        // always do this for smooth transition to IR
+        double avgVal = 0;
+        for (int i = 0; i < Global::numOctaveBands; ++i)
+            avgVal += sliders[i]->getValue();
+        avgVal /= Global::numOctaveBands;
+        
+        response->setIRseconds (Global::limit (round (avgVal), 1.0, 15.0) + 0.5);
+        
         //// there is no 'else' here so that instablility can be calculated
         calculateEQ();
         
@@ -215,6 +227,9 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
 
 void Fdn_AudioProcessorEditor::calculateImpulseResponse()
 {
+    if (!processor.getFDN()->isInitialised())
+        return;
+    
     for (int i = 0; i <= Global::numOctaveBands; ++i)
         response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients (maxDLenIdx, i));
     response->calculateIR();
@@ -267,7 +282,7 @@ void Fdn_AudioProcessorEditor::resized()
         
         // Top Half //
         fixCoeffs->setBounds (sidePanel.removeFromTop (40 - margin));
-        sidePanel.removeFromTop (margin * 2.5);
+        sidePanel.removeFromTop (margin * 4.0);
         int knobHeight = sidePanel.getHeight() * 0.2 - margin;
         sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
         sidePanel.removeFromTop (margin * 3.0);
@@ -282,9 +297,12 @@ void Fdn_AudioProcessorEditor::resized()
         allSliders->setBounds (sidePanel.removeFromBottom (40));
         sidePanel.removeFromBottom (margin);
         scatMats->setBounds (sidePanel.removeFromBottom (40));
+        sidePanel.removeFromBottom (margin * 0.5);
+        scatMatsLabel->setBounds (sidePanel.removeFromBottom (20).withX(sidePanel.getX() - 5));
         sidePanel.removeFromBottom (margin);
         fdnOrder->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (margin);
+        sidePanel.removeFromBottom (margin*0.5);
+        fdnOrderLabel->setBounds (sidePanel.removeFromBottom (20).withX(sidePanel.getX() - 5));
 
         //// Response area ////
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);

@@ -63,6 +63,7 @@ private:
     std::unique_ptr<Label> fdnOrderLabel;
     
     std::unique_ptr<ComboBox> scatMats;
+    std::unique_ptr<Label> scatMatsLabel;
 
     bool changingFDNorder = false;
     

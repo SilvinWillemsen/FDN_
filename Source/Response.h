@@ -60,6 +60,7 @@ public:
     
     void setInitialised();
     void removeInitialisedWindow();
+    
 private:
     double fs;
 //    std::vector<double> dLen;
@@ -108,6 +109,7 @@ private:
 
     std::vector<double> noiseBurst;
     double IRseconds;
+    double prevIRseconds;
     double IRsamplesPerSecond;
     
     double maxSliderValue = 1.0; 

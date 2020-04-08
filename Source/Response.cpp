@@ -138,12 +138,14 @@ void Response::paint (Graphics& g)
         //// Draw gridlines ////
         g.setColour (Colours::lightgrey);
         int xLoc = 0;
-        for (int i = 1; i < IRseconds; ++i)
+        for (int i = 1; i < prevIRseconds; ++i)
         {
-            xLoc = (i / IRseconds) * plotWidth + Global::axisMargin;
+            xLoc = (i / prevIRseconds) * plotWidth + Global::axisMargin;
             g.drawLine (xLoc, 0, xLoc, getHeight() - Global::axisMargin, 1.0f);
         }
-    } else {
+    }
+    else if (!showingIR)
+    {
         //// Draw gridlines ////
         g.setColour (Colours::lightgrey);
         for (int n = 0; n < gridLineCoords.size(); ++n)
@@ -195,13 +197,15 @@ void Response::paint (Graphics& g)
     {
         int xLoc = 0;
         g.setColour (Colours::darkgrey);
-        for (int i = 1; i <= IRseconds; ++i)
+        for (int i = 1; i < prevIRseconds; ++i)
         {
-            xLoc = (i / IRseconds) * plotWidth + Global::axisMargin;
+            xLoc = (i / prevIRseconds) * plotWidth + Global::axisMargin;
             g.drawText(String(i), xLoc - 20, getHeight() - Global::axisMargin, 40, 20, Justification::centred);
         }
         g.drawText ("Time (s)", (getWidth() + Global::axisMargin) * 0.5 - 40, getHeight() - 0.5 * Global::axisMargin - 10, 80, 30, Justification::centred);
-    } else {
+    }
+    else if (!showingIR)
+    {
         // Draw zero DB / RT line
         g.drawLine (Global::axisMargin, zeroDbHeight, getWidth(), zeroDbHeight, 1.0);
         
@@ -288,23 +292,24 @@ void Response::resized()
         gainLabel->setVisible (true);
 
         zeroDbHeight = getHeight() * Global::zeroDbRatio;
+        
         //// Calculate grid-lines ////
         setLogBase (Global::logBase, true);
         
         Rectangle<int> leftAxis = getLocalBounds().removeFromLeft (Global::axisMargin * 2.0);
         AffineTransform transformRT;
         transformRT = transformRT.rotated (-0.5 * double_Pi, Global::axisMargin, zeroDbHeight * 0.5);
-        transformRT = transformRT.translated (-Global::axisMargin * 0.75, 0);
+        transformRT = transformRT.translated (-Global::axisMargin * 0.72, 0);
         RTLabel->setTransform (transformRT);
 
         AffineTransform transformGain;
         transformGain = transformGain.rotated (-0.5 * double_Pi, Global::axisMargin, getHeight() - (Global::axisMargin + getHeight()-zeroDbHeight) * 0.5);
-        transformGain = transformGain.translated(-Global::axisMargin * 0.75, 0);
+        transformGain = transformGain.translated(-Global::axisMargin * 0.72, 0);
         gainLabel->setTransform (transformGain);
         
         leftAxis.removeFromBottom (Global::axisMargin);
-        RTLabel->setBounds(leftAxis.removeFromTop (zeroDbHeight));
-        gainLabel->setBounds(leftAxis);
+        RTLabel->setBounds (leftAxis.removeFromTop (zeroDbHeight));
+        gainLabel->setBounds (leftAxis);
     }
     
     Rectangle<int> topControlArea (0, 0, getWidth(), 100);
@@ -461,6 +466,7 @@ void Response::calculateIR()
         }
     }
     refreshed = true;
+    prevIRseconds = IRseconds;
 }
 
 void Response::setDLens (int min, int max)
