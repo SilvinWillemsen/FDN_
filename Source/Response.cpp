@@ -25,6 +25,13 @@ Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (min
     
     drawToggles.resize (2, true);
     
+    noiseBurst.resize (Global::maxDelayLength, 0);
+    
+    Random r (0);
+    for (int i = 0; i < maxDLen; ++i)
+    {
+        noiseBurst[i] = 2.0 * r.nextDouble() - 1;
+    }
     if (Global::showRTGainButtons)
     {
         for (int i = 0; i < 2; ++i)
@@ -90,6 +97,19 @@ Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (min
 
     initialiseIRComb();
     
+    //// Initialising.... ////
+    Font initialisingFont (20.0f);
+    initialisingLabel = std::make_unique<Label> ("initialising", "Initialising...");
+    initialisingLabel->setFont (initialisingFont);
+    addAndMakeVisible (initialisingLabel.get());
+    initialisingLabel->setColour (Label::backgroundColourId, Colours::black);
+    initialisingLabel->setColour (Label::textColourId, Colours::white);
+    initialisingLabel->setJustificationType (Justification::centred);
+    
+    ampLabel->setVisible (false);
+    RTLabel->setVisible (false);
+    gainLabel->setVisible (false);
+    IRButton->setVisible (false);
 }
 
 Response::~Response()
@@ -100,14 +120,17 @@ void Response::paint (Graphics& g)
 {
     
 //    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
-    g.fillAll(Colours::white);
+    g.fillAll (initialised ? Colours::white : Colours::black);
+    if (!initialised)
+        return;
+
     if (unstable)
     {
         g.setColour (unstableColour);
         g.fillRect (getLocalBounds());
     }
 
-    if (showingIR)
+    if (showingIR && refreshed)
     {
         g.setColour (Colours::black);
         g.strokePath (generateResponsePath (IRdata, 200), PathStrokeType (1.0f));
@@ -168,7 +191,7 @@ void Response::paint (Graphics& g)
     g.drawLine (Global::axisMargin, 0, Global::axisMargin, getHeight() - Global::axisMargin, 1.0f);
     g.drawLine (Global::axisMargin, getHeight() - Global::axisMargin, getWidth(), getHeight() - Global::axisMargin, 1.0f);
     
-    if (showingIR)
+    if (showingIR && refreshed)
     {
         int xLoc = 0;
         g.setColour (Colours::darkgrey);
@@ -214,6 +237,11 @@ void Response::paint (Graphics& g)
         g.setColour(Colours::black);
         g.drawRect (bounds);
     }
+    
+    if (initialisingLabel->isVisible())
+    {
+        removeInitialisedWindow();
+    }
 }
 Path Response::generateResponsePath (std::vector<double>& data, float visualScaling)
 {
@@ -237,6 +265,10 @@ Path Response::generateResponsePath (std::vector<double>& data, float visualScal
 void Response::resized()
 {
     plotWidth = getWidth() - Global::axisMargin;
+    if (!initialised)
+    {
+        initialisingLabel->setBounds (getLocalBounds());
+    }
     if (showingIR)
     {
         zeroDbHeight = (getHeight() - Global::axisMargin) * 0.5;
@@ -304,13 +336,10 @@ void Response::calculateResponse (std::vector<double> coefficients)
 {
     std::complex<double> i (0.0, 1.0);
     std::complex<double> omega (0.0, 0.0);
-//    double testDiv = abs(log10(1.0 / static_cast<double>(Global::fftOrder)));
     for (int k = 1; k <= Global::fftOrder; ++k)
     {
-//       omega.real (k / static_cast<double>(Global::fftOrder) * double_Pi);
         double linearVal = k / static_cast<double>(Global::fftOrder);
         omega.real (double_Pi * ((pow (logBase, linearVal) - 1.0) / (logBase - 1.0)));
-//        omega.real ((log10(k / static_cast<double>(Global::fftOrder)) / testDiv + 1) * double_Pi);
         linearData[k-1] *= (coefficients[0] + coefficients[1] * exp(-i * omega) + coefficients[2] * exp(-2.0 * i * omega))
                                      / (coefficients[3] + coefficients[4] * exp(-i * omega) + coefficients[5] * exp(-2.0 * i * omega));
     }
@@ -325,16 +354,8 @@ void Response::linearGainToDB()
 		dBData[i] = Global::limit (20.0 * log10(abs(linearData[i])), -60.0, 10.0);
         if (dBData[i] >= 0)
             unstable = true;
-        RTData[i] = -60.0 * (minDLen) / (Global::limit(dBData[i], -1e10, -1e-10) * fs); // calculate RT - this should be -60*dLen/RT*fs
+        RTData[i] = -60.0 * (minDLen) / (Global::limit(dBData[i], -1e10, -1e-10) * fs);
 	}
-//    if (init) // update the delay line length based on RT = 1
-//    {
-//        dLen = (Global::limit (dBData[0], -1e10, -1e-10) * fs) / (-60.0);
-//        std::cout << "Delay line length used for RT = " << dLen << std::endl;
-//        init = false;
-//        initialiseIRComb();
-//        linearGainToDB();
-//    }
 }
 
 void Response::buttonClicked (Button* button)
@@ -346,11 +367,15 @@ void Response::buttonClicked (Button* button)
     }
     else if (button == IRButton.get())
     {
-        IRButton->setButtonText(showingIR ? "Show IR" : "Show EQ");
+        IRButton->setButtonText (showingIR ? "Show IR" : "Show EQ");
         showingIR = !showingIR;
+        if (showingIR)
+        {
+            refreshed = false;
+            sendChangeMessage();
+        }
         resized();
-//        IRButton->setButtonText(curIRIsLong ? "Use longest dLen" : "Use shortest dLen");
-//        curIRIsLong = !curIRIsLong;
+        repaint();
     }
     
     for (int i = 0; i < buttons.size(); ++i)
@@ -412,8 +437,6 @@ void Response::setLogBase (double val, bool init)
 
 void Response::initialiseIRComb()
 {
-//    IRCombLong = std::make_shared<EQComb> (maxDLen);
-//    IRCombShort = std::make_shared<EQComb> (minDLen);
     IRComb = std::make_shared<EQComb> (maxDLen);
 }
 
@@ -421,12 +444,8 @@ void Response::calculateIR()
 {
     double output;
     int idx = 0;
-//    IRCombLong->zeroCoefficients();
-//    IRCombShort->zeroCoefficients();
     IRComb->zeroCoefficients();
     int t = 0;
-//    std::shared_ptr<EQComb> curIRComb = curIRIsLong ? IRCombLong : IRCombShort;
-//    int dLen = curIRIsLong ? maxDLen : minDLen;
     for (int i = 0; i < IRseconds * fs; ++i)
     {
         output = IRComb->filter (i < maxDLen ? noiseBurst[i] : 0);
@@ -441,17 +460,36 @@ void Response::calculateIR()
             ++idx;
         }
     }
+    refreshed = true;
 }
 
 void Response::setDLens (int min, int max)
 {
     minDLen = min;
     maxDLen = max;
-    noiseBurst.resize (maxDLen, 0);
+}
 
-    Random r;
-    for (int i = 0; i < maxDLen; ++i)
+void Response::setInitialised()
+{
+    if (initialised)
+        return;
+    initialised = true;
+}
+
+void Response::removeInitialisedWindow()
+{
+    initialisingLabel->setVisible (false);
+    IRButton->setVisible (true);
+    
+    if (showingIR)
     {
-        noiseBurst[i] = 2.0 * r.nextDouble() - 1;
+        ampLabel->setVisible (true);
+        RTLabel->setVisible (false);
+        gainLabel->setVisible (false);
+    } else {
+        ampLabel->setVisible (false);
+        RTLabel->setVisible (true);
+        gainLabel->setVisible (true);
     }
+    
 }

@@ -471,7 +471,8 @@ void FDN::setScatteringMatrix (MatrixType matType)
     {
         case householder:
         {
-			if (FDNorder == 16)
+//            if (log(FDNorder) / log(4) == floor(log(FDNorder) / log(4))) // if the order is of the form 4^n where n is an integer
+            if (FDNorder == 16)
 			{
 				std::vector<std::vector<double>> tmpMatrix (4, std::vector<double>(4, -1));
 				for (int i = 0; i < 4; ++i)
@@ -491,9 +492,7 @@ void FDN::setScatteringMatrix (MatrixType matType)
 			}
 			else
 			{
-//                double scF = 2 / FDNorder;
                 double scF = 2.0 / static_cast<double> (FDNorder);
-//                double test = 2 / FDNorder;
 				std::vector<std::vector<double>> tmpMatrix (FDNorder, std::vector<double>(FDNorder, scF));
 				for (int i = 0; i < FDNorder; ++i)
 				{
@@ -507,7 +506,7 @@ void FDN::setScatteringMatrix (MatrixType matType)
 					}
 				}
 			}
-
+            std::cout << "householder" << std::endl;
 			break;
         }
         case hadamard:
@@ -525,6 +524,7 @@ void FDN::setScatteringMatrix (MatrixType matType)
                     }
                 }
             }
+            std::cout << "hadamard" << std::endl;
             break;
         }
     }

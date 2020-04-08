@@ -33,6 +33,8 @@ namespace Global
     static const int maxDelayLength = 4500;
     
     static const int numDesignFreqs = numOctaveBands * 2 - 1;
+    
+    static const bool initWithImpulse = false;
 
     static const double RT = 1.0;
     static const double RTmin = 0.03;
@@ -74,16 +76,19 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92} // church
     };
     
-    static const bool usePredefinedDLens = false;
-    
+    static const bool usePredefinedDLens = true;
     static const std::vector<int> dLens
     {
-        1918, 3707, 1825, 3982, 3281, 3091, 1632, 1836,
-        4224, 1995, 2948, 3969, 3205, 3625, 2543, 2138,
-        2460, 1759, 4056, 3434, 3851, 2875, 3067, 3617,
-        4475, 3583, 3193, 1763, 1608, 2069, 2557, 3994
+        3673, 2237, 2234, 2903, 1672, 3104, 2183, 2865,
+        4075, 3711, 3138, 1763, 3773, 2223, 4150, 2018,
+        1651, 2033, 3995, 4466, 4434, 1548, 3106, 4346,
+        4097, 4022, 4346, 3280, 3321, 3704, 3134, 1832,
+        2010, 1699, 3021, 3502, 2042, 4138, 2209, 3236,
+        1932, 1617, 3440, 3652, 2683, 2324, 3196, 1779,
+        3183, 4145, 2390, 2887, 3618, 1789, 2257, 2867,
+        3431, 1972, 3453, 3206, 2920, 4129, 3721, 3114
     };
-    
+
     // GUI
     static const bool horSliders = false;
 //    static const int sliderHeight = 40;
@@ -99,8 +104,6 @@ namespace Global
     
     static const bool initShowIR = false;
     
-//    static const double IRseconds = 5.5;
-//    static const double IRsamplesPerSecond = 200;
     static const double IRplotDataPoints = 1000;
     
 }

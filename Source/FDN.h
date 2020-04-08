@@ -74,6 +74,7 @@ public:
     bool isInitialised() { return initialised; };
     
     void printScatteringMatrix();
+    
 private:
     int FDNorder;
     OwnedArray<EQComb> eqCombs;

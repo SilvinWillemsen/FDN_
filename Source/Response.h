@@ -20,7 +20,8 @@
 */
 class Response    : public Component,
                     public Button::Listener,
-                    public Slider::Listener
+                    public Slider::Listener,
+                    public ChangeBroadcaster
 {
 public:
     Response (int minDLen, int maxDLen, double fs);
@@ -46,7 +47,7 @@ public:
     void buttonClicked (Button* button) override;
     void sliderValueChanged (Slider* slider) override;
     void setLogBase (double val, bool init = false);
-    void changeGrid() { drawBandLines = !drawBandLines; setLogBase(logBase, true); };
+    void changeGrid() { drawBandLines = !drawBandLines; setLogBase (logBase, true); };
     
     void initialiseIRComb();
     bool isShowingIR() { return showingIR; };
@@ -57,6 +58,8 @@ public:
     
     void setDLens (int min, int max);
     
+    void setInitialised();
+    void removeInitialisedWindow();
 private:
     double fs;
 //    std::vector<double> dLen;
@@ -109,5 +112,11 @@ private:
     
     double maxSliderValue = 1.0; 
 
+    std::unique_ptr<Label> initialisingLabel;
+    bool initialised = false;
+    
+    // variable used to wait with switching to the IR page until the IR is refreshed
+    bool refreshed = true;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Response)
 };

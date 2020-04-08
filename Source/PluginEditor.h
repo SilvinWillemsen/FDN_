@@ -20,7 +20,8 @@ class Fdn_AudioProcessorEditor  : public AudioProcessorEditor,
                                   public Slider::Listener,
                                   public Button::Listener,
                                   public Timer,
-                                  public ComboBox::Listener
+                                  public ComboBox::Listener,
+                                  public ChangeListener
 {
 public:
     Fdn_AudioProcessorEditor (Fdn_AudioProcessor&);
@@ -30,6 +31,9 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    void calculateImpulseResponse();
+    void calculateEQ();
+    
     void sliderValueChanged (Slider* slider) override;
     void sliderDragStarted (Slider* slider) override;
     
@@ -37,6 +41,8 @@ public:
     
     void timerCallback() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    
+    void changeListenerCallback (ChangeBroadcaster* source) override;
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -71,5 +77,8 @@ private:
     
     bool paintResponse = false;
     int minDLenIdx, maxDLenIdx;
+    
+    std::unique_ptr<TextButton> fixCoeffs;
+    bool coeffsFixed = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

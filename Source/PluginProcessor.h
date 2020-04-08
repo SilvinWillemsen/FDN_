@@ -79,6 +79,7 @@ public:
     
     void changeFDNorder (int order, MatrixType matType);
     
+    void fixCoefficients (bool setFixed) { coeffsFixed = setFixed; }
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
@@ -89,7 +90,7 @@ private:
     double inputGain = Global::initInputGain;
 	
     bool init = false;
-    unsigned long t = 0;
+    unsigned long t = !Global::initWithImpulse;
     unsigned long tt = 0;
     Random rand;
     
@@ -104,6 +105,7 @@ private:
     int orderToChangeTo = 0;
     MatrixType matTypeToChangeTo;
 
+    bool coeffsFixed = false;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

@@ -144,7 +144,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     
     float* const channeldataL = buffer.getWritePointer(0);
-    float* const channeldataR = getTotalNumOutputChannels() > 1 ? buffer.getWritePointer(1) : nullptr;
+    float* const channeldataR = totalNumOutputChannels > 1 ? buffer.getWritePointer(1) : nullptr;
     ScopedNoDenormals noDenormals;
     const float* input = buffer.getReadPointer (0);
     if (fdn == nullptr)
@@ -162,7 +162,8 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     if (tt >= recalculateMod)
     {
         tt -= recalculateMod;
-        fdn->recalculateCoeffs();
+        if (!coeffsFixed)
+            fdn->recalculateCoeffs();
     }
     
     if (zeroCoeffsFlag)

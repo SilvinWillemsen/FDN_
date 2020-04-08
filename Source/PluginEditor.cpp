@@ -78,7 +78,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     labels[labels.size() - 1]->setJustificationType(Justification::centred);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
-    calculateBtn = std::make_unique<TextButton> ("Test");
+    calculateBtn = std::make_unique<TextButton> ("Impulse");
     calculateBtn->addListener (this);
     addAndMakeVisible (calculateBtn.get());
     
@@ -91,15 +91,6 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     allSliders->addListener (this);
     addAndMakeVisible (allSliders.get());
 
-    std::cout << "Max dLen = " << processor.getFDN()->getMaxDLen() << std::endl;
-    std::cout << "Avg dLen = " << processor.getFDN()->getAvgDLen() << std::endl;
-    std::cout << "Min dLen = " << processor.getFDN()->getMinDLen() << std::endl;
-
-    minDLenIdx = processor.getFDN()->getMinDLenIdx();
-    maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
-    response = std::make_unique<Response> (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen(), processor.getSampleRate());
-    addAndMakeVisible (response.get());
-
     //// Presets ////
     presets = std::make_unique<ComboBox> ("Presets");
     presets->addItem ("-- no preset --", noPreset);
@@ -109,9 +100,10 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     presets->addItem ("Large Room", largeRoom);
     presets->addItem ("Concert Hall", concertHall);
     presets->addItem ("Church", church);
-    presets->setSelectedId (3);
-    addAndMakeVisible (presets.get());
     presets->addListener (this);
+    addAndMakeVisible (presets.get());
+    presets->setSelectedId (5);
+    comboBoxChanged (presets.get());
 
     presetsLabel = std::make_unique<Label> ("presets", "Presets:");
     Font font (18.0);
@@ -125,6 +117,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     fdnOrder->addItem ("8", 1);
     fdnOrder->addItem ("16", 2);
     fdnOrder->addItem ("32", 3);
+    fdnOrder->addItem ("64", 4);
     addAndMakeVisible(fdnOrder.get());
     
     switch (Global::initFDNorder)
@@ -138,6 +131,9 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         case 32:
             fdnOrder->setSelectedId (3);
             break;
+        case 64:
+            fdnOrder->setSelectedId (4);
+            break;
         default:
             break;
     }
@@ -150,13 +146,31 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     scatMats->addItem ("Hadamard", hadamard);
     scatMats->addItem ("Householder", householder);
     scatMats->setSelectedId (Global::initMatType);
-//    if (Global::initFDNorder != 16)
-//    {
-//        scatMats->setItemEnabled (householder, false);
-//        scatMats->setSelectedId (hadamard);
-//    }
+
     scatMats->addListener (this);
     addAndMakeVisible(scatMats.get());
+    
+    //// Fix coefficients ////
+    fixCoeffs = std::make_unique<TextButton> ("Fix coeffs");
+    fixCoeffs->addListener (this);
+    addAndMakeVisible (fixCoeffs.get());
+    
+    //// Response ////
+    
+    for (int i = 0; i < Global::numOctaveBands; ++i)
+    {
+        std::cout << sliders[i]->getValue() << std::endl;
+    }
+    minDLenIdx = processor.getFDN()->getMinDLenIdx();
+    maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
+    response = std::make_unique<Response> (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen(), processor.getSampleRate());
+    processor.getFDN()->recalculateCoeffs();
+    calculateImpulseResponse();
+    calculateEQ();
+    addAndMakeVisible (response.get());
+    
+    // listen to the response IR button to refresh the coefficients asynchronously
+    response->addChangeListener (this);
     
     startTimerHz (1.0 / Global::updatePerSecondRatio);
     setSize (800, 700);
@@ -175,38 +189,46 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
     
     if (paintResponse)
     {
+        // always do this for smooth transition to IR
+        double avgVal = 0;
+        for (int i = 0; i < Global::numOctaveBands; ++i)
+            avgVal += sliders[i]->getValue();
+        avgVal /= Global::numOctaveBands;
+        
+        response->setIRseconds (Global::limit (round (avgVal), 1.0, 15.0) + 0.5);
         response->setDataToZero();
         if (response->isShowingIR())
         {
             if (response->getIRComb() != nullptr)
             {
-//                double maxVal = 0;
-//                for (int i = 0; i < Global::numOctaveBands; ++i)
-//                    if (sliders[i]->getValue() > maxVal)
-//                        maxVal = sliders[i]->getValue();
-                double avgVal = 0;
-                for (int i = 0; i < Global::numOctaveBands; ++i)
-                    avgVal += sliders[i]->getValue();
-                avgVal /= Global::numOctaveBands;
-                
-                for (int i = 0; i < Global::numOctaveBands + 1; ++i)
-                    response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients(maxDLenIdx, i));
-                response->calculateIR();
-                response->setIRseconds (Global::limit (round (avgVal), 1.0, 15.0) + 0.5);
+                calculateImpulseResponse();
             }
         }
-        //// there is no 'else' here so that instablility can be calculated {
-        for (int i = 0; i < Global::numOctaveBands + 1; ++i)
-        {
-            std::vector<double> coeffs = processor.getFDN()->getCoefficients (minDLenIdx, i);
-            response->calculateResponse (coeffs);
-            
-        }
-        response->linearGainToDB();
-        ////}
+        //// there is no 'else' here so that instablility can be calculated
+        calculateEQ();
+        
+        response->setInitialised();
         paintResponse = false;
     }
     
+}
+
+void Fdn_AudioProcessorEditor::calculateImpulseResponse()
+{
+    for (int i = 0; i <= Global::numOctaveBands; ++i)
+        response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients (maxDLenIdx, i));
+    response->calculateIR();
+}
+
+void Fdn_AudioProcessorEditor::calculateEQ()
+{
+    for (int i = 0; i < Global::numOctaveBands + 1; ++i)
+    {
+        std::vector<double> coeffs = processor.getFDN()->getCoefficients (minDLenIdx, i);
+        response->calculateResponse (coeffs);
+        
+    }
+    response->linearGainToDB();
 }
 
 void Fdn_AudioProcessorEditor::resized()
@@ -244,7 +266,8 @@ void Fdn_AudioProcessorEditor::resized()
         //// Side panel ////
         
         // Top Half //
-        sidePanel.removeFromTop (margin);
+        fixCoeffs->setBounds (sidePanel.removeFromTop (40 - margin));
+        sidePanel.removeFromTop (margin * 2.5);
         int knobHeight = sidePanel.getHeight() * 0.2 - margin;
         sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
         sidePanel.removeFromTop (margin * 3.0);
@@ -383,19 +406,45 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
                 buttonClicked (smoothVals.get());
         }
     }
+    else if (button == fixCoeffs.get())
+    {
+        coeffsFixed = !coeffsFixed;
+        if (coeffsFixed)
+        {
+            fixCoeffs->setButtonText("Unfix coeffs");
+            presets->setEnabled (false);
+            for (int i = 0; i < Global::numOctaveBands; ++i)
+            {
+                sliders[i]->setEnabled (false);
+            }
+            Timer::stopTimer();
+        } else {
+            fixCoeffs->setButtonText("Fix coeffs");
+            presets->setEnabled (true);
+            for (int i = 0; i < Global::numOctaveBands; ++i)
+            {
+                sliders[i]->setEnabled (true);
+            }
+            Timer::startTimerHz (1.0 / Global::updatePerSecondRatio);
+
+        }
+        processor.fixCoefficients (coeffsFixed);
+    }
 }
 
 void Fdn_AudioProcessorEditor::timerCallback()
 {
-    
-    if (!changingFDNorder)
-        paintResponse = true;
-    else if (processor.getFDN()->isInitialised())
+    if (processor.getFDN()->isInitialised())
     {
-        minDLenIdx = processor.getFDN()->getMinDLenIdx();
-        maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
-        response->setDLens (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen());
-        changingFDNorder = false;
+        if (!changingFDNorder)
+        {
+            paintResponse = true;
+        } else {
+            minDLenIdx = processor.getFDN()->getMinDLenIdx();
+            maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
+            response->setDLens (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen());
+            changingFDNorder = false;
+        }
     }
     repaint();
 }
@@ -425,6 +474,9 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
             case 3:
                 orderToSwitchTo = 32;
                 break;
+            case 4:
+                orderToSwitchTo = 64;
+                break;
         }
         
         if (processor.getFDN()->getFDNorder() == orderToSwitchTo)
@@ -433,13 +485,6 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         }
         
         changingFDNorder = true;
-//        if (orderToSwitchTo != 16)
-//        {
-//            scatMats->setSelectedId (hadamard);
-//            scatMats->setItemEnabled (householder, false);
-//        } else {
-//            scatMats->setItemEnabled (householder, true);
-//        }
         
         processor.changeFDNorder (orderToSwitchTo, static_cast<MatrixType> (scatMats->getSelectedId()));
 
@@ -450,3 +495,11 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         processor.changeMatType (static_cast<MatrixType> (scatMats->getSelectedId()));
     }
 }
+
+void Fdn_AudioProcessorEditor::changeListenerCallback (ChangeBroadcaster* source)
+{
+    // if a message is received it is ALWAYS the IR button clicked (to show IR)
+    // now asynchronously calculate the impulse response
+    calculateImpulseResponse();
+};
+
