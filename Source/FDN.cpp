@@ -336,6 +336,8 @@ void FDN::aceq (int idx)
 
 void FDN::getDelayLines()
 {
+    dLen.clear();
+    dLen.resize (FDNorder, 0);
     if (Global::usePredefinedDLens)
     {
         for (int i = 0; i < FDNorder; ++i)

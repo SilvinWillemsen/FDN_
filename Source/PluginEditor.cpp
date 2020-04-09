@@ -230,6 +230,8 @@ void Fdn_AudioProcessorEditor::calculateImpulseResponse()
     if (!processor.getFDN()->isInitialised())
         return;
     
+    minDLenIdx = processor.getFDN()->getMinDLenIdx();
+    maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
     for (int i = 0; i <= Global::numOctaveBands; ++i)
         response->getIRComb()->setFilter (i, processor.getFDN()->getCoefficients (maxDLenIdx, i));
     response->calculateIR();
@@ -435,7 +437,6 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
             {
                 sliders[i]->setEnabled (false);
             }
-            Timer::stopTimer();
         } else {
             fixCoeffs->setButtonText("Fix coeffs");
             presets->setEnabled (true);
@@ -443,8 +444,6 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
             {
                 sliders[i]->setEnabled (true);
             }
-            Timer::startTimerHz (1.0 / Global::updatePerSecondRatio);
-
         }
         processor.fixCoefficients (coeffsFixed);
     }
@@ -458,13 +457,12 @@ void Fdn_AudioProcessorEditor::timerCallback()
         {
             paintResponse = true;
         } else {
-            minDLenIdx = processor.getFDN()->getMinDLenIdx();
-            maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
             response->setDLens (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen());
             changingFDNorder = false;
         }
     }
-    repaint();
+    if (!coeffsFixed)
+        repaint();
 }
 
 void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -506,7 +504,7 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         
         processor.changeFDNorder (orderToSwitchTo, static_cast<MatrixType> (scatMats->getSelectedId()));
 
-        std::cout << "FDN order changed" << std::endl;
+        std::cout << "FDN order changed with maxDLenIdx = " << maxDLenIdx << std::endl;
     }
     else if (comboBoxThatHasChanged == scatMats.get())
     {
