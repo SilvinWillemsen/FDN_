@@ -113,25 +113,33 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     
     //// FDN order ////
     fdnOrder = std::make_unique<ComboBox> ("fdnOrder");
-    fdnOrder->addItem ("8", 1);
-    fdnOrder->addItem ("16", 2);
-    fdnOrder->addItem ("32", 3);
-    fdnOrder->addItem ("64", 4);
+	fdnOrder->addItem("2", 1);
+	fdnOrder->addItem("4", 2);
+    fdnOrder->addItem ("8", 3);
+    fdnOrder->addItem ("16", 4);
+    fdnOrder->addItem ("32", 5);
+    fdnOrder->addItem ("64", 6);
     addAndMakeVisible(fdnOrder.get());
     
     switch (Global::initFDNorder)
     {
-        case 8:
-            fdnOrder->setSelectedId (1);
-            break;
-        case 16:
-            fdnOrder->setSelectedId (2);
-            break;
-        case 32:
+		case 2:
+			fdnOrder->setSelectedId (1);
+			break;
+		case 4:
+			fdnOrder->setSelectedId (2);
+			break;
+		case 8:
             fdnOrder->setSelectedId (3);
             break;
-        case 64:
+        case 16:
             fdnOrder->setSelectedId (4);
+            break;
+        case 32:
+            fdnOrder->setSelectedId (5);
+            break;
+        case 64:
+            fdnOrder->setSelectedId (6);
             break;
         default:
             break;
@@ -481,16 +489,20 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         int orderToSwitchTo;
         switch (fdnOrder->getSelectedId())
         {
-            case 1:
+			case 1:
+				orderToSwitchTo = 2;
+			case 2:
+				orderToSwitchTo = 4;
+            case 3:
                 orderToSwitchTo = 8;
                 break;
-            case 2:
+            case 4:
                 orderToSwitchTo = 16;
                 break;
-            case 3:
+            case 5:
                 orderToSwitchTo = 32;
                 break;
-            case 4:
+            case 6:
                 orderToSwitchTo = 64;
                 break;
         }
