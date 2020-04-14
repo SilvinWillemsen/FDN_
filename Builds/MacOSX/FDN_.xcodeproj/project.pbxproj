@@ -73,6 +73,10 @@
 			isa = PBXBuildFile;
 			fileRef = 6AEB87D165F2E708DBCDA9F2;
 		};
+		DA653069380ED0709B323F11 = {
+			isa = PBXBuildFile;
+			fileRef = 631FEDBEC71323B958354318;
+		};
 		3785D7036D4A83AF46166BAB = {
 			isa = PBXBuildFile;
 			fileRef = 87B1E309D0926C8953FAD157;
@@ -334,6 +338,13 @@
 			path = "../../JuceLibraryCode/include_juce_data_structures.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		631FEDBEC71323B958354318 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = AdvancedSettingsWindow.cpp;
+			path = ../../Source/AdvancedSettingsWindow.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		6645AA7707D1A7B9C9E988FF = {
 			isa = PBXFileReference;
 			lastKnownFileType = file.r;
@@ -486,6 +497,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = FDN.h;
 			path = ../../Source/FDN.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		A8E278D9C797CAF339539980 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = AdvancedSettingsWindow.h;
+			path = ../../Source/AdvancedSettingsWindow.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		AD5FDA090D76E143246D153A = {
@@ -645,9 +663,11 @@
 		0B9BD4E48EFFAA0977C7A37D = {
 			isa = PBXGroup;
 			children = (
+				8179A5E69A422639EF5CE629,
+				631FEDBEC71323B958354318,
+				A8E278D9C797CAF339539980,
 				87B1E309D0926C8953FAD157,
 				AD5FDA090D76E143246D153A,
-				8179A5E69A422639EF5CE629,
 				C2D9531DE2C1E87546B8BC19,
 				AEE12744937ECEAE1BA42BB9,
 				6A5ACE211769457C673646A2,
@@ -1355,6 +1375,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA653069380ED0709B323F11,
 				3785D7036D4A83AF46166BAB,
 				4EE00309C026D3A162F9BCEE,
 				27F3BC7A5688333079ED4D3B,

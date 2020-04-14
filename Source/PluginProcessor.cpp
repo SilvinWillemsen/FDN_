@@ -103,7 +103,9 @@ void Fdn_AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // initialisation that you need..
     fs = sampleRate;
     fdn->initialise (fs);
-    recalculateMod = Global::updatePerSecondRatio * fs;
+    recalculateMod = fs / static_cast<double> (Global::updatePerSecond);
+    
+    cpuStore.resize (Global::updatePerSecond + 2, 0);
 }
 
 void Fdn_AudioProcessor::releaseResources()
@@ -138,6 +140,11 @@ bool Fdn_AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
+//    int amount = 10;
+//    if (timer % amount == 0)
+    curMillis = Time::getCurrentTime().toMilliseconds();
+//    else if (timer % amount == amount - 1)
+    
     if (fdn == nullptr)
         return;
     
@@ -184,7 +191,9 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         fdn->changeFDNorder (orderToChangeTo, matTypeToChangeTo);
         changeFDNorderFlag = !changeFDNorderFlag;
     }
-
+    
+    cpuStore[timer % (Global::updatePerSecond + 2)] = 0.001 * (Time::getCurrentTime().toMilliseconds() - curMillis) * (fs / (buffer.getNumSamples()));
+    ++timer;
 }
 
 //AudioProcessorEditor* Fdn_AudioProcessor::createEditor()

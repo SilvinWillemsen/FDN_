@@ -192,7 +192,26 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     // listen to the response IR button to refresh the coefficients asynchronously
     response->addChangeListener (this);
     
-    startTimerHz (1.0 / Global::updatePerSecondRatio);
+    //// Advanced Settings Window ////
+    if (Global::useAdvancedWindow)
+    {
+        advancedSettings = std::make_unique<TextButton>("Advanced");
+        advancedSettings->addListener (this);
+        addAndMakeVisible (advancedSettings.get());
+        
+        advancedSettingsWindow = std::make_unique<AdvancedSettingsWindow>();
+    }
+    
+    //// CPU usage ////
+    cpuUsage = std::make_unique<Label> ("cpuUsage", "CPU: ");
+    addAndMakeVisible (cpuUsage.get());
+    cpuUsage->setJustificationType(Justification::left);
+    cpuUsage->setColour (Label::textColourId, Colours::white);
+    cpuUsage->setColour (Label::backgroundColourId, defaultButtonColour);
+    cpuUsage->setColour (Label::outlineColourId, Colours::white);
+    
+    //// Timer and Size ////
+    startTimerHz (Global::updatePerSecond);
     setSize (800, 700);
 }
 
@@ -289,7 +308,8 @@ void Fdn_AudioProcessorEditor::resized()
         presetArea.removeFromLeft (margin * 0.5);
         presetArea.removeFromTop (margin);
         presetsLabel->setBounds (presetArea.removeFromLeft (70));
-//        presetArea.removeFromLeft (20);
+        cpuUsage->setBounds (presetArea.removeFromRight (100));
+        presetArea.removeFromRight (margin);
         presets->setBounds (presetArea);
         
         //// Side panel ////
@@ -309,15 +329,22 @@ void Fdn_AudioProcessorEditor::resized()
         smoothVals->setBounds (sidePanel.removeFromBottom (40));
         sidePanel.removeFromBottom (margin);
         allSliders->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (margin);
-        scatMats->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (margin * 0.5);
-        scatMatsLabel->setBounds (sidePanel.removeFromBottom (20).withX(sidePanel.getX() - 5));
-        sidePanel.removeFromBottom (margin);
-        fdnOrder->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (margin*0.5);
-        fdnOrderLabel->setBounds (sidePanel.removeFromBottom (20).withX(sidePanel.getX() - 5));
-
+       
+        if (Global::useAdvancedWindow)
+        {
+            sidePanel.removeFromBottom (margin);
+            advancedSettings->setBounds (sidePanel.removeFromBottom (40));
+        } else {
+            sidePanel.removeFromBottom (margin);
+            scatMats->setBounds (sidePanel.removeFromBottom (40));
+            sidePanel.removeFromBottom (margin * 0.5);
+            scatMatsLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
+            sidePanel.removeFromBottom (margin);
+            fdnOrder->setBounds (sidePanel.removeFromBottom (40));
+            sidePanel.removeFromBottom (margin * 0.5);
+            fdnOrderLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
+        }
+        
         //// Response area ////
         Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
         responseArea.reduce(0, margin);
@@ -411,6 +438,10 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
     {
         processor.setZeroCoeffsFlag();
     }
+    else if (button == advancedSettings.get())
+    {
+        openAdvancedSettings();
+    }
     else if (button == smoothVals.get())
     {
         smoothValsBool = !smoothValsBool;
@@ -463,6 +494,7 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
 
 void Fdn_AudioProcessorEditor::timerCallback()
 {
+    cpuUsage->setText ("CPU: " + String (static_cast<int>(processor.getCPU() * 1000.0) / 10.0) + "%", dontSendNotification);
     if (processor.getFDN()->isInitialised())
     {
         if (!changingFDNorder)
@@ -537,3 +569,13 @@ void Fdn_AudioProcessorEditor::changeListenerCallback (ChangeBroadcaster* source
     calculateImpulseResponse();
 };
 
+void Fdn_AudioProcessorEditor::openAdvancedSettings()
+{
+    DialogWindow::LaunchOptions dlg;
+    int dlgModal = -1;
+    addAndMakeVisible (advancedSettingsWindow.get());
+
+    dlg.dialogTitle = "Advanced Settings";
+    dlg.content.set (advancedSettingsWindow.get(), false);
+    dlgModal = dlg.runModal();
+}

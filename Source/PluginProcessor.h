@@ -80,6 +80,13 @@ public:
     void changeFDNorder (int order, MatrixType matType);
     
     void fixCoefficients (bool setFixed) { coeffsFixed = setFixed; }
+    
+    double getCPU() {
+        double tmp = 0;
+        for (int i = 0; i < cpuStore.size(); ++i)
+            tmp += cpuStore[i];
+        
+        return tmp / cpuStore.size(); };
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
@@ -106,6 +113,13 @@ private:
     MatrixType matTypeToChangeTo;
 
     bool coeffsFixed = false;
+    
+    double cpu = 1;
+    
+    long curMillis;
+    int timer = 0;
+    
+    std::vector<double> cpuStore;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

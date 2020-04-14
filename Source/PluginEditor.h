@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "AdvancedSettingsWindow.h"
 #include "Response.h"
 
 //==============================================================================
@@ -44,11 +45,13 @@ public:
     
     void changeListenerCallback (ChangeBroadcaster* source) override;
     
+    void openAdvancedSettings();
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+    
     Fdn_AudioProcessor& processor;
     std::unique_ptr<Response> response;
+    
+    std::unique_ptr<AdvancedSettingsWindow> advancedSettingsWindow;
     
     OwnedArray<Slider> sliders;
     OwnedArray<Label> labels;
@@ -64,6 +67,8 @@ private:
     
     std::unique_ptr<ComboBox> scatMats;
     std::unique_ptr<Label> scatMatsLabel;
+    
+    std::unique_ptr<TextButton> advancedSettings;
 
     bool changingFDNorder = false;
     
@@ -81,5 +86,8 @@ private:
     
     std::unique_ptr<TextButton> fixCoeffs;
     bool coeffsFixed = false;
+    
+    //// CPU usage
+    std::unique_ptr<Label> cpuUsage;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };
