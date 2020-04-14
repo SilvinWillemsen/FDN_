@@ -541,6 +541,23 @@ void FDN::setScatteringMatrix (MatrixType matType)
 			}
 			break;
 		}
+        case randomMat:
+        {
+            Eigen::MatrixXd randMat (FDNorder, FDNorder);       // initialise empty matrix
+            randMat.setRandom();                                // fill matrix with random values
+            Eigen::HouseholderQR<Eigen::MatrixXd> qr (randMat); // perform QR decomposition
+            Eigen::MatrixXd Q = qr.householderQ();              // get Q (orthogonal matrix)
+            
+            // Fill scattering matrix with values from Q
+            for (int i = 0; i < FDNorder; ++i)
+                for (int j = 0; j < FDNorder; ++j)
+                    A[i][j] = Q (i, j);
+            
+            std::cout << "A^T * A = (should be identity matrix within machine precision (|non-diagonal value| < 1e-15))" << std::endl;
+            std::cout << Q.transpose() * Q << std::endl;
+            
+            break;
+        }
     }
 }
 

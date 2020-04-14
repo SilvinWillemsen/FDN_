@@ -13,7 +13,8 @@ enum MatrixType
 {
     hadamard = 1,
     householder,
-	identity
+	identity,
+    randomMat
 };
 
 enum Preset
@@ -28,7 +29,7 @@ enum Preset
 
 namespace Global
 {
-    static const int initFDNorder = 16;
+    static const int initFDNorder = 8;
     static const int numOctaveBands = 10;
     static const int minDelayLength = 1500;
     static const int maxDelayLength = 4500;
@@ -65,7 +66,7 @@ namespace Global
     
     static const double updatePerSecondRatio = 0.2;
     
-    static const MatrixType initMatType = householder;
+    static const MatrixType initMatType = randomMat;
     
     static const std::vector<std::vector<double>> presetValues
     {

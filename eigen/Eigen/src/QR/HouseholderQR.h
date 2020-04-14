@@ -41,7 +41,7 @@ namespace Eigen {
   *
   * \sa MatrixBase::householderQr()
   */
-template<typename _MatrixType> class HouseholderQR
+template<typename _MatrixType> class  HouseholderQR
 {
   public:
 
