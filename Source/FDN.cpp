@@ -529,6 +529,18 @@ void FDN::setScatteringMatrix (MatrixType matType)
             std::cout << "hadamard" << std::endl;
             break;
         }
+		case identity:
+		{
+			for (int i = 0; i < FDNorder; ++i)
+			{
+				for (int j = 0; j < FDNorder; ++j)
+				{
+					if (i == j)
+						A[i][j] = 1;
+				}
+			}
+			break;
+		}
     }
 }
 

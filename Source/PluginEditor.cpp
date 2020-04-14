@@ -156,6 +156,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     scatMats = std::make_unique<ComboBox> ("scatMats");
     scatMats->addItem ("Hadamard", hadamard);
     scatMats->addItem ("Householder", householder);
+	scatMats->addItem("Identity", identity);
     scatMats->setSelectedId (Global::initMatType);
     scatMats->addListener (this);
     addAndMakeVisible(scatMats.get());

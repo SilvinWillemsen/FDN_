@@ -12,7 +12,8 @@
 enum MatrixType
 {
     hadamard = 1,
-    householder
+    householder,
+	identity
 };
 
 enum Preset
