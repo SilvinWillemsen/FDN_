@@ -111,6 +111,12 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     presetsLabel->setJustificationType(Justification::left);
     presetsLabel->setColour (Label::textColourId, Colours::white);
     
+    if (Global::useAdvancedWindow)
+    {
+//        initialiseAdvancedWindow();
+    } else {
+        initialiseAdvancedSettings();
+    }
     //// FDN order ////
     fdnOrder = std::make_unique<ComboBox> ("fdnOrder");
 	fdnOrder->addItem("2", 1);
@@ -258,13 +264,13 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
         response->setInitialised();
 
         paintResponse = false;
-        cpuUsageGraphicsValue = 0.001 * (Time::currentTimeMillis() - time) / (1.0 / static_cast<double>(Global::updatePerSecond));
+        cpuUsageGraphicsValue = 0.001 * (Time::getCurrentTime().toMilliseconds() - time) / (1.0 / static_cast<double>(Global::updatePerSecond));
     }
 }
 
 void Fdn_AudioProcessorEditor::timerCallback()
 {
-    time = Time::currentTimeMillis();
+    time = Time::getCurrentTime().toMilliseconds();
     
     if (processor.getFDN()->isInitialised())
     {
@@ -279,7 +285,7 @@ void Fdn_AudioProcessorEditor::timerCallback()
     if (!coeffsFixed)
         repaint();
     else
-        cpuUsageGraphicsValue = 0.001 * (Time::currentTimeMillis() - time) / (1.0 / static_cast<double>(Global::updatePerSecond));
+        cpuUsageGraphicsValue = 0.001 * (Time::getCurrentTime().toMilliseconds() - time) / (1.0 / static_cast<double>(Global::updatePerSecond));
     
     cpuUsageAudio->setText ("Audio CPU: " + String (static_cast<int>(processor.getCPU() * 1000.0) / 10.0) + "%", dontSendNotification);
     cpuUsageGraphics->setText ("Graphics CPU: " + String (static_cast<int>(cpuUsageGraphicsValue * 1000.0) / 10.0) + "%", dontSendNotification);
@@ -598,4 +604,9 @@ void Fdn_AudioProcessorEditor::openAdvancedSettings()
     dlg.dialogTitle = "Advanced Settings";
     dlg.content.set (advancedSettingsWindow.get(), false);
     dlgModal = dlg.runModal();
+}
+
+void Fdn_AudioProcessorEditor::initialiseAdvancedSettings()
+{
+    
 }

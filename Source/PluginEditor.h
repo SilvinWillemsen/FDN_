@@ -26,6 +26,8 @@ class Fdn_AudioProcessorEditor  : public AudioProcessorEditor,
 {
 public:
     Fdn_AudioProcessorEditor (Fdn_AudioProcessor&);
+    void initialiseAdvancedSettings();
+
     ~Fdn_AudioProcessorEditor();
 
     //==============================================================================
@@ -46,6 +48,7 @@ public:
     void changeListenerCallback (ChangeBroadcaster* source) override;
     
     void openAdvancedSettings();
+    
 private:
     
     Fdn_AudioProcessor& processor;
