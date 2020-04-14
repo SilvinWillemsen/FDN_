@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.cpp"
-            timestampString = "608566399.012277"
+            timestampString = "608570900.255354"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "191"
@@ -26,7 +26,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.cpp"
-            timestampString = "608566399.012393"
+            timestampString = "608570900.255458"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "192"
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012478"
+            timestampString = "608570900.255549"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "527"
-            endingLineNumber = "527"
+            startingLineNumber = "539"
+            endingLineNumber = "539"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012538"
+            timestampString = "608570900.255614"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "528"
-            endingLineNumber = "528"
+            startingLineNumber = "540"
+            endingLineNumber = "540"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012598"
+            timestampString = "608570900.255733"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "105"
@@ -90,11 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.0126441"
+            timestampString = "608570900.255806"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
             landmarkName = "FDN::initialise (double sampleRate)"
             landmarkType = "7">
          </BreakpointContent>
@@ -106,7 +106,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012688"
+            timestampString = "608570900.255865"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "138"
@@ -122,7 +122,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.01273"
+            timestampString = "608570900.255921"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "142"
@@ -138,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012772"
+            timestampString = "608570900.2559741"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "137"
@@ -154,7 +154,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012815"
+            timestampString = "608570900.256026"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "145"
@@ -170,7 +170,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.012856"
+            timestampString = "608570900.256104"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "150"
@@ -186,7 +186,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.0129"
+            timestampString = "608570900.256171"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "146"
@@ -202,11 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.012982"
+            timestampString = "608570900.256237"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "563"
-            endingLineNumber = "563"
+            startingLineNumber = "542"
+            endingLineNumber = "542"
             landmarkName = "Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)"
             landmarkType = "7">
          </BreakpointContent>
@@ -218,11 +218,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.0138479"
+            timestampString = "608570900.2563291"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "568"
-            endingLineNumber = "568"
+            startingLineNumber = "547"
+            endingLineNumber = "547"
             landmarkName = "Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)"
             landmarkType = "7">
          </BreakpointContent>
@@ -234,11 +234,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.0143991"
+            timestampString = "608570900.256417"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "531"
-            endingLineNumber = "531"
+            startingLineNumber = "543"
+            endingLineNumber = "543"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -250,7 +250,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.cpp"
-            timestampString = "608566399.014472"
+            timestampString = "608570900.256474"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "169"
@@ -266,7 +266,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.01457"
+            timestampString = "608570900.256551"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "19"
@@ -282,11 +282,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.014627"
+            timestampString = "608570900.256604"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "511"
-            endingLineNumber = "511"
+            startingLineNumber = "523"
+            endingLineNumber = "523"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
             <Locations>
@@ -361,7 +361,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.h"
-            timestampString = "608566399.01473"
+            timestampString = "608570900.256699"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "72"
@@ -377,7 +377,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.cpp"
-            timestampString = "608566399.014783"
+            timestampString = "608570900.256753"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "159"
@@ -393,11 +393,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.014869"
+            timestampString = "608570900.256827"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "510"
-            endingLineNumber = "510"
+            startingLineNumber = "522"
+            endingLineNumber = "522"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
             <Locations>
@@ -456,11 +456,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.014925"
+            timestampString = "608570900.256892"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "496"
-            endingLineNumber = "496"
+            startingLineNumber = "508"
+            endingLineNumber = "508"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -472,11 +472,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.014979"
+            timestampString = "608570900.256945"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "472"
-            endingLineNumber = "472"
+            startingLineNumber = "484"
+            endingLineNumber = "484"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -488,11 +488,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.015035"
+            timestampString = "608570900.256997"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "512"
-            endingLineNumber = "512"
+            startingLineNumber = "524"
+            endingLineNumber = "524"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
             <Locations>
@@ -551,11 +551,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.015089"
+            timestampString = "608570900.257049"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "471"
-            endingLineNumber = "471"
+            startingLineNumber = "483"
+            endingLineNumber = "483"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -567,11 +567,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.015139"
+            timestampString = "608570900.257103"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "470"
-            endingLineNumber = "470"
+            startingLineNumber = "482"
+            endingLineNumber = "482"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -583,11 +583,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.015187"
+            timestampString = "608570900.257154"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "469"
-            endingLineNumber = "469"
+            startingLineNumber = "481"
+            endingLineNumber = "481"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -599,11 +599,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.015237"
+            timestampString = "608570900.257208"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "574"
-            endingLineNumber = "574"
+            startingLineNumber = "553"
+            endingLineNumber = "553"
             landmarkName = "Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)"
             landmarkType = "7">
          </BreakpointContent>
@@ -615,7 +615,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.h"
-            timestampString = "608566399.0157191"
+            timestampString = "608570900.257296"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "78"
@@ -679,7 +679,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.h"
-            timestampString = "608566399.0158221"
+            timestampString = "608570900.2574"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "77"
@@ -695,11 +695,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.01596"
+            timestampString = "608570900.257461"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "479"
-            endingLineNumber = "479"
+            startingLineNumber = "491"
+            endingLineNumber = "491"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -711,11 +711,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.016034"
+            timestampString = "608570900.257519"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "351"
-            endingLineNumber = "351"
+            startingLineNumber = "332"
+            endingLineNumber = "332"
             landmarkName = "Fdn_AudioProcessorEditor::resized()"
             landmarkType = "7">
          </BreakpointContent>
@@ -727,7 +727,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.cpp"
-            timestampString = "608566399.01647"
+            timestampString = "608570900.257614"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "151"
@@ -839,11 +839,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.01668"
+            timestampString = "608570900.257797"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "104"
-            endingLineNumber = "104"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
             landmarkName = "Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor&amp; p)"
             landmarkType = "7">
          </BreakpointContent>
@@ -855,7 +855,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.h"
-            timestampString = "608566399.017074"
+            timestampString = "608570900.257882"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "51"
@@ -871,11 +871,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.017125"
+            timestampString = "608570900.2579319"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "182"
-            endingLineNumber = "182"
+            startingLineNumber = "127"
+            endingLineNumber = "127"
             landmarkName = "Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor&amp; p)"
             landmarkType = "7">
          </BreakpointContent>
@@ -887,11 +887,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.017465"
+            timestampString = "608570900.258013"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
+            startingLineNumber = "249"
+            endingLineNumber = "249"
             landmarkName = "Fdn_AudioProcessorEditor::paint (Graphics&amp; g)"
             landmarkType = "7">
          </BreakpointContent>
@@ -999,11 +999,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.01792"
+            timestampString = "608570900.25822"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "264"
-            endingLineNumber = "264"
+            startingLineNumber = "260"
+            endingLineNumber = "260"
             landmarkName = "Fdn_AudioProcessorEditor::paint (Graphics&amp; g)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1015,11 +1015,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.018253"
+            timestampString = "608570900.25831"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "341"
-            endingLineNumber = "341"
+            startingLineNumber = "368"
+            endingLineNumber = "368"
             landmarkName = "FDN::getDelayLines()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1031,11 +1031,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.018306"
+            timestampString = "608570900.258373"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "346"
-            endingLineNumber = "346"
+            startingLineNumber = "368"
+            endingLineNumber = "368"
             landmarkName = "FDN::getDelayLines()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1047,11 +1047,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.018351"
+            timestampString = "608570900.258436"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "427"
-            endingLineNumber = "427"
+            startingLineNumber = "439"
+            endingLineNumber = "439"
             landmarkName = "FDN::getMaxDLenIdx()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1063,11 +1063,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.018394"
+            timestampString = "608570900.258491"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "435"
-            endingLineNumber = "435"
+            startingLineNumber = "447"
+            endingLineNumber = "447"
             landmarkName = "FDN::getMaxDLenIdx()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1079,11 +1079,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.018438"
+            timestampString = "608570900.258544"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "570"
-            endingLineNumber = "570"
+            startingLineNumber = "549"
+            endingLineNumber = "549"
             landmarkName = "Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1095,11 +1095,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.018934"
+            timestampString = "608570900.258631"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "537"
-            endingLineNumber = "537"
+            startingLineNumber = "516"
+            endingLineNumber = "516"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -1111,7 +1111,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginProcessor.cpp"
-            timestampString = "608566399.019309"
+            timestampString = "608570900.2587399"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "104"
@@ -1127,11 +1127,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.019387"
+            timestampString = "608570900.258818"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "567"
-            endingLineNumber = "567"
+            startingLineNumber = "579"
+            endingLineNumber = "579"
             landmarkName = "FDN::printScatteringMatrix()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1143,11 +1143,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.019436"
+            timestampString = "608570900.2588741"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "559"
-            endingLineNumber = "559"
+            startingLineNumber = "571"
+            endingLineNumber = "571"
             landmarkName = "FDN::setScatteringMatrix (MatrixType matType)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1159,28 +1159,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "608566399.019485"
+            timestampString = "608570900.258929"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "579"
-            endingLineNumber = "579"
+            startingLineNumber = "558"
+            endingLineNumber = "558"
             landmarkName = "Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../../Source/FDN.cpp"
-            timestampString = "608566399.019834"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "126"
-            endingLineNumber = "126"
-            landmarkName = "FDN::initialise (double sampleRate)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1213,6 +1197,118 @@
             startingLineNumber = "20"
             endingLineNumber = "20"
             landmarkName = "EQComb::EQComb (int dLen)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/PluginEditor.cpp"
+            timestampString = "608570900.259063"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "519"
+            endingLineNumber = "519"
+            landmarkName = "Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/AdvancedSettingsWindow.cpp"
+            timestampString = "608570900.2591341"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "142"
+            endingLineNumber = "142"
+            landmarkName = "AdvancedSettingsWindow::buttonClicked (Button* button)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/PluginProcessor.cpp"
+            timestampString = "608570900.259504"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "203"
+            endingLineNumber = "203"
+            landmarkName = "Fdn_AudioProcessor::processBlock (AudioBuffer&lt;float&gt;&amp; buffer, MidiBuffer&amp;)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Fdn_AudioProcessor::processBlock(juce::AudioBuffer&lt;float&gt;&amp;, juce::MidiBuffer&amp;)"
+                  moduleName = "FDN_"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/SilvinW/repositories/FDN_/Source/PluginProcessor.cpp"
+                  timestampString = "608569538.876554"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "197"
+                  endingLineNumber = "197"
+                  offsetFromSymbolStart = "746">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Fdn_AudioProcessor::processBlock(juce::AudioBuffer&lt;float&gt;&amp;, juce::MidiBuffer&amp;)"
+                  moduleName = "FDN_"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/SilvinW/repositories/FDN_/Source/PluginProcessor.cpp"
+                  timestampString = "608569538.878499"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "197"
+                  endingLineNumber = "197"
+                  offsetFromSymbolStart = "755">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/PluginProcessor.cpp"
+            timestampString = "608570900.259558"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "202"
+            endingLineNumber = "202"
+            landmarkName = "Fdn_AudioProcessor::processBlock (AudioBuffer&lt;float&gt;&amp; buffer, MidiBuffer&amp;)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/PluginProcessor.cpp"
+            timestampString = "608570900.259606"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "195"
+            endingLineNumber = "195"
+            landmarkName = "Fdn_AudioProcessor::processBlock (AudioBuffer&lt;float&gt;&amp; buffer, MidiBuffer&amp;)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

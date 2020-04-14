@@ -192,6 +192,12 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         changeFDNorderFlag = !changeFDNorderFlag;
     }
     
+    if (changeDelayLineSettingFlag)
+    {
+        fdn->changeDelayLineSetting (dLenSetToChangeTo);
+        changeDelayLineSettingFlag = !changeDelayLineSettingFlag;
+    }
+    
     cpuStore[timer % (Global::updatePerSecond + 2)] = 0.001 * (Time::getCurrentTime().toMilliseconds() - curMillis) * (fs / (buffer.getNumSamples()));
     ++timer;
 }
@@ -238,4 +244,10 @@ void Fdn_AudioProcessor::changeFDNorder (int order, MatrixType matType)
     orderToChangeTo = order;
     matTypeToChangeTo = matType;
     changeFDNorderFlag = true;
+}
+
+void Fdn_AudioProcessor::changeDelayLineSetting (DelayLineSetting dLenSet)
+{
+    dLenSetToChangeTo = dLenSet;
+    changeDelayLineSettingFlag = true;
 }

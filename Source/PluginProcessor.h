@@ -86,7 +86,11 @@ public:
         for (int i = 0; i < cpuStore.size(); ++i)
             tmp += cpuStore[i];
         
-        return tmp / cpuStore.size(); };
+        return tmp / cpuStore.size();
+        
+    };
+    
+    void changeDelayLineSetting (DelayLineSetting dLenSet) ;
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
@@ -120,6 +124,9 @@ private:
     int timer = 0;
     
     std::vector<double> cpuStore;
-	//==============================================================================
+    
+    bool changeDelayLineSettingFlag = false;
+    DelayLineSetting dLenSetToChangeTo;
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

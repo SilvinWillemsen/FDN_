@@ -15,10 +15,9 @@
 Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
     sliderValuesAtStartDrag.resize (Global::numOctaveBands, Global::RT);
 
+    //// EQ Sliders and Labels ////
     for (int i = 0; i < Global::numOctaveBands; ++i)
     {
         String name = "RT" + String(Global::fc1[i]);
@@ -30,7 +29,6 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
             sliders[i]->setName (name);
         }
         sliders[i]->setRange (Global::RTmin, Global::RTmax, 0.01f);
-//        sliders[i]->setSkewFactorFromMidPoint (1);
         sliders[i]->setValue (Global::RT);
         addAndMakeVisible (sliders[i]);
         sliders[i]->addListener (this);
@@ -39,15 +37,12 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         labels.add (new Label (name, name));
         addAndMakeVisible (labels[i]);
         labels[i]->attachToComponent (sliders[i], false);
-        
     }
-    if (Global::horSliders)
-        sliders.add (new Slider ("dryGain"));
-    else
-    {
-        sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
-        sliders[sliders.size() - 1]->setName ("dryGain");
-    }
+
+    //// Dry/Wet ////
+    sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
+    sliders[sliders.size() - 1]->setName ("dryGain");
+
     sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
     sliders[sliders.size() - 1]->setValue (Global::dryWetInit);
     
@@ -59,13 +54,9 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     labels[labels.size() - 1]->setJustificationType(Justification::centred);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
-    if (Global::horSliders)
-        sliders.add (new Slider ("inputGain"));
-    else
-    {
-        sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
-        sliders[sliders.size() - 1]->setName ("inputGain");
-    }
+    //// Input gain ////
+    sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
+    sliders[sliders.size() - 1]->setName ("inputGain");
     
     sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
     sliders[sliders.size() - 1]->setValue (Global::initInputGain);
@@ -78,9 +69,9 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     labels[labels.size() - 1]->setJustificationType(Justification::centred);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
     
-    calculateBtn = std::make_unique<TextButton> ("Impulse");
-    calculateBtn->addListener (this);
-    addAndMakeVisible (calculateBtn.get());
+    impulseBtn = std::make_unique<TextButton> ("Impulse");
+    impulseBtn->addListener (this);
+    addAndMakeVisible (impulseBtn.get());
     
     smoothVals = std::make_unique<TextButton> ("Smooth");
     smoothVals->addListener (this);
@@ -113,68 +104,22 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     
     if (Global::useAdvancedWindow)
     {
-//        initialiseAdvancedWindow();
+        advancedSettings = std::make_unique<TextButton>("Advanced");
+        advancedSettings->addListener (this);
+        addAndMakeVisible (advancedSettings.get());
+        advancedSettingsWindow = std::make_unique<AdvancedSettingsWindow> (impulseBtn);
+        
+        fdnOrder = advancedSettingsWindow->getFDNOrderBox();
+        scatMats = advancedSettingsWindow->getScatMatsBox();
+        delayLines = advancedSettingsWindow->getDelayLinesBox();
+        fdnOrder->addListener (this);
+        scatMats->addListener (this);
+        delayLines->addListener (this);
+
     } else {
         initialiseAdvancedSettings();
     }
-    //// FDN order ////
-    fdnOrder = std::make_unique<ComboBox> ("fdnOrder");
-	fdnOrder->addItem("2", 1);
-	fdnOrder->addItem("4", 2);
-    fdnOrder->addItem ("8", 3);
-    fdnOrder->addItem ("16", 4);
-    fdnOrder->addItem ("32", 5);
-    fdnOrder->addItem ("64", 6);
-    addAndMakeVisible(fdnOrder.get());
-    
-    switch (Global::initFDNorder)
-    {
-		case 2:
-			fdnOrder->setSelectedId (1);
-			break;
-		case 4:
-			fdnOrder->setSelectedId (2);
-			break;
-		case 8:
-            fdnOrder->setSelectedId (3);
-            break;
-        case 16:
-            fdnOrder->setSelectedId (4);
-            break;
-        case 32:
-            fdnOrder->setSelectedId (5);
-            break;
-        case 64:
-            fdnOrder->setSelectedId (6);
-            break;
-        default:
-            break;
-    }
-    addAndMakeVisible (fdnOrder.get());
-    fdnOrder->addListener (this);
-   
-    fdnOrderLabel = std::make_unique<Label> ("fdnOrderLabel", "FDN Order");
-    addAndMakeVisible (fdnOrderLabel.get());
-    fdnOrderLabel->setJustificationType(Justification::left);
-    fdnOrderLabel->setColour (Label::textColourId, Colours::white);
-    
-    //// Scattering Matrices ////
-    scatMats = std::make_unique<ComboBox> ("scatMats");
-    scatMats->addItem ("Hadamard", hadamard);
-    scatMats->addItem ("Householder", householder);
-	scatMats->addItem ("Identity", identity);
-    scatMats->addItem ("Random", randomMat);
-    
-    scatMats->setSelectedId (Global::initMatType);
-    scatMats->addListener (this);
-    addAndMakeVisible (scatMats.get());
-    
-    scatMatsLabel = std::make_unique<Label> ("scatMatsLabel", "Scattering Mat.");
-    addAndMakeVisible (scatMatsLabel.get());
-    scatMatsLabel->setJustificationType(Justification::left);
-    scatMatsLabel->setColour (Label::textColourId, Colours::white);
-    
-    
+
     //// Fix coefficients ////
     fixCoeffs = std::make_unique<TextButton> ("Fix coeffs");
     fixCoeffs->addListener (this);
@@ -198,16 +143,6 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     // listen to the response IR button to refresh the coefficients asynchronously
     response->addChangeListener (this);
     
-    //// Advanced Settings Window ////
-    if (Global::useAdvancedWindow)
-    {
-        advancedSettings = std::make_unique<TextButton>("Advanced");
-        advancedSettings->addListener (this);
-        addAndMakeVisible (advancedSettings.get());
-        
-        advancedSettingsWindow = std::make_unique<AdvancedSettingsWindow>();
-    }
-    
     //// CPU usage Audio ////
     cpuUsageAudio = std::make_unique<Label> ("cpuUsage", "CPU: ");
     addAndMakeVisible (cpuUsageAudio.get());
@@ -216,7 +151,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     cpuUsageAudio->setColour (Label::backgroundColourId, defaultButtonColour);
     cpuUsageAudio->setColour (Label::outlineColourId, Colours::white);
     
-    //// CPU usage Graphics////
+    //// CPU usage Graphics ////
     cpuUsageGraphics = std::make_unique<Label> ("cpuUsage", "CPU: ");
     addAndMakeVisible (cpuUsageGraphics.get());
     cpuUsageGraphics->setJustificationType (Justification::left);
@@ -233,6 +168,67 @@ Fdn_AudioProcessorEditor::~Fdn_AudioProcessorEditor()
 {
     stopTimer();
 }
+
+void Fdn_AudioProcessorEditor::initialiseAdvancedSettings()
+{
+    //// FDN order ////
+    fdnOrder = std::make_shared<ComboBox> ("fdnOrder");
+    fdnOrder->addItem("2", 1);
+    fdnOrder->addItem("4", 2);
+    fdnOrder->addItem ("8", 3);
+    fdnOrder->addItem ("16", 4);
+    fdnOrder->addItem ("32", 5);
+    fdnOrder->addItem ("64", 6);
+    addAndMakeVisible(fdnOrder.get());
+    
+    switch (Global::initFDNorder)
+    {
+        case 2:
+            fdnOrder->setSelectedId (1);
+            break;
+        case 4:
+            fdnOrder->setSelectedId (2);
+            break;
+        case 8:
+            fdnOrder->setSelectedId (3);
+            break;
+        case 16:
+            fdnOrder->setSelectedId (4);
+            break;
+        case 32:
+            fdnOrder->setSelectedId (5);
+            break;
+        case 64:
+            fdnOrder->setSelectedId (6);
+            break;
+        default:
+            break;
+    }
+    addAndMakeVisible (fdnOrder.get());
+    fdnOrder->addListener (this);
+    
+    fdnOrderLabel = std::make_unique<Label> ("fdnOrderLabel", "FDN Order");
+    addAndMakeVisible (fdnOrderLabel.get());
+    fdnOrderLabel->setJustificationType(Justification::left);
+    fdnOrderLabel->setColour (Label::textColourId, Colours::white);
+    
+    //// Scattering Matrices ////
+    scatMats = std::make_shared<ComboBox> ("scatMats");
+    scatMats->addItem ("Hadamard", hadamard);
+    scatMats->addItem ("Householder", householder);
+    scatMats->addItem ("Identity", identity);
+    scatMats->addItem ("Random", randomMat);
+    
+    scatMats->setSelectedId (Global::initMatType);
+    scatMats->addListener (this);
+    addAndMakeVisible (scatMats.get());
+    
+    scatMatsLabel = std::make_unique<Label> ("scatMatsLabel", "Scattering Mat.");
+    addAndMakeVisible (scatMatsLabel.get());
+    scatMatsLabel->setJustificationType(Justification::left);
+    scatMatsLabel->setColour (Label::textColourId, Colours::white);
+}
+
 
 //==============================================================================
 void Fdn_AudioProcessorEditor::paint (Graphics& g)
@@ -326,89 +322,72 @@ void Fdn_AudioProcessorEditor::resized()
     // subcomponents in your editor..
     Rectangle<int> totArea = getLocalBounds();
     
-    if (Global::horSliders)
+    Rectangle<int> sidePanel = totArea.removeFromRight (120);
+    sidePanel.reduce (Global::margin, Global::margin);
+
+    //// Preset Area ////
+    Rectangle<int> presetArea = totArea.removeFromTop (40);
+    presetArea.removeFromLeft (Global::margin * 0.5);
+    presetArea.removeFromTop (Global::margin);
+    presetsLabel->setBounds (presetArea.removeFromLeft (70));
+    cpuUsageGraphics->setBounds (presetArea.removeFromRight (140));
+    presetArea.removeFromRight (Global::margin);
+    cpuUsageAudio->setBounds (presetArea.removeFromRight (140));
+    presetArea.removeFromRight (Global::margin);
+    presets->setBounds (presetArea);
+    
+    //// Side panel ////
+    
+    // Top Half //
+    fixCoeffs->setBounds (sidePanel.removeFromTop (40 - Global::margin));
+    sidePanel.removeFromTop (Global::margin * 4.0);
+    int knobHeight = sidePanel.getHeight() * 0.2 - Global::margin;
+    sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
+    sidePanel.removeFromTop (Global::margin * 3.0);
+    sliders[sliders.size() - 2]->setBounds (sidePanel.removeFromTop (knobHeight));
+    sidePanel.removeFromTop (Global::margin * 3.0);
+    
+    // Bottom Half //
+    impulseBtn->setBounds (sidePanel.removeFromBottom (40));
+    sidePanel.removeFromBottom (Global::margin);
+    smoothVals->setBounds (sidePanel.removeFromBottom (40));
+    sidePanel.removeFromBottom (Global::margin);
+    allSliders->setBounds (sidePanel.removeFromBottom (40));
+   
+    if (Global::useAdvancedWindow)
     {
-        int sliderHeight = 40;
-        response->setBounds (totArea.removeFromRight (getWidth() * 0.5));
-        calculateBtn->setBounds (totArea.removeFromBottom (sliderHeight));
-        totArea.removeFromLeft (100);
-        sliders[sliders.size() - 1]->setBounds (totArea.removeFromTop (sliderHeight));
-        sliders[sliders.size() - 2]->setBounds (totArea.removeFromTop (sliderHeight));
-        
-        for (int i = 0; i < sliders.size() - 2; ++i)
-        {
-            sliders[i]->setBounds (totArea.removeFromTop (sliderHeight));
-        }
+        sidePanel.removeFromBottom (Global::margin);
+        advancedSettings->setBounds (sidePanel.removeFromBottom (40));
     } else {
-        int margin = 12;
-        Rectangle<int> sidePanel = totArea.removeFromRight (120);
-        sidePanel.reduce (margin, margin);
-
-        //// Preset Area ////
-        Rectangle<int> presetArea = totArea.removeFromTop (40);
-        presetArea.removeFromLeft (margin * 0.5);
-        presetArea.removeFromTop (margin);
-        presetsLabel->setBounds (presetArea.removeFromLeft (70));
-        cpuUsageGraphics->setBounds (presetArea.removeFromRight (140));
-        presetArea.removeFromRight (margin);
-        cpuUsageAudio->setBounds (presetArea.removeFromRight (140));
-        presetArea.removeFromRight (margin);
-        presets->setBounds (presetArea);
-        
-        //// Side panel ////
-        
-        // Top Half //
-        fixCoeffs->setBounds (sidePanel.removeFromTop (40 - margin));
-        sidePanel.removeFromTop (margin * 4.0);
-        int knobHeight = sidePanel.getHeight() * 0.2 - margin;
-        sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
-        sidePanel.removeFromTop (margin * 3.0);
-        sliders[sliders.size() - 2]->setBounds (sidePanel.removeFromTop (knobHeight));
-        sidePanel.removeFromTop (margin * 3.0);
-        
-        // Bottom Half //
-        calculateBtn->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (margin);
-        smoothVals->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (margin);
-        allSliders->setBounds (sidePanel.removeFromBottom (40));
-       
-        if (Global::useAdvancedWindow)
-        {
-            sidePanel.removeFromBottom (margin);
-            advancedSettings->setBounds (sidePanel.removeFromBottom (40));
-        } else {
-            sidePanel.removeFromBottom (margin);
-            scatMats->setBounds (sidePanel.removeFromBottom (40));
-            sidePanel.removeFromBottom (margin * 0.5);
-            scatMatsLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
-            sidePanel.removeFromBottom (margin);
-            fdnOrder->setBounds (sidePanel.removeFromBottom (40));
-            sidePanel.removeFromBottom (margin * 0.5);
-            fdnOrderLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
-        }
-        
-        //// Response area ////
-        Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
-        responseArea.reduce(0, margin);
-        responseArea.removeFromLeft (margin);
-        response->setBounds (responseArea);
-        
-        //// Sliders ////
-        totArea.removeFromTop (20);
-        totArea.removeFromBottom (margin);
-
-        int sliderMargin = 10;
-        totArea.removeFromLeft (margin);
-        int sliderWidth = ceil ((totArea.getWidth() - (9.0 * sliderMargin)) / 10.0);
-        
-        for (int i = 0; i < sliders.size() - 2; ++i)
-        {
-            sliders[i]->setBounds (totArea.removeFromLeft (sliderWidth));
-            totArea.removeFromLeft (sliderMargin);
-        }
+        sidePanel.removeFromBottom (Global::margin);
+        scatMats->setBounds (sidePanel.removeFromBottom (40));
+        sidePanel.removeFromBottom (Global::margin * 0.5);
+        scatMatsLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
+        sidePanel.removeFromBottom (Global::margin);
+        fdnOrder->setBounds (sidePanel.removeFromBottom (40));
+        sidePanel.removeFromBottom (Global::margin * 0.5);
+        fdnOrderLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
     }
     
+    //// Response area ////
+    Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
+    responseArea.reduce(0, Global::margin);
+    responseArea.removeFromLeft (Global::margin);
+    response->setBounds (responseArea);
+    
+    //// Sliders ////
+    totArea.removeFromTop (20);
+    totArea.removeFromBottom (Global::margin);
+
+    int sliderMargin = 10;
+    totArea.removeFromLeft (Global::margin);
+    int sliderWidth = ceil ((totArea.getWidth() - (9.0 * sliderMargin)) / 10.0);
+    
+    for (int i = 0; i < sliders.size() - 2; ++i)
+    {
+        sliders[i]->setBounds (totArea.removeFromLeft (sliderWidth));
+        totArea.removeFromLeft (sliderMargin);
+    }
 }
 
 void Fdn_AudioProcessorEditor::sliderDragStarted (Slider* slider)
@@ -477,7 +456,7 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
 
 void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
 {
-    if (button == calculateBtn.get())
+    if (button == impulseBtn.get())
     {
         processor.setZeroCoeffsFlag();
     }
@@ -586,6 +565,10 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
     {
         processor.changeMatType (static_cast<MatrixType> (scatMats->getSelectedId()));
     }
+    else if (comboBoxThatHasChanged == delayLines.get())
+    {
+        processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()));
+    }
 }
 
 void Fdn_AudioProcessorEditor::changeListenerCallback (ChangeBroadcaster* source)
@@ -604,9 +587,4 @@ void Fdn_AudioProcessorEditor::openAdvancedSettings()
     dlg.dialogTitle = "Advanced Settings";
     dlg.content.set (advancedSettingsWindow.get(), false);
     dlgModal = dlg.runModal();
-}
-
-void Fdn_AudioProcessorEditor::initialiseAdvancedSettings()
-{
-    
 }

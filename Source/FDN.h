@@ -76,6 +76,8 @@ public:
     
     void printScatteringMatrix();
     
+    void changeDelayLineSetting (DelayLineSetting dLenSet);
+    
 private:
     int FDNorder;
     OwnedArray<EQComb> eqCombs;
@@ -129,5 +131,7 @@ private:
     std::vector<std::vector<double>> leak2;
     
     bool initialised = false;
+    
+    DelayLineSetting delayLineSetting = Global::initDelayLineSetting;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };

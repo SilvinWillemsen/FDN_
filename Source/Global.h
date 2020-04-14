@@ -27,6 +27,14 @@ enum Preset
     church
 };
 
+enum DelayLineSetting
+{
+    randomPredef = 1,
+    randomDlen,
+    primes,
+    uniform,
+};
+
 namespace Global
 {
     static const int initFDNorder = 8;
@@ -77,7 +85,7 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const bool usePredefinedDLens = true;
+    static const DelayLineSetting initDelayLineSetting = randomPredef;
     static const std::vector<int> dLens
     {
         3673, 2237, 2234, 2903, 1672, 3104, 3236, 1832,
@@ -92,14 +100,13 @@ namespace Global
 
     // GUI
     static const bool horSliders = false;
-    
-    static const bool useAdvancedWindow = false;
+    static const bool useAdvancedWindow = true;
+    static const int margin = 12;
     
     static const double logBase = 1000;
     static const int axisMargin = 40;
     static const double zeroDbRatio = 0.6;
     static const int fftOrder = 1024;
-
 
     static const bool showRTGainButtons = false;
     static const bool showLogSlider = false;

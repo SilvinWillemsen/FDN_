@@ -106,23 +106,23 @@ void FDN::initialise (double sampleRate)
     
     std::vector<double> vals;
     
-    for (int i = 0; i < FDNorder; ++i)
-    {
-        for (int j = 0; j < Global::numOctaveBands + 1; ++j)
-        {
-            std::cout << "Comb filter " << i+1 << ", octaveband " << j+1 << " Numerators: ";
-            vals = eqCombs[i]->getFilter(j)->getNums();
-            for (int k = 0; k < 3; ++k)
-                std::cout << vals[k] << " ";
-            std::cout << std::endl << "Denominators: ";
-            vals = eqCombs[i]->getFilter(j)->getDens();
-            for (int k = 0; k < 3; ++k)
-                std::cout << vals[k] << " ";
-            
-            std::cout << std::endl;
-        }
-    }
-    std::cout << "YAY" << std::endl;
+//    for (int i = 0; i < FDNorder; ++i)
+//    {
+//        for (int j = 0; j < Global::numOctaveBands + 1; ++j)
+//        {
+//            std::cout << "Comb filter " << i+1 << ", octaveband " << j+1 << " Numerators: ";
+//            vals = eqCombs[i]->getFilter(j)->getNums();
+//            for (int k = 0; k < 3; ++k)
+//                std::cout << vals[k] << " ";
+//            std::cout << std::endl << "Denominators: ";
+//            vals = eqCombs[i]->getFilter(j)->getDens();
+//            for (int k = 0; k < 3; ++k)
+//                std::cout << vals[k] << " ";
+//            
+//            std::cout << std::endl;
+//        }
+//    }
+//    std::cout << "YAY" << std::endl;
     initialised = true;
 }
 
@@ -338,20 +338,32 @@ void FDN::getDelayLines()
 {
     dLen.clear();
     dLen.resize (FDNorder, 0);
-    if (Global::usePredefinedDLens)
+    switch (static_cast<int> (delayLineSetting))
     {
-        for (int i = 0; i < FDNorder; ++i)
-            dLen[i] = Global::dLens[i];
-    }
-    else
-    {
-        Random rand;
-        // make a random-length delay line
-        for (int i = 0; i < FDNorder; ++i)
+        case randomPredef:
         {
-            dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
-            std::cout << i << " " << dLen[i] << std::endl;
+            // random delay line with predefined values
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = Global::dLens[i];
+            break;
         }
+        case randomDlen:
+        {
+            Random rand;
+            
+            // make a fully random-length delay line
+            for (int i = 0; i < FDNorder; ++i)
+            {
+                dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+                std::cout << i << " " << dLen[i] << std::endl;
+            }
+            break;
+        }
+        case primes:
+            break;
+        case uniform:
+            break;
+            
     }
 }
 
@@ -578,4 +590,13 @@ void FDN::changeFDNorder (int order, MatrixType matType)
     constructor (matType);
     initialise (fs);
     printScatteringMatrix();
+}
+
+void FDN::changeDelayLineSetting (DelayLineSetting dLenSet)
+{
+    initialised = false;
+    for (auto comb : eqCombs)
+        comb->zeroCoefficients();
+    delayLineSetting = dLenSet;
+    initialise (fs);
 }

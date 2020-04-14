@@ -26,9 +26,9 @@ class Fdn_AudioProcessorEditor  : public AudioProcessorEditor,
 {
 public:
     Fdn_AudioProcessorEditor (Fdn_AudioProcessor&);
-    void initialiseAdvancedSettings();
-
     ~Fdn_AudioProcessorEditor();
+
+    void initialiseAdvancedSettings();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -58,18 +58,20 @@ private:
     
     OwnedArray<Slider> sliders;
     OwnedArray<Label> labels;
-    std::unique_ptr<TextButton> calculateBtn;
+    std::shared_ptr<TextButton> impulseBtn;
     std::unique_ptr<TextButton> smoothVals;
     std::unique_ptr<TextButton> allSliders;
     
     std::unique_ptr<ComboBox> presets;
     std::unique_ptr<Label> presetsLabel;
     
-    std::unique_ptr<ComboBox> fdnOrder;
+    std::shared_ptr<ComboBox> fdnOrder;
     std::unique_ptr<Label> fdnOrderLabel;
     
-    std::unique_ptr<ComboBox> scatMats;
+    std::shared_ptr<ComboBox> scatMats;
     std::unique_ptr<Label> scatMatsLabel;
+    
+    std::shared_ptr<ComboBox> delayLines;
     
     std::unique_ptr<TextButton> advancedSettings;
 

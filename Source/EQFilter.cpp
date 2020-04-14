@@ -47,7 +47,7 @@ void EQFilter::setCoeffs (std::vector<double> coeffsToSet)
 {
     if (coeffsToSet.size() != 6)
     {
-        std::cout << "WTF" << std::endl;
+        std::cout << "Nope" << std::endl;
         return;
     } else {
         for (int i = 0; i < 3; ++i)
