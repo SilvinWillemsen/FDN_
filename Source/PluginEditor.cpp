@@ -491,8 +491,10 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         {
 			case 1:
 				orderToSwitchTo = 2;
+                break;
 			case 2:
 				orderToSwitchTo = 4;
+                break;
             case 3:
                 orderToSwitchTo = 8;
                 break;
