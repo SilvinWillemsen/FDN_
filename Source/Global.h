@@ -77,7 +77,7 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const bool usePredefinedDLens = true;
+    static const bool usePredefinedDLens = false;
     static const std::vector<int> dLens
     {
         4466, 1548, 3673, 2237, 2234, 2903, 1672, 3104,

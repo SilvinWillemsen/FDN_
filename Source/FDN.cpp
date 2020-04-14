@@ -553,7 +553,7 @@ void FDN::setScatteringMatrix (MatrixType matType)
                 for (int j = 0; j < FDNorder; ++j)
                     A[i][j] = Q (i, j);
             
-            std::cout << "A^T * A = (should be identity matrix within machine precision (|non-diagonal value| < 1e-15))" << std::endl;
+            std::cout << "A^T * A = I (should be identity matrix within machine precision (|non-diagonal value| < 1e-15))" << std::endl;
             std::cout << Q.transpose() * Q << std::endl;
             
             break;
@@ -573,7 +573,6 @@ void FDN::printScatteringMatrix()
 
 void FDN::changeFDNorder (int order, MatrixType matType)
 {
-    initialised = false;
     eqCombs.clear();
     FDNorder = order;
     constructor (matType);

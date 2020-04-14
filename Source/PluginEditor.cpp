@@ -161,7 +161,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     
     scatMats->setSelectedId (Global::initMatType);
     scatMats->addListener (this);
-    addAndMakeVisible(scatMats.get());
+    addAndMakeVisible (scatMats.get());
     
     scatMatsLabel = std::make_unique<Label> ("scatMatsLabel", "Scattering Mat.");
     addAndMakeVisible (scatMatsLabel.get());
@@ -175,7 +175,6 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     addAndMakeVisible (fixCoeffs.get());
     
     //// Response ////
-    
     for (int i = 0; i < Global::numOctaveBands; ++i)
     {
         std::cout << sliders[i]->getValue() << std::endl;
@@ -250,6 +249,8 @@ void Fdn_AudioProcessorEditor::calculateImpulseResponse()
 
 void Fdn_AudioProcessorEditor::calculateEQ()
 {
+    minDLenIdx = processor.getFDN()->getMinDLenIdx();
+    maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
     for (int i = 0; i < Global::numOctaveBands + 1; ++i)
     {
         std::vector<double> coeffs = processor.getFDN()->getCoefficients (minDLenIdx, i);
@@ -518,7 +519,7 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         }
         
         changingFDNorder = true;
-        
+        processor.getFDN()->setInitialised (false);
         processor.changeFDNorder (orderToSwitchTo, static_cast<MatrixType> (scatMats->getSelectedId()));
 
         std::cout << "FDN order changed with maxDLenIdx = " << maxDLenIdx << std::endl;

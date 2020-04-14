@@ -71,6 +71,7 @@ public:
     void changeFDNorder (int order, MatrixType matType);
     int getFDNorder() { return FDNorder; };
     
+    void setInitialised (bool init) { initialised = init; };
     bool isInitialised() { return initialised; };
     
     void printScatteringMatrix();
