@@ -142,7 +142,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
 //    int amount = 10;
 //    if (timer % amount == 0)
-    curMillis = Time::getCurrentTime().toMilliseconds();
+    curMillis = Time::currentTimeMillis();
 //    else if (timer % amount == amount - 1)
     
     if (fdn == nullptr)
@@ -192,7 +192,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         changeFDNorderFlag = !changeFDNorderFlag;
     }
     
-    cpuStore[timer % (Global::updatePerSecond + 2)] = 0.001 * (Time::getCurrentTime().toMilliseconds() - curMillis) * (fs / (buffer.getNumSamples()));
+    cpuStore[timer % (Global::updatePerSecond + 2)] = 0.001 * (Time::currentTimeMillis() - curMillis) * (fs / (buffer.getNumSamples()));
     ++timer;
 }
 

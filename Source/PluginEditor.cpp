@@ -202,13 +202,21 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         advancedSettingsWindow = std::make_unique<AdvancedSettingsWindow>();
     }
     
-    //// CPU usage ////
-    cpuUsage = std::make_unique<Label> ("cpuUsage", "CPU: ");
-    addAndMakeVisible (cpuUsage.get());
-    cpuUsage->setJustificationType(Justification::left);
-    cpuUsage->setColour (Label::textColourId, Colours::white);
-    cpuUsage->setColour (Label::backgroundColourId, defaultButtonColour);
-    cpuUsage->setColour (Label::outlineColourId, Colours::white);
+    //// CPU usage Audio ////
+    cpuUsageAudio = std::make_unique<Label> ("cpuUsage", "CPU: ");
+    addAndMakeVisible (cpuUsageAudio.get());
+    cpuUsageAudio->setJustificationType (Justification::left);
+    cpuUsageAudio->setColour (Label::textColourId, Colours::white);
+    cpuUsageAudio->setColour (Label::backgroundColourId, defaultButtonColour);
+    cpuUsageAudio->setColour (Label::outlineColourId, Colours::white);
+    
+    //// CPU usage Graphics////
+    cpuUsageGraphics = std::make_unique<Label> ("cpuUsage", "CPU: ");
+    addAndMakeVisible (cpuUsageGraphics.get());
+    cpuUsageGraphics->setJustificationType (Justification::left);
+    cpuUsageGraphics->setColour (Label::textColourId, Colours::white);
+    cpuUsageGraphics->setColour (Label::backgroundColourId, defaultButtonColour);
+    cpuUsageGraphics->setColour (Label::outlineColourId, Colours::white);
     
     //// Timer and Size ////
     startTimerHz (Global::updatePerSecond);
@@ -225,7 +233,6 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-    
     if (paintResponse)
     {
         response->setDataToZero();
@@ -249,10 +256,38 @@ void Fdn_AudioProcessorEditor::paint (Graphics& g)
         calculateEQ();
         
         response->setInitialised();
+
         paintResponse = false;
+        cpuUsageGraphicsValue = 0.001 * (Time::currentTimeMillis() - time) / (1.0 / static_cast<double>(Global::updatePerSecond));
     }
+}
+
+void Fdn_AudioProcessorEditor::timerCallback()
+{
+    time = Time::currentTimeMillis();
+    
+    if (processor.getFDN()->isInitialised())
+    {
+        if (!changingFDNorder)
+        {
+            paintResponse = true;
+        } else {
+            response->setDLens (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen());
+            changingFDNorder = false;
+        }
+    }
+    if (!coeffsFixed)
+        repaint();
+    else
+        cpuUsageGraphicsValue = 0.001 * (Time::currentTimeMillis() - time) / (1.0 / static_cast<double>(Global::updatePerSecond));
+    
+    cpuUsageAudio->setText ("Audio CPU: " + String (static_cast<int>(processor.getCPU() * 1000.0) / 10.0) + "%", dontSendNotification);
+    cpuUsageGraphics->setText ("Graphics CPU: " + String (static_cast<int>(cpuUsageGraphicsValue * 1000.0) / 10.0) + "%", dontSendNotification);
+    
     
 }
+
+
 
 void Fdn_AudioProcessorEditor::calculateImpulseResponse()
 {
@@ -308,7 +343,9 @@ void Fdn_AudioProcessorEditor::resized()
         presetArea.removeFromLeft (margin * 0.5);
         presetArea.removeFromTop (margin);
         presetsLabel->setBounds (presetArea.removeFromLeft (70));
-        cpuUsage->setBounds (presetArea.removeFromRight (100));
+        cpuUsageGraphics->setBounds (presetArea.removeFromRight (140));
+        presetArea.removeFromRight (margin);
+        cpuUsageAudio->setBounds (presetArea.removeFromRight (140));
         presetArea.removeFromRight (margin);
         presets->setBounds (presetArea);
         
@@ -490,23 +527,6 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
         }
         processor.fixCoefficients (coeffsFixed);
     }
-}
-
-void Fdn_AudioProcessorEditor::timerCallback()
-{
-    cpuUsage->setText ("CPU: " + String (static_cast<int>(processor.getCPU() * 1000.0) / 10.0) + "%", dontSendNotification);
-    if (processor.getFDN()->isInitialised())
-    {
-        if (!changingFDNorder)
-        {
-            paintResponse = true;
-        } else {
-            response->setDLens (processor.getFDN()->getMinDLen(), processor.getFDN()->getMaxDLen());
-            changingFDNorder = false;
-        }
-    }
-    if (!coeffsFixed)
-        repaint();
 }
 
 void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)

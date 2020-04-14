@@ -87,7 +87,12 @@ private:
     std::unique_ptr<TextButton> fixCoeffs;
     bool coeffsFixed = false;
     
-    //// CPU usage
-    std::unique_ptr<Label> cpuUsage;
+    //// CPU usage ////
+    std::unique_ptr<Label> cpuUsageAudio;
+    std::unique_ptr<Label> cpuUsageGraphics;
+    
+    long time;
+    double cpuUsageGraphicsValue;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };
