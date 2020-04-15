@@ -90,7 +90,8 @@ public:
         
     };
     
-    void changeDelayLineSetting (DelayLineSetting dLenSet) ;
+    void changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max);
+    
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
@@ -127,6 +128,8 @@ private:
     
     bool changeDelayLineSettingFlag = false;
     DelayLineSetting dLenSetToChangeTo;
+    int minDLenToSet;
+    int maxDLenToSet;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

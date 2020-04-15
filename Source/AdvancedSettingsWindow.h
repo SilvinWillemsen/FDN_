@@ -17,7 +17,8 @@
 */
 class AdvancedSettingsWindow    :   public Component,
                                     public Button::Listener,
-                                    public ComboBox::Listener
+                                    public ComboBox::Listener,
+                                    public Slider::Listener
 
 {
 public:
@@ -31,10 +32,19 @@ public:
     
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
+    void sliderValueChanged (Slider* slider) override;
+    void sliderDragStarted (Slider* slider) override;
+    
     std::shared_ptr<ComboBox> getFDNOrderBox() { return fdnOrder; };
     std::shared_ptr<ComboBox> getScatMatsBox() { return scatMats; };
     std::shared_ptr<ComboBox> getDelayLinesBox() { return delayLines; };
+    std::shared_ptr<TextButton> getApplyRangeBtn() { return applyRangeBtn; };
+//    std::shared_ptr<TextButton> getExitBtn() { return exitBtn; };
 
+    int getRangeSliderMin() { return rangeSliderMin->getValue(); };
+    int getRangeSliderMax() { return rangeSliderMax->getValue(); };
+
+    void checkSlidersAgainstAppliedVals();
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AdvancedSettingsWindow)
     std::shared_ptr<ComboBox> fdnOrder;
@@ -48,5 +58,16 @@ private:
     
     std::unique_ptr<TextButton> impulseBtn;
     std::shared_ptr<TextButton> impulseBtnPtr;
+    
+    std::shared_ptr<Slider> rangeSliderMin;
+    std::shared_ptr<Slider> rangeSliderMax;
+    std::unique_ptr<Label> rangeLabel;
+    std::shared_ptr<TextButton> applyRangeBtn;
+
+    std::shared_ptr<TextButton> exitBtn;
+    Slider* curSlider = nullptr;
+
+    int lastMinRange = Global::minDelayLength;
+    int lastMaxRange = Global::maxDelayLength;
 
 };

@@ -37,10 +37,13 @@ enum DelayLineSetting
 
 namespace Global
 {
-    static const int initFDNorder = 8;
+    static const int initFDNorder = 16;
     static const int numOctaveBands = 10;
     static const int minDelayLength = 1500;
     static const int maxDelayLength = 4500;
+    static const int minRange = 500;
+    static const int maxRange = 10000;
+    static const int minRangeDiff = 100;
     
     static const int numDesignFreqs = numOctaveBands * 2 - 1;
     
@@ -97,7 +100,12 @@ namespace Global
         3183, 4145, 2390, 2887, 3618, 1789, 2257, 2867,
         3431, 1972, 3453, 3206, 2920, 4129, 3721, 3114
     };
-	// primes 
+    
+//    static const std::vector<int> dLens // very freaky sound
+//    {
+//        676, 1780, 2217, 628, 2196, 656, 678, 1260, 1940, 1114, 937, 1114, 608, 2046, 874, 654
+//    };
+	// primes
 	/*static const std::vector<int> primeLens
 	{
 		2927, 2593, 2273, 3697, 1877, 3877, 2477, 3461,

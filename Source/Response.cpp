@@ -25,7 +25,7 @@ Response::Response (int minDLen, int maxDLen, double fs) : fs (fs), minDLen (min
     
     drawToggles.resize (2, true);
     
-    noiseBurst.resize (Global::maxDelayLength, 0);
+    noiseBurst.resize (Global::maxRange, 0);
     
     Random r (0);
     for (int i = 0; i < maxDLen; ++i)

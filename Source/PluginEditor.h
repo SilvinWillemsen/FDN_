@@ -65,6 +65,9 @@ private:
     std::unique_ptr<ComboBox> presets;
     std::unique_ptr<Label> presetsLabel;
     
+    //// Advanced Settings ////
+    std::unique_ptr<TextButton> advancedSettings;
+
     std::shared_ptr<ComboBox> fdnOrder;
     std::unique_ptr<Label> fdnOrderLabel;
     
@@ -72,8 +75,10 @@ private:
     std::unique_ptr<Label> scatMatsLabel;
     
     std::shared_ptr<ComboBox> delayLines;
+    std::shared_ptr<TextButton> applyRangeBtn;
     
-    std::unique_ptr<TextButton> advancedSettings;
+//    std::shared_ptr<TextButton> exitBtn;
+
 
     bool changingFDNorder = false;
     

@@ -76,8 +76,11 @@ public:
     
     void printScatteringMatrix();
     
-    void changeDelayLineSetting (DelayLineSetting dLenSet);
+    void changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max);
     
+    int getMinDelayLength() { return minDelayLength; };
+    int getMaxDelayLength() { return maxDelayLength; };
+
 private:
     int FDNorder;
     OwnedArray<EQComb> eqCombs;
@@ -133,5 +136,8 @@ private:
     bool initialised = false;
     
     DelayLineSetting delayLineSetting = Global::initDelayLineSetting;
+    int minDelayLength = Global::minDelayLength;
+    int maxDelayLength = Global::maxDelayLength;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };

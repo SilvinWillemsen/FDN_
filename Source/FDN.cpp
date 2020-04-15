@@ -118,7 +118,7 @@ void FDN::initialise (double sampleRate)
 //            vals = eqCombs[i]->getFilter(j)->getDens();
 //            for (int k = 0; k < 3; ++k)
 //                std::cout << vals[k] << " ";
-//            
+//
 //            std::cout << std::endl;
 //        }
 //    }
@@ -354,7 +354,7 @@ void FDN::getDelayLines()
             // make a fully random-length delay line
             for (int i = 0; i < FDNorder; ++i)
             {
-                dLen[i] = round(Global::minDelayLength + (Global::maxDelayLength - Global::minDelayLength) * rand.nextFloat());
+                dLen[i] = round(minDelayLength + (maxDelayLength - minDelayLength) * rand.nextFloat());
                 std::cout << i << " " << dLen[i] << std::endl;
             }
             break;
@@ -450,7 +450,7 @@ int FDN::getMaxDLenIdx()
 
 double FDN::getMinDLen()
 {
-    int tmp = Global::maxDelayLength;
+    int tmp = Global::maxRange;
     for (int i = 0; i < dLen.size(); ++i)
     {
         if (dLen[i] < tmp)
@@ -461,7 +461,7 @@ double FDN::getMinDLen()
 
 int FDN::getMinDLenIdx()
 {
-    int tmp = Global::maxDelayLength;
+    int tmp = Global::maxRange;
     int idx;
     for (int i = 0; i < dLen.size(); ++i)
     {
@@ -592,11 +592,13 @@ void FDN::changeFDNorder (int order, MatrixType matType)
     printScatteringMatrix();
 }
 
-void FDN::changeDelayLineSetting (DelayLineSetting dLenSet)
+void FDN::changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max)
 {
     initialised = false;
     for (auto comb : eqCombs)
         comb->zeroCoefficients();
     delayLineSetting = dLenSet;
+    minDelayLength = min;
+    maxDelayLength = max;
     initialise (fs);
 }

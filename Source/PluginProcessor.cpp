@@ -194,7 +194,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     
     if (changeDelayLineSettingFlag)
     {
-        fdn->changeDelayLineSetting (dLenSetToChangeTo);
+        fdn->changeDelayLineSetting (dLenSetToChangeTo, minDLenToSet, maxDLenToSet);
         changeDelayLineSettingFlag = !changeDelayLineSettingFlag;
     }
     
@@ -246,8 +246,10 @@ void Fdn_AudioProcessor::changeFDNorder (int order, MatrixType matType)
     changeFDNorderFlag = true;
 }
 
-void Fdn_AudioProcessor::changeDelayLineSetting (DelayLineSetting dLenSet)
+void Fdn_AudioProcessor::changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max)
 {
     dLenSetToChangeTo = dLenSet;
+    minDLenToSet = min;
+    maxDLenToSet = max;
     changeDelayLineSettingFlag = true;
 }

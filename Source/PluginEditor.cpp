@@ -112,9 +112,14 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         fdnOrder = advancedSettingsWindow->getFDNOrderBox();
         scatMats = advancedSettingsWindow->getScatMatsBox();
         delayLines = advancedSettingsWindow->getDelayLinesBox();
+        applyRangeBtn = advancedSettingsWindow->getApplyRangeBtn();
+//        exitBtn = advancedSettingsWindow->getApplyRangeBtn();
+
         fdnOrder->addListener (this);
         scatMats->addListener (this);
         delayLines->addListener (this);
+        applyRangeBtn->addListener (this);
+//        exitBtn->addListener (this);
 
     } else {
         initialiseAdvancedSettings();
@@ -512,6 +517,10 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
         }
         processor.fixCoefficients (coeffsFixed);
     }
+    else if (button == applyRangeBtn.get())
+    {
+        processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), advancedSettingsWindow->getRangeSliderMin(), advancedSettingsWindow->getRangeSliderMax());
+    }
 }
 
 void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -567,7 +576,11 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
     }
     else if (comboBoxThatHasChanged == delayLines.get())
     {
-        processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()));
+        if (delayLines->getSelectedId() == randomDlen)
+            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), advancedSettingsWindow->getRangeSliderMin(), advancedSettingsWindow->getRangeSliderMax());
+        else
+            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), Global::minDelayLength, Global::maxDelayLength);
+
     }
 }
 
