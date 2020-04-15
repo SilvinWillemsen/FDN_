@@ -360,28 +360,14 @@ void FDN::getDelayLines()
             break;
         }
         case primes:
+            // random delay line with predefined values
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = Global::primeLens[i];
             break;
         case uniform:
             break;
             
     }
-}
-
-int FDN::getClosestToAvgDLenIdx()
-{
-    // find closest delayline length
-    double avgDLen = getAvgDLen();
-    int closestDLen = 0;
-    int diffDLen = 10000;
-    for (int i = 0; i < FDNorder; ++i)
-    {
-        if (abs(avgDLen - dLen[i]) < diffDLen)
-        {
-            closestDLen = i;
-            diffDLen = abs(avgDLen - dLen[i]);
-        }
-    }
-    return closestDLen;
 }
 
 void FDN::getAttenuation()
@@ -409,6 +395,24 @@ void FDN::debugPrint (std::vector<std::vector<double>>& vect)
         std::cout << std::endl;
     }
     std::cout << std::endl;
+}
+
+
+int FDN::getClosestToAvgDLenIdx()
+{
+    // find closest delayline length
+    double avgDLen = getAvgDLen();
+    int closestDLen = 0;
+    int diffDLen = 10000;
+    for (int i = 0; i < FDNorder; ++i)
+    {
+        if (abs(avgDLen - dLen[i]) < diffDLen)
+        {
+            closestDLen = i;
+            diffDLen = abs(avgDLen - dLen[i]);
+        }
+    }
+    return closestDLen;
 }
 
 double FDN::getAvgDLen()

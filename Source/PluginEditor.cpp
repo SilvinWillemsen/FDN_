@@ -113,13 +113,11 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         scatMats = advancedSettingsWindow->getScatMatsBox();
         delayLines = advancedSettingsWindow->getDelayLinesBox();
         applyRangeBtn = advancedSettingsWindow->getApplyRangeBtn();
-//        exitBtn = advancedSettingsWindow->getApplyRangeBtn();
 
         fdnOrder->addListener (this);
         scatMats->addListener (this);
         delayLines->addListener (this);
         applyRangeBtn->addListener (this);
-//        exitBtn->addListener (this);
 
     } else {
         initialiseAdvancedSettings();

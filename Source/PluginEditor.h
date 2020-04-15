@@ -76,9 +76,6 @@ private:
     
     std::shared_ptr<ComboBox> delayLines;
     std::shared_ptr<TextButton> applyRangeBtn;
-    
-//    std::shared_ptr<TextButton> exitBtn;
-
 
     bool changingFDNorder = false;
     
