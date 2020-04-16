@@ -29,10 +29,10 @@ enum Preset
 
 enum DelayLineSetting
 {
-    randomDlen = 1,
+    gaussianDlen = 1,
     primes,
     uniform,
-    randomDlenPredef,
+    gaussianDlenPredef,
     primesPredef,
     uniformPredef,
 };
@@ -79,8 +79,7 @@ namespace Global
     
     static const int updatePerSecond = 5;
     
-    static const MatrixType initMatType = randomMat;
-    static const bool initPreDefOn = false;
+    static const MatrixType initMatType = hadamard;
     
     static const std::vector<std::vector<double>> presetValues
     {
@@ -91,8 +90,41 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const DelayLineSetting initDelayLineSetting = randomDlen;
-    static const std::vector<int> dLens
+    static const DelayLineSetting initDelayLineSetting = gaussianDlenPredef;
+    static const bool initPreDefOn = initDelayLineSetting >= 3 ? true : false;
+
+    // gaussian-distributed delay lengths
+    static const std::vector<int> gaussianDLens
+    {
+        3106, 2760, 3203, 3126, 3367, 2942, 3284, 2510,
+        2532, 2520, 3231, 3318, 2134, 3031, 3470, 2462,
+        2789, 3034, 1999, 3732, 1964, 4143, 1947, 3066,
+        2607, 2349, 4013, 3271, 2903, 3122, 2619, 1867,
+        2431, 3475, 2593, 3728, 3165, 3391, 2895, 3049,
+        2754, 3647, 2644, 2176, 3015, 3397, 4424, 3074,
+        3012, 2815, 3138, 3258, 2447, 3621, 4827, 3343,
+        3427, 3152, 2456, 2645, 3132, 2504, 4017, 2098
+    };
+//    static const std::vector<int> dLens // very freaky sound
+//    {
+//        676, 1780, 2217, 628, 2196, 656, 678, 1260, 1940, 1114, 937, 1114, 608, 2046, 874, 654
+//    };
+    
+    // prime delay lengths
+    static const std::vector<int> primeDLens
+    {
+        2927, 2593, 2273, 3697, 1877, 3877, 2477, 3461,
+        1609, 3779, 3541, 4259, 1669, 3539, 3637, 4013,
+        3121, 4003, 1627, 3733, 3511, 4093, 2411, 3011,
+        2801, 2017, 4013, 1621, 3023, 2161, 4201, 3079,
+        1783, 4027, 1613, 1907, 2129, 3797, 2543, 1579,
+        3967, 2551, 3833, 4111, 3059, 4159, 1753, 1601,
+        2423, 1993, 4493, 2707, 3719, 3547, 3769, 4219,
+        2389, 2087, 1709, 3229, 3083, 3391, 3259, 2791
+    };
+    
+    // uniformly distributed delay lengths
+    static const std::vector<int> uniformDLens
     {
         3673, 2237, 2234, 2903, 1672, 3104, 3236, 1832,
         4075, 3711, 3138, 1763, 3773, 2223, 4150, 2018,
@@ -104,23 +136,7 @@ namespace Global
         3431, 1972, 3453, 3206, 2920, 4129, 3721, 3114
     };
     
-//    static const std::vector<int> dLens // very freaky sound
-//    {
-//        676, 1780, 2217, 628, 2196, 656, 678, 1260, 1940, 1114, 937, 1114, 608, 2046, 874, 654
-//    };
     
-    // primes
-    static const std::vector<int> primeLens
-    {
-        2927, 2593, 2273, 3697, 1877, 3877, 2477, 3461,
-        1609, 3779, 3541, 4259, 1669, 3539, 3637, 4013,
-        3121, 4003, 1627, 3733, 3511, 4093, 2411, 3011,
-        2801, 2017, 4013, 1621, 3023, 2161, 4201, 3079,
-        1783, 4027, 1613, 1907, 2129, 3797, 2543, 1579,
-        3967, 2551, 3833, 4111, 3059, 4159, 1753, 1601,
-        2423, 1993, 4493, 2707, 3719, 3547, 3769, 4219,
-        2389, 2087, 1709, 3229, 3083, 3391, 3259, 2791
-    };
     // GUI
     static const bool horSliders = false;
     static const bool useAdvancedWindow = true;

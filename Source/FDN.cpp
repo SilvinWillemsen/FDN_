@@ -10,6 +10,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "FDN.h"
+#include <random>
 
 //==============================================================================
 FDN::FDN()
@@ -340,21 +341,30 @@ void FDN::getDelayLines()
     dLen.resize (FDNorder, 0);
     switch (static_cast<int> (delayLineSetting))
     {
-        case randomDlen:
+        //// Random ////
+        case gaussianDlen:
         {
-            Random rand;
-            
-            // make a fully random-length delay line
+            // make gaussian distributed delay lines
+            std::random_device randDevice;
+            std::normal_distribution<double> distribution ((maxDelayLength + minDelayLength) * 0.5, (maxDelayLength - minDelayLength) * 0.2);
+
             for (int i = 0; i < FDNorder; ++i)
             {
-                dLen[i] = round(minDelayLength + (maxDelayLength - minDelayLength) * rand.nextFloat());
-                std::cout << i << " " << dLen[i] << std::endl;
+                int number = round(distribution (randDevice));
+                if (number < minDelayLength && number > maxDelayLength)
+                {
+                    --i;
+                } else {
+                    dLen[i] = number;
+                    std::cout << dLen[i] << std::endl;
+                }
             }
             break;
         }
             
         case primes:
         {
+            // make prime-length delay lines
             possiblePrimes.resize (1134, 0); // 1134 is the highest number of primes possible between 500 and 10000
             int numPrimes = 0;
             bool flag;
@@ -386,26 +396,40 @@ void FDN::getDelayLines()
         }
             
         case uniform:
-            break;
-            
-        case randomDlenPredef:
         {
-            // random delay line with predefined values
+            // make uniformly-random-length delay lines
+            Random rand;
             for (int i = 0; i < FDNorder; ++i)
-                dLen[i] = Global::dLens[i];
+            {
+                dLen[i] = round(minDelayLength + (maxDelayLength - minDelayLength) * rand.nextFloat());
+                std::cout << i << " " << dLen[i] << std::endl;
+            }
+            break;
+        }
+            
+        //// Pre-defined ////
+        case gaussianDlenPredef:
+        {
+            // predefined gaussian delay lengths
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = Global::gaussianDLens[i];
             break;
         }
         case primesPredef:
         {
             // predefined primes
             for (int i = 0; i < FDNorder; ++i)
-                dLen[i] = Global::primeLens[i];
+                dLen[i] = Global::primeDLens[i];
             break;
         }
         case uniformPredef:
+        {
+            // random delay line with predefined values
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = Global::uniformDLens[i];
             break;
+        }
 
-            
     }
 }
 

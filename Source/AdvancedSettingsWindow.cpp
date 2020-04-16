@@ -76,11 +76,11 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     
     //// Delay lines ////
     delayLines = std::make_unique<ComboBox> ("delayLines");
-    delayLines->addItem ("Random", randomDlen);
+    delayLines->addItem ("Random", gaussianDlen);
     delayLines->addItem ("Primes", primes);
     delayLines->addItem ("Uniform", uniform);
     
-    delayLines->setSelectedId (Global::initDelayLineSetting);
+    delayLines->setSelectedId (Global::initDelayLineSetting - (preDefOn ? 3 : 0));
     addAndMakeVisible (delayLines.get());
     delayLines->addListener (this);
     
@@ -114,11 +114,20 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     rangeSliderMax->setValue (Global::maxDelayLength);
     addAndMakeVisible (rangeSliderMax.get());
     rangeSliderMax->addListener (this);
-
-    setPreDefEnabled (preDefOn);
+    
+    //// Labels ////
+    minLabel = std::make_unique<Label> ("minLabel", "Min:");
+    addAndMakeVisible (minLabel.get());
+    minLabel->setJustificationType (Justification::left);
+    minLabel->setColour (Label::textColourId, Colours::white);
+    
+    maxLabel = std::make_unique<Label> ("maxLabel", "Max:");
+    addAndMakeVisible (maxLabel.get());
+    maxLabel->setJustificationType (Justification::left);
+    maxLabel->setColour (Label::textColourId, Colours::white);
     
     //// Pre-defined Button ////
-    preDefBtn = std::make_shared<TextButton> ("Pre-defined\n(1500-4500)");
+    preDefBtn = std::make_shared<TextButton> ("Pre-defined (1500-4500)");
     preDefBtn->addListener (this);
     addAndMakeVisible (preDefBtn.get());
     defaultButtonColour = preDefBtn->getLookAndFeel().findColour (TextButton::buttonColourId);
@@ -127,6 +136,8 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     exitBtn = std::make_unique<TextButton> ("Exit");
     exitBtn->addListener (this);
     addAndMakeVisible (exitBtn.get());
+    
+    setPreDefEnabled (preDefOn);
     
     setSize (400, 400);
 }
@@ -166,17 +177,25 @@ void AdvancedSettingsWindow::resized()
     topArea.removeFromTop(Global::margin);
     scatMats->setBounds (topArea.removeFromTop (40));
     
+
     //// Delay line area ////
-    delayLinesLabel->setBounds (delayLineArea.removeFromTop (20).withX (Global::margin));
     delayLineArea.removeFromTop (Global::margin);
+    Rectangle<int> delayTitleArea = delayLineArea.removeFromTop (40);
+    delayTitleArea.reduce (Global::margin, 0);
+    delayLinesLabel->setBounds (delayTitleArea.removeFromLeft (0.4 * delayTitleArea.getWidth()));
+    delayTitleArea.removeFromLeft(Global::margin);
+    delayTitleArea.reduce (0, Global::margin * 0.5);
+    preDefBtn->setBounds (delayTitleArea);
     
     Rectangle<int> delayLineLabelArea = delayLineArea.removeFromLeft (0.33 * getWidth());
     delayLineLabelArea.reduce (Global::margin, Global::margin);
     delayLineArea.reduce (Global::margin, Global::margin);
     
-    preDefBtn->setBounds (delayLineLabelArea.removeFromTop (40));
+    applyRangeBtn->setBounds (delayLineLabelArea.removeFromTop (40));
     delayLineLabelArea.removeFromTop (Global::margin);
-    applyRangeBtn->setBounds (delayLineLabelArea.removeFromTop (20));
+    minLabel->setBounds (delayLineLabelArea.removeFromTop (20));
+    delayLineLabelArea.removeFromTop (Global::margin);
+    maxLabel->setBounds (delayLineLabelArea.removeFromTop (20));
 
     delayLines->setBounds (delayLineArea.removeFromTop (40));
     delayLineArea.removeFromTop (Global::margin);
@@ -206,10 +225,6 @@ void AdvancedSettingsWindow::buttonClicked (Button* button)
     else if (button == preDefBtn.get())
     {
         preDefOn = !preDefOn;
-        if (preDefOn)
-            preDefBtn->setColour (TextButton::buttonColourId, Colours::darkgreen);
-        else
-            preDefBtn->setColour (TextButton::buttonColourId, defaultButtonColour);
         setPreDefEnabled (preDefOn);
     }
     else if (button == exitBtn.get())
@@ -258,4 +273,5 @@ void AdvancedSettingsWindow::setPreDefEnabled (bool enabled)
     rangeSliderMin->setEnabled (!enabled);
     rangeSliderMax->setEnabled (!enabled);
     applyRangeBtn->setEnabled (!enabled);
+    preDefBtn->setColour (TextButton::buttonColourId, preDefOn ? Colours::darkgreen : defaultButtonColour);
 }

@@ -62,9 +62,12 @@ private:
     std::unique_ptr<TextButton> impulseBtn;
     std::shared_ptr<TextButton> impulseBtnPtr;
     
+    std::unique_ptr<Label> rangeLabel;
     std::shared_ptr<Slider> rangeSliderMin;
     std::shared_ptr<Slider> rangeSliderMax;
-    std::unique_ptr<Label> rangeLabel;
+    std::unique_ptr<Label> minLabel;
+    std::unique_ptr<Label> maxLabel;
+
     std::shared_ptr<TextButton> preDefBtn;
     bool preDefOn = Global::initPreDefOn;
     
