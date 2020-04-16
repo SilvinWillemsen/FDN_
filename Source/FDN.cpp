@@ -418,6 +418,7 @@ void FDN::getAttenuation()
         for (int m = 0; m < Global::numOctaveBands; m++)
         {
             gainDB[k][m] = (-60.0 / (RT[m] * fs)) * dLen[k];
+			
         }
     }
 }

@@ -200,7 +200,7 @@ void AdvancedSettingsWindow::buttonClicked (Button* button)
     else if (button == applyRangeBtn.get())
     {
         lastMinRange = rangeSliderMin->getValue();
-        lastMaxRange = rangeSliderMin->getValue();
+        lastMaxRange = rangeSliderMax->getValue();
         applyRangeBtn->setButtonText("Randomise");
     }
     else if (button == preDefBtn.get())
