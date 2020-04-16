@@ -249,6 +249,7 @@ void Fdn_AudioProcessor::changeFDNorder (int order, MatrixType matType)
 void Fdn_AudioProcessor::changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max)
 {
     dLenSetToChangeTo = dLenSet;
+    std::cout << "DLenSet: " << dLenSet << std::endl;
     minDLenToSet = min;
     maxDLenToSet = max;
     changeDelayLineSettingFlag = true;

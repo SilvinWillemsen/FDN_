@@ -310,6 +310,8 @@ void Fdn_AudioProcessorEditor::calculateImpulseResponse()
 
 void Fdn_AudioProcessorEditor::calculateEQ()
 {
+    if (!processor.getFDN()->isInitialised())
+        return;
     minDLenIdx = processor.getFDN()->getMinDLenIdx();
     maxDLenIdx = processor.getFDN()->getMaxDLenIdx();
     for (int i = 0; i < Global::numOctaveBands + 1; ++i)

@@ -22,6 +22,9 @@ FDN::FDN()
 
 void FDN::constructor (MatrixType matType)
 {
+    b.clear();
+    c.clear();
+    
     b.resize (FDNorder, 1.0);
     c.resize (FDNorder, 1.0);
     
@@ -83,9 +86,25 @@ double FDN::calculate (double input)
 
 void FDN::initialise (double sampleRate)
 {
+    initialised = false;
     fs = sampleRate;
     
     gainDB.clear();
+    numsOpt.clear();
+    densOpt.clear();
+    
+    Goptdb.clear();
+    Gopt.clear();
+    G2optdb.clear();
+    G2opt.clear();
+    G2woptdb.clear();
+    G2wopt.clear();
+    
+    leak.clear();
+    leak2.clear();
+    
+    dLen.clear();
+    
     gainDB.resize (FDNorder, std::vector<double> (Global::numOctaveBands, 0));
     numsOpt.resize (3, std::vector<double> (Global::numOctaveBands + 1, 0));
     densOpt.resize (3, std::vector<double> (Global::numOctaveBands + 1, 0));
@@ -134,6 +153,7 @@ void FDN::recalculateCoeffs (bool init)
     
     if (init)
     {
+        eqCombs.clear();
         for (int i = 0; i < FDNorder; ++i)
         {
             eqCombs.add (new EQComb (dLen[i]));
@@ -342,7 +362,7 @@ void FDN::getDelayLines()
     switch (static_cast<int> (delayLineSetting))
     {
         //// Random ////
-        case gaussianDlen:
+        case gaussian:
         {
             // make gaussian distributed delay lines
             std::random_device randDevice;
@@ -356,7 +376,6 @@ void FDN::getDelayLines()
                     --i;
                 } else {
                     dLen[i] = number;
-                    std::cout << dLen[i] << std::endl;
                 }
             }
             break;
@@ -408,7 +427,7 @@ void FDN::getDelayLines()
         }
             
         //// Pre-defined ////
-        case gaussianDlenPredef:
+        case gaussianPredef:
         {
             // predefined gaussian delay lengths
             for (int i = 0; i < FDNorder; ++i)
@@ -455,6 +474,10 @@ void FDN::getDelayLines()
             break;
         }
 
+    }
+    for (int i = 0; i < FDNorder; ++i)
+    {
+        std::cout << dLen[i] << std::endl;
     }
 }
 
@@ -678,7 +701,6 @@ void FDN::printScatteringMatrix()
 
 void FDN::changeFDNorder (int order, MatrixType matType)
 {
-    eqCombs.clear();
     FDNorder = order;
     constructor (matType);
     initialise (fs);
@@ -687,9 +709,6 @@ void FDN::changeFDNorder (int order, MatrixType matType)
 
 void FDN::changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max)
 {
-    initialised = false;
-    for (auto comb : eqCombs)
-        comb->zeroCoefficients();
     delayLineSetting = dLenSet;
     minDelayLength = min;
     maxDelayLength = max;

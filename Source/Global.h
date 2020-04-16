@@ -29,10 +29,10 @@ enum Preset
 
 enum DelayLineSetting
 {
-    gaussianDlen = 1,
+    gaussian = 1,
     primes,
     uniform,
-    gaussianDlenPredef,
+    gaussianPredef,
     primesPredef,
     uniformPredef,
 };
@@ -90,8 +90,8 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const DelayLineSetting initDelayLineSetting = uniformPredef;
-    static const bool initPreDefOn = initDelayLineSetting > 3 ? true : false;
+    static const DelayLineSetting initDelayLineSetting = primesPredef;
+    static const bool initPreDefOn = static_cast<int> (initDelayLineSetting) > 3 ? true : false;
 
     // gaussian-distributed delay lengths
     static const std::vector<int> gaussianDLens

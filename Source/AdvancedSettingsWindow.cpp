@@ -76,7 +76,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     
     //// Delay lines ////
     delayLines = std::make_unique<ComboBox> ("delayLines");
-    delayLines->addItem ("Gaussian", gaussianDlen);
+    delayLines->addItem ("Gaussian", gaussian);
     delayLines->addItem ("Primes", primes);
     delayLines->addItem ("Uniform", uniform);
     
