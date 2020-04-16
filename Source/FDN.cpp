@@ -399,10 +399,10 @@ void FDN::getDelayLines()
         {
             // make uniformly-random-length delay lines
             Random rand;
+            double bandWidth = (maxDelayLength - minDelayLength) / static_cast<double> (FDNorder);
             for (int i = 0; i < FDNorder; ++i)
             {
-                dLen[i] = round(minDelayLength + (maxDelayLength - minDelayLength) * rand.nextFloat());
-                std::cout << i << " " << dLen[i] << std::endl;
+                dLen[i] = round (minDelayLength + i * bandWidth + rand.nextInt (round (bandWidth)));
             }
             break;
         }
@@ -424,9 +424,34 @@ void FDN::getDelayLines()
         }
         case uniformPredef:
         {
-            // random delay line with predefined values
-            for (int i = 0; i < FDNorder; ++i)
-                dLen[i] = Global::uniformDLens[i];
+            // predefined uniformly-distributed delay lengths
+            switch (FDNorder)
+            {
+                case 2:
+                    for (int i = 0; i < FDNorder; ++i)
+                        dLen[i] = Global::uniformDLens2[i];
+                    break;
+                case 4:
+                    for (int i = 0; i < FDNorder; ++i)
+                        dLen[i] = Global::uniformDLens4[i];
+                    break;
+                case 8:
+                    for (int i = 0; i < FDNorder; ++i)
+                        dLen[i] = Global::uniformDLens8[i];
+                    break;
+                case 16:
+                    for (int i = 0; i < FDNorder; ++i)
+                        dLen[i] = Global::uniformDLens16[i];
+                    break;
+                case 32:
+                    for (int i = 0; i < FDNorder; ++i)
+                        dLen[i] = Global::uniformDLens32[i];
+                    break;
+                case 64:
+                    for (int i = 0; i < FDNorder; ++i)
+                        dLen[i] = Global::uniformDLens64[i];
+                    break;
+            }
             break;
         }
 

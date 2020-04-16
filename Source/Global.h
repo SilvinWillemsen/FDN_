@@ -90,8 +90,8 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const DelayLineSetting initDelayLineSetting = gaussianDlenPredef;
-    static const bool initPreDefOn = initDelayLineSetting >= 3 ? true : false;
+    static const DelayLineSetting initDelayLineSetting = uniformPredef;
+    static const bool initPreDefOn = initDelayLineSetting > 3 ? true : false;
 
     // gaussian-distributed delay lengths
     static const std::vector<int> gaussianDLens
@@ -124,18 +124,46 @@ namespace Global
     };
     
     // uniformly distributed delay lengths
-    static const std::vector<int> uniformDLens
+    static const std::vector<int> uniformDLens2
     {
-        3673, 2237, 2234, 2903, 1672, 3104, 3236, 1832,
-        4075, 3711, 3138, 1763, 3773, 2223, 4150, 2018,
-        1651, 2033, 3995, 4434, 3106, 4346, 2183, 2865,
-        4097, 4022, 1548, 4346, 3280, 3321, 3704, 3134,
-        2010, 1699, 3021, 3502, 4466, 2042, 4138, 2209,
-        1932, 1617, 3440, 3652, 2683, 2324, 3196, 1779,
-        3183, 4145, 2390, 2887, 3618, 1789, 2257, 2867,
-        3431, 1972, 3453, 3206, 2920, 4129, 3721, 3114
+        1562, 4294
     };
     
+    static const std::vector<int> uniformDLens4
+    {
+        1670, 2835, 3030, 3827
+    };
+    
+    static const std::vector<int> uniformDLens8
+    {
+        1688, 2048, 2300, 2866, 3037, 3579, 3911, 4146
+    };
+    
+    static const std::vector<int> uniformDLens16
+    {
+        1607, 1834, 1906, 2165, 2385, 2502, 2749, 2943,
+        3147, 3226, 3389, 3638, 3844, 3941, 4235, 4347
+    };
+    
+    static const std::vector<int> uniformDLens32
+    {
+        1573, 1612, 1737, 1846, 1917, 1992, 2142, 2169,
+        2332, 2389, 2442, 2537, 2664, 2777, 2818, 2977,
+        3015, 3121, 3226, 3320, 3443, 3471, 3576, 3693,
+        3823, 3935, 3941, 4083, 4128, 4281, 4378, 4410
+    };
+    
+    static const std::vector<int> uniformDLens64
+    {
+        1513, 1585, 1594, 1681, 1714, 1780, 1790, 1833,
+        1917, 1949, 2014, 2055, 2076, 2119, 2195, 2214,
+        2258, 2304, 2377, 2405, 2457, 2506, 2554, 2602,
+        2667, 2708, 2754, 2795, 2849, 2883, 2908, 2986,
+        3018, 3085, 3131, 3167, 3208, 3280, 3327, 3335,
+        3407, 3444, 3481, 3533, 3589, 3637, 3665, 3717,
+        3774, 3832, 3877, 3906, 3964, 3987, 4032, 4086,
+        4147, 4181, 4241, 4299, 4337, 4369, 4406, 4475
+    };
     
     // GUI
     static const bool horSliders = false;
