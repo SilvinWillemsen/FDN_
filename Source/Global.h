@@ -29,10 +29,12 @@ enum Preset
 
 enum DelayLineSetting
 {
-    randomPredef = 1,
-    randomDlen,
+    randomDlen = 1,
     primes,
     uniform,
+    randomDlenPredef,
+    primesPredef,
+    uniformPredef,
 };
 
 namespace Global
@@ -78,6 +80,7 @@ namespace Global
     static const int updatePerSecond = 5;
     
     static const MatrixType initMatType = randomMat;
+    static const bool initPreDefOn = false;
     
     static const std::vector<std::vector<double>> presetValues
     {
@@ -88,7 +91,7 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const DelayLineSetting initDelayLineSetting = randomPredef;
+    static const DelayLineSetting initDelayLineSetting = randomDlen;
     static const std::vector<int> dLens
     {
         3673, 2237, 2234, 2903, 1672, 3104, 3236, 1832,

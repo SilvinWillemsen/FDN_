@@ -112,11 +112,13 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
         fdnOrder = advancedSettingsWindow->getFDNOrderBox();
         scatMats = advancedSettingsWindow->getScatMatsBox();
         delayLines = advancedSettingsWindow->getDelayLinesBox();
+        preDefBtn = advancedSettingsWindow->getPreDefBtn();
         applyRangeBtn = advancedSettingsWindow->getApplyRangeBtn();
 
         fdnOrder->addListener (this);
         scatMats->addListener (this);
         delayLines->addListener (this);
+        preDefBtn->addListener (this);
         applyRangeBtn->addListener (this);
 
     } else {
@@ -515,9 +517,14 @@ void Fdn_AudioProcessorEditor::buttonClicked (Button* button)
         }
         processor.fixCoefficients (coeffsFixed);
     }
-    else if (button == applyRangeBtn.get())
+    else if (button == applyRangeBtn.get() || button == preDefBtn.get())
     {
-        processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), advancedSettingsWindow->getRangeSliderMin(), advancedSettingsWindow->getRangeSliderMax());
+        if (button == preDefBtn.get())
+            preDefOn = !preDefOn; // using two separate preDefOn booleans (this and the one in advancedSettingsWindow) as one comes before the other in an order that I'm unsure about
+        if (preDefOn)
+            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId() + 3), Global::minDelayLength, Global::maxDelayLength);
+        else
+            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), advancedSettingsWindow->getRangeSliderMin(), advancedSettingsWindow->getRangeSliderMax());
     }
 }
 
@@ -574,10 +581,11 @@ void Fdn_AudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged
     }
     else if (comboBoxThatHasChanged == delayLines.get())
     {
-        if (delayLines->getSelectedId() == randomDlen)
-            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), advancedSettingsWindow->getRangeSliderMin(), advancedSettingsWindow->getRangeSliderMax());
+        if (preDefOn)
+            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId() + 3), Global::minDelayLength, Global::maxDelayLength);
         else
-            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), Global::minDelayLength, Global::maxDelayLength);
+            processor.changeDelayLineSetting (static_cast<DelayLineSetting> (delayLines->getSelectedId()), advancedSettingsWindow->getRangeSliderMin(), advancedSettingsWindow->getRangeSliderMax());
+        
 
     }
 }

@@ -139,5 +139,6 @@ private:
     int minDelayLength = Global::minDelayLength;
     int maxDelayLength = Global::maxDelayLength;
     
+    std::vector<int> possiblePrimes;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };

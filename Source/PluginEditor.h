@@ -74,6 +74,9 @@ private:
     std::shared_ptr<ComboBox> scatMats;
     std::unique_ptr<Label> scatMatsLabel;
     
+    std::shared_ptr<TextButton> preDefBtn;
+    bool preDefOn = Global::initPreDefOn;
+    
     std::shared_ptr<ComboBox> delayLines;
     std::shared_ptr<TextButton> applyRangeBtn;
 

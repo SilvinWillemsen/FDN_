@@ -38,11 +38,14 @@ public:
     std::shared_ptr<ComboBox> getFDNOrderBox() { return fdnOrder; };
     std::shared_ptr<ComboBox> getScatMatsBox() { return scatMats; };
     std::shared_ptr<ComboBox> getDelayLinesBox() { return delayLines; };
+    std::shared_ptr<TextButton> getPreDefBtn() { return preDefBtn; };
     std::shared_ptr<TextButton> getApplyRangeBtn() { return applyRangeBtn; };
 //    std::shared_ptr<TextButton> getExitBtn() { return exitBtn; };
 
     int getRangeSliderMin() { return rangeSliderMin->getValue(); };
     int getRangeSliderMax() { return rangeSliderMax->getValue(); };
+    
+    void setPreDefEnabled (bool enabled);
 
     void checkSlidersAgainstAppliedVals();
 private:
@@ -62,6 +65,9 @@ private:
     std::shared_ptr<Slider> rangeSliderMin;
     std::shared_ptr<Slider> rangeSliderMax;
     std::unique_ptr<Label> rangeLabel;
+    std::shared_ptr<TextButton> preDefBtn;
+    bool preDefOn = Global::initPreDefOn;
+    
     std::shared_ptr<TextButton> applyRangeBtn;
 
     std::shared_ptr<TextButton> exitBtn;
@@ -69,5 +75,7 @@ private:
 
     int lastMinRange = Global::minDelayLength;
     int lastMaxRange = Global::maxDelayLength;
+
+    Colour defaultButtonColour;
 
 };

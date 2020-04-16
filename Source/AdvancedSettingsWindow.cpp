@@ -76,7 +76,6 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     
     //// Delay lines ////
     delayLines = std::make_unique<ComboBox> ("delayLines");
-    delayLines->addItem ("Random (pre-defined)", randomPredef);
     delayLines->addItem ("Random", randomDlen);
     delayLines->addItem ("Primes", primes);
     delayLines->addItem ("Uniform", uniform);
@@ -85,7 +84,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     addAndMakeVisible (delayLines.get());
     delayLines->addListener (this);
     
-    delayLinesLabel = std::make_unique<Label> ("delayLinesLabel", "Delay Lines Type");
+    delayLinesLabel = std::make_unique<Label> ("delayLinesLabel", "Delay-line Settings");
+    Font font (18.0f);
+    delayLinesLabel->setFont (font);
     addAndMakeVisible (delayLinesLabel.get());
     delayLinesLabel->setJustificationType(Justification::left);
     delayLinesLabel->setColour (Label::textColourId, Colours::white);
@@ -114,21 +115,20 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     addAndMakeVisible (rangeSliderMax.get());
     rangeSliderMax->addListener (this);
 
-    if (delayLines->getSelectedId() != randomDlen)
-    {
-        rangeSliderMin->setEnabled (false);
-        rangeSliderMax->setEnabled (false);
-        applyRangeBtn->setEnabled (false);
-    } else {
-        checkSlidersAgainstAppliedVals();
-    }
+    setPreDefEnabled (preDefOn);
+    
+    //// Pre-defined Button ////
+    preDefBtn = std::make_shared<TextButton> ("Pre-defined\n(1500-4500)");
+    preDefBtn->addListener (this);
+    addAndMakeVisible (preDefBtn.get());
+    defaultButtonColour = preDefBtn->getLookAndFeel().findColour (TextButton::buttonColourId);
     
     //// Exit Button ////
     exitBtn = std::make_unique<TextButton> ("Exit");
     exitBtn->addListener (this);
     addAndMakeVisible (exitBtn.get());
     
-    setSize (400, 300);
+    setSize (400, 400);
 }
 
 AdvancedSettingsWindow::~AdvancedSettingsWindow()
@@ -148,34 +148,41 @@ void AdvancedSettingsWindow::paint (Graphics& g)
 }
 void AdvancedSettingsWindow::resized()
 {
-    Rectangle<int> totArea = getLocalBounds();
-    Rectangle<int> lowerButtonArea = totArea.removeFromBottom (40 + 2.0 * Global::margin);
-    Rectangle<int> labelArea = totArea.removeFromLeft (0.33 * getWidth());
+    Rectangle<int> totalArea = getLocalBounds();
+    Rectangle<int> lowerButtonArea = totalArea.removeFromBottom (40 + 2.0 * Global::margin);
+    Rectangle<int> topArea = totalArea.removeFromTop(2.0 * (2.0 * Global::margin + 40));
+    Rectangle<int> delayLineArea = totalArea;
 
-    //// Labels ////
-    labelArea.reduce (Global::margin, Global::margin);
-    fdnOrderLabel->setBounds (labelArea.removeFromTop (40));
-    labelArea.removeFromTop(Global::margin);
-    scatMatsLabel->setBounds (labelArea.removeFromTop (40));
-    labelArea.removeFromTop(Global::margin);
-    delayLinesLabel->setBounds (labelArea.removeFromTop (40));
-    labelArea.removeFromTop(Global::margin);
-    rangeLabel->setBounds (labelArea.removeFromTop (20));
-    labelArea.removeFromTop(Global::margin);
-    applyRangeBtn->setBounds (labelArea.removeFromTop (20));
-
+    //// Labels top area ////
+    Rectangle<int> topLabelArea = topArea.removeFromLeft (0.33 * getWidth());
+    topLabelArea.reduce (Global::margin, Global::margin);
+    fdnOrderLabel->setBounds (topLabelArea.removeFromTop (40));
+    topLabelArea.removeFromTop(Global::margin);
+    scatMatsLabel->setBounds (topLabelArea.removeFromTop (40));
     
-    //// Controls ////
-    totArea.reduce (Global::margin, Global::margin);
-    fdnOrder->setBounds (totArea.removeFromTop (40));
-    totArea.removeFromTop(Global::margin);
-    scatMats->setBounds (totArea.removeFromTop (40));
-    totArea.removeFromTop (Global::margin);
-    delayLines->setBounds (totArea.removeFromTop (40));
-    totArea.removeFromTop (Global::margin);
-    rangeSliderMin->setBounds (totArea.removeFromTop (20));
-    totArea.removeFromTop (Global::margin);
-    rangeSliderMax->setBounds (totArea.removeFromTop (20));
+    //// Controls top area ////
+    topArea.reduce (Global::margin, Global::margin);
+    fdnOrder->setBounds (topArea.removeFromTop (40));
+    topArea.removeFromTop(Global::margin);
+    scatMats->setBounds (topArea.removeFromTop (40));
+    
+    //// Delay line area ////
+    delayLinesLabel->setBounds (delayLineArea.removeFromTop (20).withX (Global::margin));
+    delayLineArea.removeFromTop (Global::margin);
+    
+    Rectangle<int> delayLineLabelArea = delayLineArea.removeFromLeft (0.33 * getWidth());
+    delayLineLabelArea.reduce (Global::margin, Global::margin);
+    delayLineArea.reduce (Global::margin, Global::margin);
+    
+    preDefBtn->setBounds (delayLineLabelArea.removeFromTop (40));
+    delayLineLabelArea.removeFromTop (Global::margin);
+    applyRangeBtn->setBounds (delayLineLabelArea.removeFromTop (20));
+
+    delayLines->setBounds (delayLineArea.removeFromTop (40));
+    delayLineArea.removeFromTop (Global::margin);
+    rangeSliderMin->setBounds (delayLineArea.removeFromTop (20));
+    delayLineArea.removeFromTop (Global::margin);
+    rangeSliderMax->setBounds (delayLineArea.removeFromTop (20));
     
     //// Buttons ////
     lowerButtonArea.reduce (Global::margin, Global::margin);
@@ -194,29 +201,27 @@ void AdvancedSettingsWindow::buttonClicked (Button* button)
     {
         lastMinRange = rangeSliderMin->getValue();
         lastMaxRange = rangeSliderMin->getValue();
-        applyRangeBtn->setEnabled (false);
+        applyRangeBtn->setButtonText("Randomise");
+    }
+    else if (button == preDefBtn.get())
+    {
+        preDefOn = !preDefOn;
+        if (preDefOn)
+            preDefBtn->setColour (TextButton::buttonColourId, Colours::darkgreen);
+        else
+            preDefBtn->setColour (TextButton::buttonColourId, defaultButtonColour);
+        setPreDefEnabled (preDefOn);
     }
     else if (button == exitBtn.get())
     {
         DialogWindow* dw = this->findParentComponentOfClass<DialogWindow>();
         dw->exitModalState (0);
     }
+    
 }
 
 void AdvancedSettingsWindow::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-    if (comboBoxThatHasChanged == delayLines.get())
-    {
-        if (delayLines->getSelectedId() == randomDlen)
-        {
-            rangeSliderMin->setEnabled (true);
-            rangeSliderMax->setEnabled (true);
-            checkSlidersAgainstAppliedVals();
-        } else {
-            rangeSliderMin->setEnabled (false);
-            rangeSliderMax->setEnabled (false);
-        }
-    }
     
 }
 
@@ -243,7 +248,14 @@ void AdvancedSettingsWindow::sliderValueChanged (Slider* slider)
 void AdvancedSettingsWindow::checkSlidersAgainstAppliedVals()
 {
     if (rangeSliderMin->getValue() == lastMinRange && rangeSliderMax->getValue() == lastMaxRange)
-    applyRangeBtn->setEnabled (false);
+        applyRangeBtn->setButtonText ("Randomise");
     else
-    applyRangeBtn->setEnabled (true);
+        applyRangeBtn->setButtonText ("Apply range");
+}
+
+void AdvancedSettingsWindow::setPreDefEnabled (bool enabled)
+{
+    rangeSliderMin->setEnabled (!enabled);
+    rangeSliderMax->setEnabled (!enabled);
+    applyRangeBtn->setEnabled (!enabled);
 }

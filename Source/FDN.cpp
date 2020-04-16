@@ -340,13 +340,6 @@ void FDN::getDelayLines()
     dLen.resize (FDNorder, 0);
     switch (static_cast<int> (delayLineSetting))
     {
-        case randomPredef:
-        {
-            // random delay line with predefined values
-            for (int i = 0; i < FDNorder; ++i)
-                dLen[i] = Global::dLens[i];
-            break;
-        }
         case randomDlen:
         {
             Random rand;
@@ -359,13 +352,59 @@ void FDN::getDelayLines()
             }
             break;
         }
+            
         case primes:
+        {
+            possiblePrimes.resize (1134, 0); // 1134 is the highest number of primes possible between 500 and 10000
+            int numPrimes = 0;
+            bool flag;
+            int low = minDelayLength;
+            while (low < maxDelayLength)
+            {
+                flag = false;
+                
+                for (int i = 2; i <= low / 2; ++i)
+                {
+                    if (low % i == 0)
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+                
+                if (!flag)
+                {
+                    possiblePrimes[numPrimes] = low;
+                    ++numPrimes;
+                }
+                ++low;
+            }
+            Random randInt;
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = possiblePrimes[randInt.nextInt (numPrimes)];
+            break;
+        }
+            
+        case uniform:
+            break;
+            
+        case randomDlenPredef:
+        {
             // random delay line with predefined values
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = Global::dLens[i];
+            break;
+        }
+        case primesPredef:
+        {
+            // predefined primes
             for (int i = 0; i < FDNorder; ++i)
                 dLen[i] = Global::primeLens[i];
             break;
-        case uniform:
+        }
+        case uniformPredef:
             break;
+
             
     }
 }
