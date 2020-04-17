@@ -362,6 +362,17 @@ void FDN::getDelayLines()
     switch (static_cast<int> (delayLineSetting))
     {
         //// Random ////
+        case randomDLen:
+        {
+            Random rand;
+            
+            // make a fully random-length delay line
+            for (int i = 0; i < FDNorder; ++i)
+            {
+                dLen[i] = round(minDelayLength + (maxDelayLength - minDelayLength) * rand.nextFloat());
+            }
+            break;
+        }
         case gaussian:
         {
             // make gaussian distributed delay lines
@@ -427,6 +438,13 @@ void FDN::getDelayLines()
         }
             
         //// Pre-defined ////
+            
+        case randomDLenPredef:
+        {
+            for (int i = 0; i < FDNorder; ++i)
+                dLen[i] = Global::randomDLens[i];
+            break;
+        }
         case gaussianPredef:
         {
             // predefined gaussian delay lengths

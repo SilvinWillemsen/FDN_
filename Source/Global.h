@@ -29,9 +29,11 @@ enum Preset
 
 enum DelayLineSetting
 {
-    gaussian = 1,
+    randomDLen = 1,
+    gaussian,
     primes,
     uniform,
+    randomDLenPredef,
     gaussianPredef,
     primesPredef,
     uniformPredef,
@@ -90,9 +92,22 @@ namespace Global
         {5.68, 4.41, 3.86, 2.86, 2.59, 2.61, 2.47, 2.02, 1.32, 0.92}    // church
     };
     
-    static const DelayLineSetting initDelayLineSetting = primesPredef;
-    static const bool initPreDefOn = static_cast<int> (initDelayLineSetting) > 3 ? true : false;
+    static const DelayLineSetting initDelayLineSetting = randomDLenPredef;
+    static const bool initPreDefOn = static_cast<int> (initDelayLineSetting) > 4 ? true : false;
 
+    // randomly distributed delay lengths
+    static const std::vector<int> randomDLens
+    {
+        3673, 2237, 2234, 2903, 1672, 3104, 3236, 1832,
+        4075, 3711, 3138, 1763, 3773, 2223, 4150, 2018,
+        1651, 2033, 3995, 4434, 3106, 4346, 2183, 2865,
+        4097, 4022, 1548, 4346, 3280, 3321, 3704, 3134,
+        2010, 1699, 3021, 3502, 4466, 2042, 4138, 2209,
+        1932, 1617, 3440, 3652, 2683, 2324, 3196, 1779,
+        3183, 4145, 2390, 2887, 3618, 1789, 2257, 2867,
+        3431, 1972, 3453, 3206, 2920, 4129, 3721, 3114
+    };
+    
     // gaussian-distributed delay lengths
     static const std::vector<int> gaussianDLens
     {

@@ -76,11 +76,12 @@ AdvancedSettingsWindow::AdvancedSettingsWindow (std::shared_ptr<TextButton> impu
     
     //// Delay lines ////
     delayLines = std::make_unique<ComboBox> ("delayLines");
+    delayLines->addItem ("Random", randomDLen);
     delayLines->addItem ("Gaussian", gaussian);
     delayLines->addItem ("Primes", primes);
     delayLines->addItem ("Uniform", uniform);
     
-    delayLines->setSelectedId (Global::initDelayLineSetting - (preDefOn ? 3 : 0));
+    delayLines->setSelectedId (Global::initDelayLineSetting - (preDefOn ? 4 : 0));
     addAndMakeVisible (delayLines.get());
     delayLines->addListener (this);
     
