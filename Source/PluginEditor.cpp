@@ -104,7 +104,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     
     if (Global::useAdvancedWindow)
     {
-        advancedSettings = std::make_unique<TextButton>("Advanced");
+        advancedSettings = std::make_unique<TextButton>("Advanced\nSettings");
         advancedSettings->addListener (this);
         addAndMakeVisible (advancedSettings.get());
         advancedSettingsWindow = std::make_unique<AdvancedSettingsWindow> (impulseBtn);
@@ -346,25 +346,28 @@ void Fdn_AudioProcessorEditor::resized()
     //// Side panel ////
     
     // Top Half //
-    fixCoeffs->setBounds (sidePanel.removeFromTop (40 - Global::margin));
-    sidePanel.removeFromTop (Global::margin * 4.0);
-    int knobHeight = sidePanel.getHeight() * 0.2 - Global::margin;
-    sliders[sliders.size() - 1]->setBounds (sidePanel.removeFromTop (knobHeight));
-    sidePanel.removeFromTop (Global::margin * 3.0);
-    sliders[sliders.size() - 2]->setBounds (sidePanel.removeFromTop (knobHeight));
-    sidePanel.removeFromTop (Global::margin * 3.0);
+    Rectangle<int> sidePanelTop = sidePanel.removeFromTop (getHeight() * 0.5 + 40);
+    fixCoeffs->setBounds (sidePanelTop.removeFromTop (40 - Global::margin));
+    sidePanelTop.removeFromTop (Global::margin * 4.0);
+    int knobHeight = getHeight() * 0.2 - Global::margin;
+    sliders[sliders.size() - 1]->setBounds (sidePanelTop.removeFromTop (knobHeight));
+    sidePanelTop.removeFromTop (Global::margin * 3.0);
+    sliders[sliders.size() - 2]->setBounds (sidePanelTop.removeFromTop (knobHeight));
+    sidePanelTop.removeFromTop (Global::margin * 3.0);
     
     // Bottom Half //
-    impulseBtn->setBounds (sidePanel.removeFromBottom (40));
-    sidePanel.removeFromBottom (Global::margin);
-    smoothVals->setBounds (sidePanel.removeFromBottom (40));
-    sidePanel.removeFromBottom (Global::margin);
-    allSliders->setBounds (sidePanel.removeFromBottom (40));
+    Rectangle<int> sidePanelBottom = sidePanel;
+
+    impulseBtn->setBounds (sidePanelBottom.removeFromBottom (40));
+    sidePanelBottom.removeFromBottom (Global::margin);
+    smoothVals->setBounds (sidePanelBottom.removeFromBottom (40));
+    sidePanelBottom.removeFromBottom (Global::margin);
+    allSliders->setBounds (sidePanelBottom.removeFromBottom (40));
    
     if (Global::useAdvancedWindow)
     {
-        sidePanel.removeFromBottom (Global::margin);
-        advancedSettings->setBounds (sidePanel.removeFromBottom (40));
+        sidePanelBottom.removeFromTop (Global::margin);
+        advancedSettings->setBounds (sidePanelBottom.removeFromTop (80));
     } else {
         sidePanel.removeFromBottom (Global::margin);
         scatMats->setBounds (sidePanel.removeFromBottom (40));
