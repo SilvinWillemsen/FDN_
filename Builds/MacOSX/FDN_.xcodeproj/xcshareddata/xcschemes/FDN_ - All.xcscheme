@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6F0394DE86E2821BC1376E22"
-               BuildableName = "FDN_.component"
-               BlueprintName = "FDN_ - AU"
+               BlueprintIdentifier = "EA6945FC1F306A3D380AF4F1"
+               BuildableName = "FDN_ - All"
+               BlueprintName = "FDN_ - All"
                ReferencedContainer = "container:FDN_.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,7 +50,7 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "NO">
+      allowLocationSimulation = "YES">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
@@ -65,21 +65,20 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      savedToolIdentifier = "Time Profiler"
+      savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-            BuildableName = "FDN_.app"
-            BlueprintName = "FDN_ - Standalone Plugin"
+            BlueprintIdentifier = "EA6945FC1F306A3D380AF4F1"
+            BuildableName = "FDN_ - All"
+            BlueprintName = "FDN_ - All"
             ReferencedContainer = "container:FDN_.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

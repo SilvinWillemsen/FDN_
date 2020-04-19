@@ -72,7 +72,6 @@ public:
     void setZeroCoeffsFlag() { zeroCoeffsFlag = true; };
     
     void setDryGain (double val) { dryGain = val; };
-    void setInputGain (double val) { inputGain = val; };
 
     double getFs() { return fs; };
     void changeMatType (MatrixType mt) { changeMatTypeFlag = true; matType = mt; };
@@ -99,7 +98,6 @@ private:
     double fs;
     float totInput;
     float output;
-    double inputGain = Global::initInputGain;
 	
     bool init = false;
     unsigned long t = !Global::initWithImpulse;

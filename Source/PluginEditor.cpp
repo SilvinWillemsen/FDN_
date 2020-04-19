@@ -53,21 +53,7 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     addAndMakeVisible (labels[labels.size() - 1]);
     labels[labels.size() - 1]->setJustificationType(Justification::centred);
     labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
-    
-    //// Input gain ////
-    sliders.add (new Slider (Slider::RotaryVerticalDrag, Slider::TextBoxBelow));
-    sliders[sliders.size() - 1]->setName ("inputGain");
-    
-    sliders[sliders.size() - 1]->setRange (0.0, 1.0, 0.001);
-    sliders[sliders.size() - 1]->setValue (Global::initInputGain);
-    
-    sliders[sliders.size() - 1]->addListener (this);
-    addAndMakeVisible (sliders[sliders.size() - 1]);
-    
-    labels.add (new Label ("inputGain", "Input Gain"));
-    addAndMakeVisible (labels[labels.size() - 1]);
-    labels[labels.size() - 1]->setJustificationType(Justification::centred);
-    labels[labels.size() - 1]->attachToComponent (sliders[sliders.size() - 1], false);
+
     
     impulseBtn = std::make_unique<TextButton> ("Impulse");
     impulseBtn->addListener (this);
@@ -348,36 +334,19 @@ void Fdn_AudioProcessorEditor::resized()
     // Top Half //
     Rectangle<int> sidePanelTop = sidePanel.removeFromTop (getHeight() * 0.5 + 40);
     fixCoeffs->setBounds (sidePanelTop.removeFromTop (40 - Global::margin));
-    sidePanelTop.removeFromTop (Global::margin * 4.0);
-    int knobHeight = getHeight() * 0.2 - Global::margin;
-    sliders[sliders.size() - 1]->setBounds (sidePanelTop.removeFromTop (knobHeight));
-    sidePanelTop.removeFromTop (Global::margin * 3.0);
-    sliders[sliders.size() - 2]->setBounds (sidePanelTop.removeFromTop (knobHeight));
-    sidePanelTop.removeFromTop (Global::margin * 3.0);
+    sidePanelTop.removeFromTop (Global::margin);
+    advancedSettings->setBounds (sidePanelTop.removeFromTop (40));
     
     // Bottom Half //
     Rectangle<int> sidePanelBottom = sidePanel;
-
     impulseBtn->setBounds (sidePanelBottom.removeFromBottom (40));
     sidePanelBottom.removeFromBottom (Global::margin);
     smoothVals->setBounds (sidePanelBottom.removeFromBottom (40));
     sidePanelBottom.removeFromBottom (Global::margin);
     allSliders->setBounds (sidePanelBottom.removeFromBottom (40));
-   
-    if (Global::useAdvancedWindow)
-    {
-        sidePanelBottom.removeFromTop (Global::margin);
-        advancedSettings->setBounds (sidePanelBottom.removeFromTop (80));
-    } else {
-        sidePanel.removeFromBottom (Global::margin);
-        scatMats->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (Global::margin * 0.5);
-        scatMatsLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
-        sidePanel.removeFromBottom (Global::margin);
-        fdnOrder->setBounds (sidePanel.removeFromBottom (40));
-        sidePanel.removeFromBottom (Global::margin * 0.5);
-        fdnOrderLabel->setBounds (sidePanel.removeFromBottom (20).withX (sidePanel.getX() - 5));
-    }
+    sidePanelBottom.removeFromTop (Global::margin);
+    sliders[sliders.size() - 1]->setBounds (sidePanelBottom.removeFromTop (sidePanelBottom.getWidth()));
+    
     
     //// Response area ////
     Rectangle<int> responseArea = totArea.removeFromTop (getHeight() * 0.5);
@@ -393,7 +362,7 @@ void Fdn_AudioProcessorEditor::resized()
     totArea.removeFromLeft (Global::margin);
     int sliderWidth = ceil ((totArea.getWidth() - (9.0 * sliderMargin)) / 10.0);
     
-    for (int i = 0; i < sliders.size() - 2; ++i)
+    for (int i = 0; i < Global::numOctaveBands; ++i)
     {
         sliders[i]->setBounds (totArea.removeFromLeft (sliderWidth));
         totArea.removeFromLeft (sliderMargin);
@@ -402,7 +371,7 @@ void Fdn_AudioProcessorEditor::resized()
 
 void Fdn_AudioProcessorEditor::sliderDragStarted (Slider* slider)
 {
-    for (int i = 0; i < sliders.size() - 2; ++i)
+    for (int i = 0; i < Global::numOctaveBands; ++i)
     {
         sliderValuesAtStartDrag[i] = sliders[i]->getValue();
         if (slider == sliders[i])
@@ -415,15 +384,9 @@ void Fdn_AudioProcessorEditor::sliderDragStarted (Slider* slider)
 
 void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
-    if (slider == sliders[sliders.size() - 2])
+    if (slider == sliders[Global::numOctaveBands])
     {
         processor.setDryGain (1.0-slider->getValue());
-        return;
-    }
-    
-    if (slider == sliders[sliders.size() - 1])
-    {
-        processor.setInputGain (slider->getValue());
         return;
     }
     
@@ -441,7 +404,7 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
     // Affect all sliders smoothly
     if (smoothValsBool)
     {
-        for (int j = 0; j < sliders.size() - 2; ++j)
+        for (int j = 0; j < Global::numOctaveBands; ++j)
         {
             if (curSliderIdx != j)
             {
@@ -453,7 +416,7 @@ void Fdn_AudioProcessorEditor::sliderValueChanged (Slider* slider)
     // Set all sliders to the current slider value
     else if (allSlidersBool)
     {
-        for (int j = 0; j < sliders.size() - 2; ++j)
+        for (int j = 0; j < Global::numOctaveBands; ++j)
         {
             if (curSliderIdx != j)
             {

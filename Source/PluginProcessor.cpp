@@ -158,7 +158,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         return;
     for (int i = 0; i < buffer.getNumSamples(); ++i)
     {
-        totInput = (input[i] + (t == 0 ? 1.0 : 0.0)) * inputGain;
+        totInput = (input[i] + (t == 0 ? 1.0 : 0.0)) * 0.5;
         output = fdn->calculate (totInput);
         channeldataL[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
         if (channeldataR != nullptr)
