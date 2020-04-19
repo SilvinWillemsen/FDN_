@@ -91,6 +91,8 @@ public:
     
     void changeDelayLineSetting (DelayLineSetting dLenSet, int min, int max);
     
+    AudioTransportSource* getTransportSource() { return &transportSource; };
+    
 private:
     //==============================================================================
     std::shared_ptr<FDN> fdn;
@@ -128,6 +130,10 @@ private:
     DelayLineSetting dLenSetToChangeTo;
     int minDLenToSet;
     int maxDLenToSet;
+    
+    //// Audio Fil ////
+    AudioTransportSource transportSource;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessor)
 };

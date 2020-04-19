@@ -39,6 +39,14 @@ enum DelayLineSetting
     uniformPredef,
 };
 
+enum TransportState
+{
+    Stopped,
+    Starting,
+    Playing,
+    Stopping
+};
+
 namespace Global
 {
     static const int initFDNorder = 16;
@@ -57,7 +65,7 @@ namespace Global
     static const double RTmin = 0.03;
     static const double RTmax = 15.0;
     
-    static const double dryWetInit = 0.45;
+    static const double dryWetInit = 0.7;
     static const double initInputGain = 0.5;
     
     // Make this dynamic!! (using 125*2^(n-3))

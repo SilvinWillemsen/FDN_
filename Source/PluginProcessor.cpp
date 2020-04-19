@@ -104,6 +104,7 @@ void Fdn_AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     fs = sampleRate;
     fdn->initialise (fs);
     recalculateMod = fs / static_cast<double> (Global::updatePerSecond);
+    transportSource.prepareToPlay (samplesPerBlock, sampleRate);
     
     cpuStore.resize (Global::updatePerSecond + 2, 0);
 }
@@ -112,6 +113,8 @@ void Fdn_AudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    transportSource.releaseResources();
+    
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -140,29 +143,35 @@ bool Fdn_AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-//    int amount = 10;
-//    if (timer % amount == 0)
     curMillis = Time::getCurrentTime().toMilliseconds();
-//    else if (timer % amount == amount - 1)
     
     if (fdn == nullptr)
         return;
     
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     
+    AudioSourceChannelInfo bufferToFill (&buffer, 0, buffer.getNumSamples());
+    transportSource.getNextAudioBlock (bufferToFill);
+    if (transportSource.getCurrentPosition() >= 8)
+    {
+        transportSource.setPosition (0.0);
+    }
+    
+    const float* input = bufferToFill.buffer->getReadPointer (0);
     float* const channeldataL = buffer.getWritePointer(0);
     float* const channeldataR = totalNumOutputChannels > 1 ? buffer.getWritePointer(1) : nullptr;
-    ScopedNoDenormals noDenormals;
-    const float* input = buffer.getReadPointer (0);
+//    ScopedNoDenormals noDenormals;
+//    const float* input = buffer.getReadPointer (0);
     if (fdn == nullptr)
         return;
     for (int i = 0; i < buffer.getNumSamples(); ++i)
     {
-        totInput = (input[i] + (t == 0 ? 1.0 : 0.0)) * 0.5;
+        totInput = (input[i] * 0.5 + (t == 0 ? 1.0 : 0.0)) * 0.5;
         output = fdn->calculate (totInput);
-        channeldataL[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
+//        channeldataL[i] = input[i];
+        channeldataL[i] = Global::limit ((totInput * 3.0 * dryGain + (1.0 - dryGain) * output) * 0.25, -1, 1);
         if (channeldataR != nullptr)
-            channeldataR[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
+            channeldataR[i] = Global::limit ((totInput * 3.0 * dryGain + (1.0 - dryGain) * output) * 0.25, -1, 1);
         ++t;
         ++tt;
     }
@@ -172,32 +181,32 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
         if (!coeffsFixed)
             fdn->recalculateCoeffs();
     }
-    
+
     if (zeroCoeffsFlag)
     {
         fdn->zeroCoefficients();
         zeroCoeffsFlag = false;
         t = 0;
     }
-    
+
     if (changeMatTypeFlag)
     {
         changeMatTypeFlag = false;
         fdn->setScatteringMatrix (matType);
     }
-    
+
     if (changeFDNorderFlag)
     {
         fdn->changeFDNorder (orderToChangeTo, matTypeToChangeTo);
         changeFDNorderFlag = !changeFDNorderFlag;
     }
-    
+
     if (changeDelayLineSettingFlag)
     {
         fdn->changeDelayLineSetting (dLenSetToChangeTo, minDLenToSet, maxDLenToSet);
         changeDelayLineSettingFlag = !changeDelayLineSettingFlag;
     }
-    
+
     cpuStore[timer % (Global::updatePerSecond + 2)] = 0.001 * (Time::getCurrentTime().toMilliseconds() - curMillis) * (fs / (buffer.getNumSamples()));
     ++timer;
 }

@@ -13,7 +13,7 @@
 #include "Global.h"
 //==============================================================================
 Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+    : AudioProcessorEditor (&p), processor (p), state (Stopped)
 {
     sliderValuesAtStartDrag.resize (Global::numOctaveBands, Global::RT);
 
@@ -149,6 +149,21 @@ Fdn_AudioProcessorEditor::Fdn_AudioProcessorEditor (Fdn_AudioProcessor& p)
     cpuUsageGraphics->setColour (Label::textColourId, Colours::white);
     cpuUsageGraphics->setColour (Label::backgroundColourId, defaultButtonColour);
     cpuUsageGraphics->setColour (Label::outlineColourId, Colours::white);
+    
+    //// Audio file ////
+    addKeyListener (this);
+    
+    processor.getTransportSource()->addChangeListener (this);
+    formatManager.registerBasicFormats(); // [1]
+    File audioFile ("/Users/SilvinW/repositories/FDN_/Binaries/rhodes.wav");
+    auto* reader = formatManager.createReaderFor (audioFile);              // [10]
+    
+    if (reader != nullptr)
+    {
+        std::unique_ptr<AudioFormatReaderSource> newSource (new AudioFormatReaderSource (reader, true)); // [11]
+        processor.getTransportSource()->setSource (newSource.get(), 0, nullptr, reader->sampleRate);                     // [12]
+        readerSource.reset (newSource.release());                                                        // [14]
+    }
     
     //// Timer and Size ////
     startTimerHz (Global::updatePerSecond);
@@ -560,7 +575,21 @@ void Fdn_AudioProcessorEditor::changeListenerCallback (ChangeBroadcaster* source
 {
     // if a message is received it is ALWAYS the IR button clicked (to show IR)
     // now asynchronously calculate the impulse response
-    calculateImpulseResponse();
+    if (source == response.get())
+    {
+        calculateImpulseResponse();
+    }
+    else if (source == processor.getTransportSource())
+    {
+        if (processor.getTransportSource()->isPlaying())
+        {
+            changeState (Playing);
+            processor.getTransportSource()->setLooping (true);
+            std::cout << "Editor (is looping): " << processor.getTransportSource()->isLooping() << std::endl;
+        } else {
+            changeState (Stopped);
+        }
+    }
 };
 
 void Fdn_AudioProcessorEditor::openAdvancedSettings()
@@ -572,4 +601,54 @@ void Fdn_AudioProcessorEditor::openAdvancedSettings()
     dlg.dialogTitle = "Advanced Settings";
     dlg.content.set (advancedSettingsWindow.get(), false);
     dlgModal = dlg.runModal();
+}
+
+bool Fdn_AudioProcessorEditor::keyPressed (const KeyPress& key, Component* originatingComponent)
+{
+    switch (key.getTextCharacter())
+    {
+        case 'p':
+        {
+            if (!processor.getTransportSource()->isPlaying())
+                changeState (Starting);
+            else
+                changeState (Stopping);
+            break;
+        }
+        default:
+            break;
+    }
+    return true;
+}
+
+bool Fdn_AudioProcessorEditor::keyStateChanged (bool isKeyDown, Component *originatingComponent)
+{
+    std::cout << "Keystate changed!" << std::endl;
+    return true;
+}
+
+void Fdn_AudioProcessorEditor::changeState (TransportState newState)
+{
+    if (state != newState)
+    {
+        state = newState;
+        
+        switch (state)
+        {
+            case Stopped:                           // [3]
+                processor.getTransportSource()->setPosition (0.0);
+                break;
+                
+            case Starting:                          // [4]
+                processor.getTransportSource()->start();
+                break;
+                
+            case Playing:                           // [5]
+                break;
+                
+            case Stopping:                          // [6]
+                processor.getTransportSource()->stop();
+                break;
+        }
+    }
 }

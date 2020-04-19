@@ -17,12 +17,13 @@
 //==============================================================================
 /**
 */
-class Fdn_AudioProcessorEditor  : public AudioProcessorEditor,
-                                  public Slider::Listener,
-                                  public Button::Listener,
-                                  public Timer,
-                                  public ComboBox::Listener,
-                                  public ChangeListener
+class Fdn_AudioProcessorEditor  :   public AudioProcessorEditor,
+                                    public Slider::Listener,
+                                    public Button::Listener,
+                                    public Timer,
+                                    public ComboBox::Listener,
+                                    public ChangeListener,
+                                    public KeyListener
 {
 public:
     Fdn_AudioProcessorEditor (Fdn_AudioProcessor&);
@@ -49,6 +50,10 @@ public:
     
     void openAdvancedSettings();
     
+    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+    bool keyStateChanged (bool isKeyDown, Component* originatingComponent) override;
+
+    void changeState (TransportState state);
 private:
     
     Fdn_AudioProcessor& processor;
@@ -103,6 +108,11 @@ private:
     
     long time;
     double cpuUsageGraphicsValue;
+    
+    //// Audio file ////
+    AudioFormatManager formatManager;
+    std::unique_ptr<AudioFormatReaderSource> readerSource;
+    TransportState state;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };
