@@ -27,6 +27,7 @@ Fdn_AudioProcessor::Fdn_AudioProcessor()
                        )
 #endif
 {
+//    setBu (getBusesLayout().withOutput("Output", AudioChannelSet::stereo(), true));
     fdn = std::make_shared<FDN>();
 }
 
@@ -140,14 +141,11 @@ bool Fdn_AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-//    int amount = 10;
-//    if (timer % amount == 0)
     curMillis = Time::getCurrentTime().toMilliseconds();
-//    else if (timer % amount == amount - 1)
     
     if (fdn == nullptr)
         return;
-    
+    const int totalNumInputChannels = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     
     float* const channeldataL = buffer.getWritePointer(0);

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SVjOjm" name="FDN_" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST3"
-              displaySplashScreen="1" jucerFormatVersion="1" pluginChannelConfigs="(1,2)"
-              pluginAAXCategory="8">
+              displaySplashScreen="1" jucerFormatVersion="1" pluginVST3Category="Reverb"
+              pluginRTASCategory="8192" pluginAAXCategory="8" pluginAUMainType="'aufx'"
+              pluginChannelConfigs="{2, 2}">
   <MAINGROUP id="SOc3ba" name="FDN_">
     <GROUP id="{6620E8CE-0269-4766-9F48-378FA259DA6A}" name="Source">
       <FILE id="rzWsBR" name="Global.h" compile="0" resource="0" file="Source/Global.h"/>

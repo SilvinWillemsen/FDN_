@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-               BuildableName = "FDN_.app"
-               BlueprintName = "FDN_ - Standalone Plugin"
-               ReferencedContainer = "container:FDN_.xcodeproj">
+               BlueprintIdentifier = "EA6945FC1F306A3D380AF4F1"
+               BuildableName = "FDNupdated2 - All"
+               BlueprintName = "FDNupdated2 - All"
+               ReferencedContainer = "container:FDNupdated2.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,15 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-            BuildableName = "FDN_.app"
-            BlueprintName = "FDN_ - Standalone Plugin"
-            ReferencedContainer = "container:FDN_.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -51,16 +42,15 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-            BuildableName = "FDN_.app"
-            BlueprintName = "FDN_ - Standalone Plugin"
-            ReferencedContainer = "container:FDN_.xcodeproj">
+            BlueprintIdentifier = "EA6945FC1F306A3D380AF4F1"
+            BuildableName = "FDNupdated2 - All"
+            BlueprintName = "FDNupdated2 - All"
+            ReferencedContainer = "container:FDNupdated2.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -70,16 +60,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A2EEAB83A22A33498959459"
-            BuildableName = "FDN_.app"
-            BlueprintName = "FDN_ - Standalone Plugin"
-            ReferencedContainer = "container:FDN_.xcodeproj">
+            BlueprintIdentifier = "EA6945FC1F306A3D380AF4F1"
+            BuildableName = "FDNupdated2 - All"
+            BlueprintName = "FDNupdated2 - All"
+            ReferencedContainer = "container:FDNupdated2.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
