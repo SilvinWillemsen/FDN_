@@ -318,6 +318,13 @@
 			path = "/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_gui_basics";
 			sourceTree = "<absolute>";
 		};
+		47D8923D680D124E68EE844C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = JucePluginDefines.h;
+			path = ../../JuceLibraryCode/JucePluginDefines.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		497620C0479A342718026E96 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -765,6 +772,7 @@
 				BD9CFDAC705F88C036905829,
 				42091110E39AEF372601F27D,
 				28A975C12BB2B74E0BA48221,
+				47D8923D680D124E68EE844C,
 			);
 			name = "JUCE Library Code";
 			sourceTree = "<group>";
@@ -824,6 +832,34 @@
 			name = Source;
 			sourceTree = "<group>";
 		};
+		E9980F455F7B7CBD3E7A19C8 = {
+			isa = PBXTargetDependency;
+			target = F70D3675CAD07C0E5ED48737;
+		};
+		4ADB2A01DD2E6381D5842489 = {
+			isa = PBXTargetDependency;
+			target = 6F0394DE86E2821BC1376E22;
+		};
+		DBE2AF00F4542DA4D952685C = {
+			isa = PBXTargetDependency;
+			target = 2A2EEAB83A22A33498959459;
+		};
+		EBBC1B5C814C5C7B68E1A1E3 = {
+			isa = PBXTargetDependency;
+			target = 0186FF9BB1057FA4436AD7B1;
+		};
+		4D7FBDE5D1FFFAAA04733938 = {
+			isa = PBXTargetDependency;
+			target = 0186FF9BB1057FA4436AD7B1;
+		};
+		0520C912CC5C4E695F4C4B90 = {
+			isa = PBXTargetDependency;
+			target = 0186FF9BB1057FA4436AD7B1;
+		};
+		981A25861DC1F555EB3B30C7 = {
+			isa = PBXTargetDependency;
+			target = 0186FF9BB1057FA4436AD7B1;
+		};
 		3FB9A36542405324FD4370C4 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -872,7 +908,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -920,11 +956,10 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -976,7 +1011,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -1025,11 +1060,10 @@
 					"JucePlugin_Build_Standalone=0",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -1079,7 +1113,7 @@
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -1122,10 +1156,9 @@
 					"JucePlugin_Build_Standalone=1",
 					"JucePlugin_Build_Unity=0",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -1172,7 +1205,7 @@
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -1215,10 +1248,9 @@
 					"JucePlugin_Build_Unity=0",
 					"JUCE_SHARED_CODE=1",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
-					"/Users/SilvinW/repositories/VST_SDK/VST3_SDK",
+					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_processors/format_types/VST3_SDK",
 					"../../JuceLibraryCode",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules",
 					"/Users/SilvinW/repositories/newJUCE/JUCE/modules/juce_audio_plugin_client",
@@ -1259,11 +1291,12 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
+				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1307,10 +1340,12 @@
 				CODE_SIGN_IDENTITY = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -1327,22 +1362,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Release;
-		};
-		AC7EA540D64576B7CE3D9BC0 = {
-			isa = PBXTargetDependency;
-			target = F70D3675CAD07C0E5ED48737;
-		};
-		B8E756E511429778CA5331E1 = {
-			isa = PBXTargetDependency;
-			target = 6F0394DE86E2821BC1376E22;
-		};
-		F00D7056D070662FE88F4B76 = {
-			isa = PBXTargetDependency;
-			target = 2A2EEAB83A22A33498959459;
-		};
-		058CB0850A33206F708D6AA8 = {
-			isa = PBXTargetDependency;
-			target = 0186FF9BB1057FA4436AD7B1;
 		};
 		40BA38013D5364A6DC25930B = {
 			isa = XCConfigurationList;
@@ -1368,10 +1387,10 @@
 			buildPhases = ( );
 			buildRules = ( );
 			dependencies = (
-				AC7EA540D64576B7CE3D9BC0,
-				B8E756E511429778CA5331E1,
-				F00D7056D070662FE88F4B76,
-				058CB0850A33206F708D6AA8,
+				E9980F455F7B7CBD3E7A19C8,
+				4ADB2A01DD2E6381D5842489,
+				DBE2AF00F4542DA4D952685C,
+				EBBC1B5C814C5C7B68E1A1E3,
 			);
 			name = "FDN_ - All";
 			productName = "FDN_";
@@ -1430,7 +1449,7 @@
 			);
 			buildRules = ( );
 			dependencies = (
-				058CB0850A33206F708D6AA8,
+				4D7FBDE5D1FFFAAA04733938,
 			);
 			name = "FDN_ - VST3";
 			productName = "FDN_";
@@ -1502,7 +1521,7 @@
 			);
 			buildRules = ( );
 			dependencies = (
-				058CB0850A33206F708D6AA8,
+				0520C912CC5C4E695F4C4B90,
 			);
 			name = "FDN_ - AU";
 			productName = "FDN_";
@@ -1563,7 +1582,7 @@
 			);
 			buildRules = ( );
 			dependencies = (
-				058CB0850A33206F708D6AA8,
+				981A25861DC1F555EB3B30C7,
 			);
 			name = "FDN_ - Standalone Plugin";
 			productName = "FDN_";

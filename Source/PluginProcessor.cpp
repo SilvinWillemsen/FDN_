@@ -153,6 +153,7 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     float* const channeldataL = buffer.getWritePointer(0);
     float* const channeldataR = totalNumOutputChannels > 1 ? buffer.getWritePointer(1) : nullptr;
     ScopedNoDenormals noDenormals;
+    
     const float* input = buffer.getReadPointer (0);
     if (fdn == nullptr)
         return;
@@ -160,9 +161,9 @@ void Fdn_AudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
     {
         totInput = (input[i] + (t == 0 ? 1.0 : 0.0)) * 0.5;
         output = fdn->calculate (totInput);
-        channeldataL[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
+        channeldataL[i] = Global::limit ((totInput * 3.0 * dryGain + (1.0 - dryGain) * output) * 0.25, -1, 1);
         if (channeldataR != nullptr)
-            channeldataR[i] = Global::limit (totInput * dryGain + (1.0 - dryGain) * output, -1, 1);
+            channeldataR[i] = Global::limit ((totInput * 3.0 * dryGain + (1.0 - dryGain) * output) * 0.25, -1, 1);
         ++t;
         ++tt;
     }
