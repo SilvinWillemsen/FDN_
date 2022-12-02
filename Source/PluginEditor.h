@@ -104,5 +104,7 @@ private:
     long time;
     double cpuUsageGraphicsValue;
 
+    DialogWindow* dlgWindow;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fdn_AudioProcessorEditor)
 };

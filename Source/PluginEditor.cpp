@@ -565,11 +565,8 @@ void Fdn_AudioProcessorEditor::changeListenerCallback (ChangeBroadcaster* source
 
 void Fdn_AudioProcessorEditor::openAdvancedSettings()
 {
-    DialogWindow::LaunchOptions dlg;
-    int dlgModal = -1;
     addAndMakeVisible (advancedSettingsWindow.get());
 
-    dlg.dialogTitle = "Advanced Settings";
-    dlg.content.set (advancedSettingsWindow.get(), false);
-    dlgModal = dlg.runModal();
+    dlgWindow->showDialog("Advanced Settings", advancedSettingsWindow.get(), this, getLookAndFeel().findColour(ResizableWindow::backgroundColourId), true);
+
 }
